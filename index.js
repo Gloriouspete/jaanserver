@@ -79,7 +79,7 @@ const setpayment = async (data) => {
   const { userid, phone, deposit, Status, amount, date } = data;
 
   try {
-    const query = `INSERT INTO transactions(userid,phone, service, status, price, date) VALUES (?,?,?,?,?,?)`;
+    const query = `INSERT INTO transactions(userid,recipient, service, status, price, date) VALUES (?,?,?,?,?,?)`;
     const results = await executor(query, [
       userid,
       phone,
