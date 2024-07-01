@@ -22,9 +22,10 @@ async function AdminLogin(req, res) {
     const user = results[0];
     const { userid } = user;
     console.log("check number");
-    const userpassword = user.password.toString();
+    const hashedpass = user.password;
+    const unhashpass = jwt.verify(hashedpass,secretKey);
+    const userpassword = unhashpass.password;
     const intpassword = password.toString();
-    
     if (userpassword !== intpassword) {
       console.log("Incorrect password", intpassword, userpassword);
       return res.status(200).json({
