@@ -103,7 +103,7 @@ async function Buydata(req, res) {
 
   } catch (error) {
       console.error(error.response?.data);
-      res.status(500).json({message:'Internal Server Error',success:false});
+      res.status(500).json({message:'Currently Unable to purchase data, kindly try agin later',success:false});
   }
   finally {
       // Release transaction lock
