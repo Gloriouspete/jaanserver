@@ -18,7 +18,7 @@ async function Genaccount(req, res) {
       .then(async (results) => {
         const mydata = results.data;
         const { bankName, accountNumber } = mydata;
-        const fact = await setBank(bankName, accountNumber, userid);
+        const fact = await setBank(bankName, accountNumber,name, userid);
         if (fact) {
           res.status(200).json({
             success: true,
@@ -49,10 +49,11 @@ async function Genaccount(req, res) {
   }
 }
 
-const setBank = async (bankname, accountnumber, userid) => {
+const setBank = async (bankname, accountnumber,name, userid) => {
   try {
-    const query = `UPDATE users SET bankname = ? , accountnumber = ? where userid = ?`;
-    executor(query, [bankname, accountnumber, userid]).then((response) => {
+    const customerbankname = 'Jaan - ' + name.slice(0,3);
+    const query = `UPDATE users SET bankname = ? , accountnumber = ?, accountname = ? where userid = ?`;
+    executor(query, [bankname, accountnumber,customerbankname, userid]).then((response) => {
       return true;
     });
   } catch (error) {
