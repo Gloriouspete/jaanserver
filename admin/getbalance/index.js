@@ -9,21 +9,20 @@ const Getbalance = async (req, res) => {
     let config = {
       method: "get",
       maxBodyLength: Infinity,
-      url: "https://api.connectvaluedataservice.com/api/v1/user/account",
+      url: "https://datastation.com.ng/api/user",
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${datasecret}`,
+        Authorization: `Token ${datasecret}`,
       },
       data: null,
     };
     const response = await axios(config);
     const result = response.data;
     console.log(result);
-    const balance = result.user.balance;
     return res.status(200).json({
       success: true,
       message: "Successfully Returned",
-      data: balance,
+      data: result,
     });
   } catch (error) {
     console.error("Error finding user credentials:", error);

@@ -17,7 +17,15 @@ async function Manualfund(req, res) {
     const selectUserQuery = `UPDATE users SET credit = credit + ${theamount} where email = ?`;
     executor(selectUserQuery, [email])
       .then(async (results) => {
-        await setpayment(userid, phone, "funding", "sucessful", amount,gete());
+        const data = {
+          userid,
+          phone,
+          deposit: "funding",
+          Status: "sucessful",
+          amount,
+          date: gete(),
+        };
+        await setpayment(data);
         return res.status(200).json({
           success: true,
           message: "Transaction successfully completed",
@@ -26,10 +34,13 @@ async function Manualfund(req, res) {
       })
       .catch((error) => {
         console.error("Error finding user credentials:", error);
-        return res.status(500).json({ error: "Internal server error" });
+        return res
+          .status(500)
+          .json({ success: false, message: "Unable to fund" });
       });
   } catch (error) {
     console.log(error);
+    return res.status(500).json({ success: false, message: "Unable to fund " });
   }
 }
 
