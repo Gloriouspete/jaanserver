@@ -46,6 +46,7 @@ const Editelectric = require("./admin/price/changeelec.js");
 const GetPrice = require("./routes/price/price.js");
 const Resetpass = require("./routes/resetpass/reset.js");
 const Genaccount = require("./routes/genaccount/index.js");
+const Kyc = require("./routes/kyc/index.js");
 app.use((req, res, next) => {
   res.setHeader("Access-Control-Allow-Origin", "*");
   res.setHeader(
@@ -197,6 +198,7 @@ app.post("/api/v1/getcable", Getcable);
 app.post("/api/v1/buycable", Buycable);
 
 app.post("/api/v1/buyelectric", Buyelectric);
+app.post("/api/v1/kyc", Kyc);
 app.get("/api/v1/genaccount", Genaccount);
 
 app.get("/api/v1/getelectric", Getelectric);
