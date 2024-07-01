@@ -7,4 +7,9 @@ const func = (password) =>{
     console.log(token)
 }
 
-func('Ubbh47&0')
+const gete =() =>{
+    const date = new Date()
+   
+    console.log(date.toISOString().slice(0,19).replace("T"," "))
+}
+gete()
