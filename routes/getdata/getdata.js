@@ -22,7 +22,7 @@ async function Getdata (req,res) {
                 transformedData = transformData(response.data.MTN_PLAN,type);
                 break;
             case 'glo':
-                transformedData = transformData(response.data.GLO_PLAN),type;
+                transformedData = transformData(response.data.GLO_PLAN,type);
                 break;
             case '9mobile':
                 transformedData = transformData(response.data['9MOBILE_PLAN'],type);
