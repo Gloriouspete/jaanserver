@@ -15,7 +15,7 @@ async function Deleteuser (req,res) {
             console.error('Error finding user credentials:', error);
             return res.status(200).json({
                 success: false,
-                message: 'Error deleting user',
+                message: 'Currently unable to delete user',
                 data: null
             });
         })
