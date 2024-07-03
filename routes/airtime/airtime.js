@@ -78,7 +78,9 @@ const Airtime = async (req, res) => {
       const response = await axios(config);
       const responseData = response.data;
 
-      const { mobile_number, Status, plan_network, create_date } = responseData;
+      const { mobile_number, Status, plan_network } = responseData;
+      const newdate = new Date()
+      const create_date  = newdate.toISOString()
       const imade = { userid, recipient:mobile_number, Status, network:plan_network, amount, create_date };
 
       await airtimetran(imade);

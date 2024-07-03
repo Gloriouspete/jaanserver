@@ -35,7 +35,7 @@ const Totalfund = async () => {
 
 const AllTran = async () => {
     try {
-        const selectUserQuery = 'SELECT * FROM transactions';
+        const selectUserQuery = 'SELECT transactions.* , users.user_name FROM transactions JOIN users ON transactions.userid = users.userid';
         const result = await executor(selectUserQuery, [])
         if (result) {
             console.warn(result ,'see total fund')

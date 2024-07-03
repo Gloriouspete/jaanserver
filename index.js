@@ -78,7 +78,7 @@ app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
 
 const setpayment = async (data) => {
-  const { userid, phone, deposit, Status, amount, date } = data;
+  const { userid, phone, deposit, Status, amount, create_date } = data;
 
   try {
     const query = `INSERT INTO transactions(userid,recipient, service, status, price, date) VALUES (?,?,?,?,?,?)`;
@@ -88,7 +88,7 @@ const setpayment = async (data) => {
       deposit,
       Status,
       amount,
-      date,
+      create_date,
     ]);
     console.log("successful!", results);
     // Assuming you want to return the results
@@ -118,7 +118,9 @@ const paymentSuccess = async (userid, amount, date) => {
 
     const deposit = "Funding";
     const Status = "successful";
-    const imade = { userid, phone, deposit, Status, amount, date };
+    const newdate = new Date()
+    const create_date  = newdate.toISOString()
+    const imade = { userid, phone, deposit, Status, amount, create_date };
 
     await setpayment(imade);
     return Status;

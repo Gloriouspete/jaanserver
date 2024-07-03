@@ -47,7 +47,7 @@ const secretKey = process.env.SECRET;
             if (!response) {
                 return res.status(500).json({
                     success: false,
-                    message: 'There is an error signing up, please try again later',
+                    message: 'There is an issue generating an automatic account for you, please try again later',
                     data: null
                 });
             }
@@ -71,7 +71,7 @@ const secretKey = process.env.SECRET;
             console.error('Error during user signup:', error);
             return res.status(500).json({
                 success: false,
-                message: 'There is an error signing up, please try again later',
+                message: 'We are currently unable to sign you up, please try again later',
                 data: null
             });
         }
