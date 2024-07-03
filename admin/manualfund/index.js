@@ -55,7 +55,7 @@ const setpayment = async (data) => {
       deposit,
       Status,
       amount,
-      date,
+      create_date,
     ]);
     console.log("successful!", results);
     return true;
