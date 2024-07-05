@@ -10,11 +10,11 @@ const executor = require("../../config/db.js");
         message: "Server authentication failed, Contact support",
       });
     }
-    const { refid } = results[0];
+    const { refer_code } = results[0];
     return res.status(200).json({
       success: true,
       message: "Successfully returned",
-      data: refid,
+      data: refer_code,
     });
   } catch (error) {
     console.error("Error finding user credentials:", error);
