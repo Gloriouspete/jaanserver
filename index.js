@@ -47,6 +47,8 @@ const GetPrice = require("./routes/price/price.js");
 const Resetpass = require("./routes/resetpass/reset.js");
 const Genaccount = require("./routes/genaccount/index.js");
 const Kyc = require("./routes/kyc/index.js");
+const GetRefid = require("./routes/referral/getrefid.js");
+const GetReferrals = require("./routes/referral/getref.js");
 app.use((req, res, next) => {
   res.setHeader("Access-Control-Allow-Origin", "*");
   res.setHeader(
@@ -118,8 +120,8 @@ const paymentSuccess = async (userid, amount, date) => {
 
     const deposit = "Funding";
     const Status = "successful";
-    const newdate = new Date()
-    const create_date  = newdate.toISOString()
+    const newdate = new Date();
+    const create_date = newdate.toISOString();
     const imade = { userid, phone, deposit, Status, amount, create_date };
 
     await setpayment(imade);
@@ -241,6 +243,8 @@ app.get("/admin/cableprice", Getcableprice);
 app.get("/admin/datatransaction", Datatransaction);
 
 app.get("/admin/airtimetransaction", Airtimetransaction);
+app.get("/api/v1/getrefid", GetRefid);
+app.get("/api/v1/getref", GetReferrals);
 
 const seedata = async (network) => {
   const url = `https://api.connectvaluedataservice.com/api/v1/transactions/data`;
