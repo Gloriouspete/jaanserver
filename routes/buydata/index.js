@@ -125,10 +125,7 @@ const setData = async (data) => {
     create_date,
   } = data;
 
-    const parsedDate = new Date(create_date);
-    const formattedDate = `${parsedDate.getFullYear()}-${(parsedDate.getMonth() + 1).toString().padStart(2, '0')}-${parsedDate.getDate().toString().padStart(2, '0')} 
-    ${parsedDate.getHours().toString().padStart(2, '0')}:${parsedDate.getMinutes().toString().padStart(2, '0')}:${parsedDate.getSeconds().toString().padStart(2, '0')}`;
-
+   
   try {
     const query = `INSERT INTO transactions (userid, recipient, status, price, date, network, plan,service) VALUES (?,?,?,?,?,?,?,?)`;
     executor(query, [
@@ -136,7 +133,7 @@ const setData = async (data) => {
       recipient,
       Status,
       amount,
-      formattedDate,
+      create_date,
       network,
       plan,
       "data",

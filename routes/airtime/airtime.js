@@ -118,19 +118,10 @@ const airtimetran = async (data) => {
     Status,
     network,
     amount,
-    created_date,
+    create_date,
   } = data;
   // console.log(data, "see data o");
-  const parsedDate = new Date(created_date);
-  const formattedDate = `${parsedDate.getFullYear()}-${(
-    parsedDate.getMonth() + 1
-  )
-    .toString()
-    .padStart(2, "0")}-${parsedDate.getDate().toString().padStart(2, "0")} 
-      ${parsedDate.getHours().toString().padStart(2, "0")}:${parsedDate
-    .getMinutes()
-    .toString()
-    .padStart(2, "0")}:${parsedDate.getSeconds().toString().padStart(2, "0")}`;
+  
 
   try {
     const query = `INSERT INTO transactions(userid , recipient, status, price, date, network,service) VALUES (?,?,?,?,?,?,?)`;
@@ -139,7 +130,7 @@ const airtimetran = async (data) => {
       recipient,
       Status,
       amount,
-      formattedDate,
+      create_date,
       network,
       "airtime",
     ])
