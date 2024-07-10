@@ -49,6 +49,9 @@ const Genaccount = require("./routes/genaccount/index.js");
 const Kyc = require("./routes/kyc/index.js");
 const GetRefid = require("./routes/referral/getrefid.js");
 const GetReferrals = require("./routes/referral/getref.js");
+const Createcoupon = require("./admin/coupon/createcoupon.js");
+const Deletecoupon = require("./admin/coupon/deletecoupon.js");
+const Createcoupons = require("./routes/coupon/create.js");
 app.use((req, res, next) => {
   res.setHeader("Access-Control-Allow-Origin", "*");
   res.setHeader(
@@ -208,6 +211,8 @@ app.get("/api/v1/genaccount", Genaccount);
 app.get("/api/v1/getelectric", Getelectric);
 app.get("/api/v1/getprice", GetPrice);
 
+app.get("/api/v1/createcoupon", Createcoupons);
+
 app.get("/admin/getusers", Getusers);
 
 app.post("/admin/login", AdminLogin);
@@ -243,7 +248,13 @@ app.get("/admin/cableprice", Getcableprice);
 app.get("/admin/datatransaction", Datatransaction);
 
 app.get("/admin/airtimetransaction", Airtimetransaction);
+
+app.post("/admin/createcoupon", Createcoupon);
+
+app.post("/admin/deletecoupon", Deletecoupon);
+
 app.get("/api/v1/getrefid", GetRefid);
+
 app.get("/api/v1/getref", GetReferrals);
 
 const seedata = async (network) => {
