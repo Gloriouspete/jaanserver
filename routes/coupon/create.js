@@ -70,7 +70,8 @@ const Createcoupons = async (req, res) => {
       userid,
       recipient: phone,
       Status:"Successful",
-      network: couponid,
+      network: "coupon",
+      plan:couponid,
       amount,
       create_date,
     };
@@ -96,11 +97,11 @@ const Createcoupons = async (req, res) => {
   }
 };
 const coupontran = async (data) => {
-  const { userid, recipient, Status, network, amount, create_date } = data;
+  const { userid, recipient, Status, network,plan, amount, create_date } = data;
   // console.log(data, "see data o");
 
   try {
-    const query = `INSERT INTO transactions(userid , recipient, status, price, date, network,service) VALUES (?,?,?,?,?,?,?)`;
+    const query = `INSERT INTO transactions(userid , recipient, status, price, date, network,plan,service) VALUES (?,?,?,?,?,?,?)`;
     executor(query, [
       userid,
       recipient,
@@ -108,6 +109,7 @@ const coupontran = async (data) => {
       amount,
       create_date,
       network,
+      plan,
       "coupon",
     ])
       .then((results) => {

@@ -5,16 +5,13 @@ const secretKey = process.env.VT_SAND_SECRET;
 const Gettime = require("./services/getTime.js")
 async function Getelectric(req, res) {
   const load = {
-    "request_id":`${Gettime()}erf`,
-    serviceID: "ikeja-electric",
+    serviceID: "abuja-electric",
     billersCode: "1111111111111",
-    variation_code: "prepaid",
-    amount: 500,
-    phone: "09023469927",
+    type: "prepaid",
   };
   try {
     const response = await axios.post(
-      "https://sandbox.vtpass.com/api/pay",
+      "https://api-service.vtpass.com/api/merchant-verify",
       load,
       {
         headers: {
