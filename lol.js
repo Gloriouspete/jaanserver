@@ -12,7 +12,7 @@ const transporter = createTransport({
   },
   auth: {
     user: 'mcgrin1@gmail.com', 
-    pass: 'HOAR1FI32SCfvayE',
+    pass: process.env.BREVO,
   },
 });
 
