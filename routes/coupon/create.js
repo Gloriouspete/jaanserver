@@ -2,12 +2,12 @@ const executor = require("../../config/db.js");
 require("dotenv").config();
 const NodeCache = require("node-cache");
 const myCache = new NodeCache();
-
+const Email = require("./email.js")
 const Createcoupons = async (req, res) => {
   const userid = req.user.userid;
-
+  const { amount,email } = req.body;
   try {
-    const { amount } = req.body;
+   
     const couponid = generateCouponId();
     const lockExists = myCache.get(`couponLocks:${userid}`);
     if (lockExists) {
@@ -76,10 +76,14 @@ const Createcoupons = async (req, res) => {
       create_date,
     };
     await coupontran(imade);
-      await executor("UPDATE users SET credit = ? WHERE userid = ?", [
+
+    await executor("UPDATE users SET credit = ? WHERE userid = ?", [
         newbalance,
         userid,
       ]);
+    if(email){
+      await Email(email,couponid,amount)
+    }
       return res
       .status(200)
       .json({

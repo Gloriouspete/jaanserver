@@ -72,8 +72,6 @@ app.options(
   })
 );
 
-// Your route handlers go here
-
 app.use(authenticateJWT);
 
 app.get("/", (req, res) => {

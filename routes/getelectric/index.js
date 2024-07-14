@@ -8,7 +8,7 @@ async function Getelectric(req, res) {
   console.log("Received phonenumber:", userid);
   try {
     const response = await axios.get(
-      `https://api.connectvaluedataservice.com/api/v1/transactions/electricity`,
+      `https://api.con`,
       {
         headers: {
           "Content-Type": "application/json",
