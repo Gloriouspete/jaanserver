@@ -7,7 +7,7 @@ const UserCount = async () => {
         const result = await executor(query, [])
         if (result) {
             const newresult = result[0].rowcount
-            console.log(newresult, 'see result')
+       
             return newresult
         }
     }
@@ -22,7 +22,7 @@ const Totalfund = async () => {
         const selectUserQuery = 'SELECT SUM(credit) AS totalbalance FROM users';
         const result = await executor(selectUserQuery, [])
         if (result) {
-            console.warn(result ,'see total fund')
+           
             const mydata = result[0].totalbalance
             return mydata
         }
@@ -38,7 +38,6 @@ const AllTran = async () => {
         const selectUserQuery = 'SELECT transactions.* , users.user_name FROM transactions JOIN users ON transactions.userid = users.userid';
         const result = await executor(selectUserQuery, [])
         if (result) {
-            console.warn(result ,'see total fund')
             const mydata = result.reverse()
             return mydata
         }
@@ -54,7 +53,6 @@ const CreditTran = async () => {
         const selectUserQuery = `SELECT SUM(price) as totalprice FROM transactions where service = 'funding'`;
         const result = await executor(selectUserQuery, [])
         if (result) {
-            console.warn(result ,'see total fund')
             const mydata = result[0].totalprice
             return mydata
         }
@@ -69,7 +67,6 @@ const DebitTran = async () => {
         const selectUserQuery = `SELECT SUM(price) as totalfund FROM transactions where service != 'funding'`;
         const result = await executor(selectUserQuery, [])
         if (result) {
-            console.warn(result ,'see total fund')
             const mydata = result[0].totalfund
             return mydata
         }

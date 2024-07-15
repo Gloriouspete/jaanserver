@@ -12,7 +12,7 @@ const Createcoupons = async (req, res) => {
     const lockExists = myCache.get(`couponLocks:${userid}`);
     if (lockExists) {
       console.log("Existing Transaction in progress");
-      return res.status(200).json({
+      return res.status(429).json({
         success: false,
         message: "Too Many Requests",
         data: null,
@@ -32,16 +32,7 @@ const Createcoupons = async (req, res) => {
     }
 
     const { pin: mypin, phone, credit } = userData;
-    console.log("this is userdata", credit);
-
-    if (mypin.toString() !== pincode.toString()) {
-      console.log("Incorrect pin");
-      return res.status(200).json({
-        success: false,
-        message: "Incorrect Pin",
-        data: null,
-      });
-    }
+    console.warn("this is userdata", credit);
 
     const balancc = Number(credit);
     const amountcc = Number(amount);
@@ -56,14 +47,10 @@ const Createcoupons = async (req, res) => {
       });
     }
 
-    const insertCouponQuery =
-      "INSERT INTO coupon (couponid, amount,creator) VALUES (?, ?,?)";
+    const insertCouponQuery = "INSERT INTO coupon (couponid, amount,creator) VALUES (?, ?,?)";
 
     await executor(insertCouponQuery, [couponid, amount, userid]);
-
     console.log("Inserted Coupon into the database successfully");
-
-    
     const newdate = new Date();
     const create_date = newdate.toISOString();
     const imade = {
@@ -84,15 +71,13 @@ const Createcoupons = async (req, res) => {
     if(email){
       await Email(email,couponid,amount)
     }
-      return res
-      .status(200)
-      .json({
+    return res.status(200).json({
         message: `You have successfully created a coupon with ID ${couponid} with amount ${amount}`,
         token: token,
         success: true,
-      });
+    });
   } catch (error) {
-    console.error(error.response?.data);
+    console.error(error);
     return res.status(500).json({
       success: false,
       message: "Coupon Purchase Failed",
