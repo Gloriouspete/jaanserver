@@ -55,6 +55,8 @@ const Createcoupons = require("./routes/coupon/create.js");
 const Deletemessage = require("./admin/message/delete.js");
 const Createmessage = require("./admin/message/create.js");
 const GetPopup = require("./routes/popup/index.js");
+const Viewcoupon = require("./admin/coupon/viewcoupon.js");
+const Viewmessage = require("./admin/message/viewmessage.js");
 app.use((req, res, next) => {
   res.setHeader("Access-Control-Allow-Origin", "*");
   res.setHeader(
@@ -257,6 +259,10 @@ app.post("/admin/deletecoupon", Deletecoupon);
 app.post("/admin/createmessage", Createmessage);
 
 app.post("/admin/deletemessage", Deletemessage);
+
+app.get("/admin/viewcoupon", Viewcoupon);
+
+app.get("/admin/viewmessage", Viewmessage);
 
 app.get("/api/v1/getrefid", GetRefid);
 
