@@ -82,7 +82,7 @@ async function Buyelectric(req, res) {
         userid,
       ]);
       return res.status(200).json({
-        message: `Your Electric Purchase Transaction was Successful and the token is ${token}`,
+        message: `Your Electric Purchase Transaction was Successful and the token is ${Token}`,
         success: true,
       });
     } else if (responseData.code === "099") {
@@ -92,7 +92,7 @@ async function Buyelectric(req, res) {
       });
     } else {
       return res.status(500).json({
-        message: "Electricity Purchase Failed, Kindly Try Again later ",
+        message: `Electricity Purchase Failed, Kindly Try Again later ${responseData.code}`,
         success: false,
       });
     }
