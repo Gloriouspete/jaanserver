@@ -74,7 +74,6 @@ const Createcoupons = async (req, res) => {
     }
     return res.status(200).json({
         message: `You have successfully created a coupon with ID ${couponid} with amount ${amount}`,
-        token: token,
         success: true,
     });
   } catch (error) {
