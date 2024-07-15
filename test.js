@@ -4,8 +4,9 @@ const apiKey = process.env.VT_SAND_API;
 const secretKey = process.env.VT_SAND_SECRET;
 const Gettime = require("./services/getTime.js")
 async function Getelectric(req, res) {
+  const requesttime = Gettime();
   const load = {
-    "request_id":`${Gettime()}erf`,
+    "request_id":`${requesttime}erf`,
     serviceID: "ikeja-electric",
     billersCode: "1111111111111",
     variation_code: "prepaid",

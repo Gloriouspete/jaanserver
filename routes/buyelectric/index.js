@@ -36,12 +36,12 @@ async function Buyelectric(req, res) {
     } else if (balance >= intamount) {
   */
     let data = {
-      request_id: `${requesttime}erf`,
+      "request_id": `${requesttime}erf`,
       billersCode: 1111111111111,
-      serviceID: serviceID,
-      variation_code: variation_code,
-      phone: phone,
-      amount: amount,
+      serviceID: serviceID.toString(),
+      variation_code: variation_code.toString(),
+      phone: phone.toString(),
+      amount: amount.toString(),
     };
     const response = await axios.post(
       `https://sandbox.vtpass.com/api/pay`,
