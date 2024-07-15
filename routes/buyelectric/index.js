@@ -13,7 +13,7 @@ async function Buyelectric(req, res) {
 
   try {
     const requesttime = Gettime();
-    /*
+  
     const [userData] = await executor(
       "SELECT credit FROM users WHERE userid = ?",
       [userid]
@@ -34,7 +34,6 @@ async function Buyelectric(req, res) {
         success: false,
       });
     } else if (balance >= intamount) {
-  */
     let data = {
       "request_id": `${requesttime}erf`,
       billersCode: 1111111111111,
@@ -85,6 +84,7 @@ async function Buyelectric(req, res) {
         message: `Your Electric Purchase Transaction was Successful and the token is ${Token}`,
         success: true,
       });
+    }
     } else if (responseData.code === "099") {
       return res.status(500).json({
         message: `Electricity Purchase is processing, Kindly contact support with the code ${requesttime} `,
