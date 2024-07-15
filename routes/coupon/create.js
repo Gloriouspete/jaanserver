@@ -4,6 +4,7 @@ const NodeCache = require("node-cache");
 const myCache = new NodeCache();
 const Email = require("./email.js")
 const Createcoupons = async (req, res) => {
+  console.log("got here")
   const userid = req.user.userid;
   const { amount,email } = req.body;
   try {

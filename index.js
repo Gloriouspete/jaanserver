@@ -209,7 +209,7 @@ app.get("/api/v1/genaccount", Genaccount);
 app.get("/api/v1/getelectric", Getelectric);
 app.get("/api/v1/getprice", GetPrice);
 
-app.get("/api/v1/createcoupon", Createcoupons);
+app.post("/api/v1/createcoupon", Createcoupons);
 
 app.get("/admin/getusers", Getusers);
 
