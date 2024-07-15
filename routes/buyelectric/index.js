@@ -9,7 +9,6 @@ async function Buyelectric(req, res) {
   const { userid } = req.user;
   const { billersCode, serviceID, variation_code, phone, amount } = req.body;
   const datas = { billersCode, serviceID, variation_code, phone, amount };
-  console.log(datas, "lol");
   const intamount = parseInt(amount, 10);
 
   try {
@@ -43,7 +42,6 @@ async function Buyelectric(req, res) {
       phone: phone,
       amount: amount,
     };
-    console.warn(data, "uggh");
     const response = await axios.post(
       `https://sandbox.vtpass.com/api/pay`,
       data,
@@ -56,7 +54,6 @@ async function Buyelectric(req, res) {
     );
     const responseData = response.data;
     console.log(responseData);
-
     if (responseData.code === "000") {
       const {
         content: {
@@ -106,7 +103,7 @@ async function Buyelectric(req, res) {
       success: false,
       data: error,
     };
-    console.log(error);
+    console.warn(error);
     res.status(500).json(responsed);
   }
 }
@@ -135,7 +132,7 @@ const setElectric = async (data) => {
         console.log("successful!", results);
       })
       .catch((error) => {
-        console.log("error setting transaction", mydate);
+        console.warn("error setting transaction", mydate);
       });
   } catch (error) {}
 };
