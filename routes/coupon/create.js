@@ -65,8 +65,8 @@ const Createcoupons = async (req, res) => {
     };
     await coupontran(imade);
 
-    await executor("UPDATE users SET credit = ? WHERE userid = ?", [
-        newbalance,
+    await executor("UPDATE users SET credit = credit - ? WHERE userid = ?", [
+        amountcc,
         userid,
       ]);
     if(email){
@@ -90,7 +90,7 @@ const coupontran = async (data) => {
   // console.log(data, "see data o");
 
   try {
-    const query = `INSERT INTO transactions(userid , recipient, status, price, date, network,plan,service) VALUES (?,?,?,?,?,?,?)`;
+    const query = `INSERT INTO transactions(userid , recipient, status, price, date, network,plan,service) VALUES (?,?,?,?,?,?,?,?)`;
     executor(query, [
       userid,
       recipient,
@@ -105,10 +105,10 @@ const coupontran = async (data) => {
         // console.log("successfully inserted into transaction");
       })
       .catch((error) => {
-        // console.log("error setting transaction");
+        console.log(error);
       });
   } catch (error) {
-    // console.log(error);
+    console.warn(error);
   }
 };
 function generateCouponId() {
