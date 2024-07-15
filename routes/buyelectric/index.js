@@ -13,6 +13,7 @@ async function Buyelectric(req, res) {
 
   try {
     const requesttime = Gettime();
+    /*
     const [userData] = await executor(
       "SELECT credit FROM users WHERE userid = ?",
       [userid]
@@ -33,7 +34,7 @@ async function Buyelectric(req, res) {
         success: false,
       });
     } else if (balance >= intamount) {
-  
+  */
     let data = {
       request_id: `${requesttime}erf`,
       billersCode: 1111111111111,
@@ -59,7 +60,7 @@ async function Buyelectric(req, res) {
         content: {
           transactions: { unique_element, phone, product_name },
         },
-        token,
+        Token,
         purchased_code,
         units,
       } = responseData;
@@ -70,7 +71,7 @@ async function Buyelectric(req, res) {
         recipient: unique_element,
         Status: "successful",
         name: product_name,
-        token: token || purchased_code,
+        token: Token || purchased_code,
         plan: units,
         amount,
       };
@@ -95,7 +96,7 @@ async function Buyelectric(req, res) {
         success: false,
       });
     }
-  }
+  
   } catch (error) {
     const responsed = {
       message:

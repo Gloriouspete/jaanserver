@@ -52,6 +52,9 @@ const GetReferrals = require("./routes/referral/getref.js");
 const Createcoupon = require("./admin/coupon/createcoupon.js");
 const Deletecoupon = require("./admin/coupon/deletecoupon.js");
 const Createcoupons = require("./routes/coupon/create.js");
+const Deletemessage = require("./admin/message/delete.js");
+const Createmessage = require("./admin/message/create.js");
+const GetPopup = require("./routes/popup/index.js");
 app.use((req, res, next) => {
   res.setHeader("Access-Control-Allow-Origin", "*");
   res.setHeader(
@@ -208,7 +211,7 @@ app.get("/api/v1/genaccount", Genaccount);
 
 app.get("/api/v1/getelectric", Getelectric);
 app.get("/api/v1/getprice", GetPrice);
-
+app.get("/api/v1/getpopup", GetPopup);
 app.post("/api/v1/createcoupon", Createcoupons);
 
 app.get("/admin/getusers", Getusers);
@@ -250,6 +253,10 @@ app.get("/admin/airtimetransaction", Airtimetransaction);
 app.post("/admin/createcoupon", Createcoupon);
 
 app.post("/admin/deletecoupon", Deletecoupon);
+
+app.post("/admin/createmessage", Createmessage);
+
+app.post("/admin/deletemessage", Deletemessage);
 
 app.get("/api/v1/getrefid", GetRefid);
 
