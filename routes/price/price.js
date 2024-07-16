@@ -3,7 +3,7 @@ require("dotenv").config();
 const datasecret = process.env.DATA_SECRET;
 async function GetPrice(req, res) {
   try {
-    const query = `SELECT cableprice,electricprice FROM admin`;
+    const query = `SELECT cableprice,electricprice FROM admin where username = 'Jaan'`;
     const response = await executor(query, []);
     console.log(response);
     res

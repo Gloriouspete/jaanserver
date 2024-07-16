@@ -1,11 +1,18 @@
 const executor = require("../../config/db.js");
 
-const Editdata = (req, res) => {
+const Editprice = (req, res) => {
   const userid = req.user.userid;
-  const { price ,planid} = req.body;
-  console.log("Received phonenumber:", userid);
-  const selectUserQuery = `UPDATE datatable SET price = ? where planid = ?`;
-  executor(selectUserQuery, [price,planid])
+  const { price ,plan} = req.body;
+  let changeQuery;
+  if(plan === "electric"){
+    changeQuery = `update admin set electricprice = ? where username = 'Jaan'`
+  }
+  else if (plan === "cable"){
+    changeQuery = `update admin set cableprice = ? where username = 'Jaan'`
+  }
+
+
+  executor(changeQuery, [price])
     .then((results) => {
       return res.status(200).json({
         success: true,
@@ -18,4 +25,4 @@ const Editdata = (req, res) => {
       return res.status(500).json({ error: "Internal server error" });
     });
 };
-module.exports = Editdata;
+module.exports = Editprice;

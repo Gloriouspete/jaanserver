@@ -18,9 +18,9 @@ const Createcoupon = async(req,res) =>{
             }
     
             const insertCouponQuery =
-                'INSERT INTO coupon (couponid, amount,creator) VALUES (?, ?,?)';
+                'INSERT INTO coupon (couponid, amount,creator,admin) VALUES (?, ?,?,?)';
     
-            await executor(insertCouponQuery, [couponid, amount,userid]);
+            await executor(insertCouponQuery, [couponid, amount,userid,"true"]);
     
             console.log('Inserted Coupon into the database successfully');
     

@@ -3,14 +3,12 @@ require("dotenv").config();
 const NodeCache = require("node-cache");
 const myCache = new NodeCache();
 const Email = require("./email.js")
-const Createcoupons = async (req, res) => {
+const Redeemcoupon = async (req, res) => {
   console.log("got here")
   const userid = req.user.userid;
-  const { amount,email } = req.body;
+  const { couponid } = req.body;
   try {
-   
-    const couponid = generateCouponId();
-    const lockExists = myCache.get(`couponLocks:${userid}`);
+    const lockExists = myCache.get(`redeemLocks:${userid}`);
     if (lockExists) {
       console.log("Existing Transaction in progress");
       return res.status(429).json({
@@ -20,38 +18,47 @@ const Createcoupons = async (req, res) => {
       });
     }
 
-    myCache.set(`couponLocks:${userid}`, "locked", 10);
+    myCache.set(`redeemLocks:${userid}`, "locked", 10);
 
     const [userData] = await executor(
       "SELECT pin, phone, credit FROM users WHERE userid = ?",
       [userid]
     );
+    const [checkCoupon] = await executor(
+        "SELECT * FROM coupon WHERE couponid = ?",
+        [couponid]
+      );
+    const [checkUsed] = await executor(
+        "SELECT * FROM coupon_user WHERE couponid = ?",
+        [couponid]
+      );
 
     if (!userData) {
       console.error("Account not found");
-      return res.json({ success: false, message: "Account not found" });
+      return res.status(404).json({ success: false, message: "Account not found" });
     }
+    if (!checkCoupon) {
+        console.error("Account not found");
+        return res.status(404).json({ success: false, message: "Invalid Coupon" });
+      }
 
-    const { pin: mypin, phone, credit } = userData;
+    const { user_name, phone, credit } = userData;
+    const {admin,amount} = checkCoupon;
     console.warn("this is userdata", credit);
-
-    const balancc = Number(credit);
     const amountcc = Number(amount);
-    const newbalance = balancc - amountcc;
-
-    if (newbalance < 0 || newbalance === undefined) {
-      console.log("Insufficient funds");
-      return res.status(200).json({
+    if ( checkUsed || admin !== "true") {
+      return res.status(400).json({
         success: false,
-        message: "Insufficient Balance",
+        message: "This coupon has been used by another user",
         data: null,
       });
     }
 
-    const insertCouponQuery = "INSERT INTO coupon (couponid, amount,creator,admin) VALUES (?, ?,?,?)";
-
-    await executor(insertCouponQuery, [couponid, amount, userid,"false"]);
-    console.log("Inserted Coupon into the database successfully");
+    const insertCouponQuery = "INSERT INTO coupon_user (userid, couponid,username) VALUES (?, ?,?)";
+    const updateBalanceQuery = "UPDATE users SET credit = credit + ? where userid = ?"
+    await executor(insertCouponQuery, [userid, couponid, user_name]);
+    await executor(updateBalanceQuery, [amountcc, userid]);
+    console.log("Updated Coupon into the database successfully");
     const newdate = new Date();
     const create_date = newdate.toISOString();
     const imade = {
@@ -64,16 +71,8 @@ const Createcoupons = async (req, res) => {
       create_date,
     };
     await coupontran(imade);
-
-    await executor("UPDATE users SET credit = credit - ? WHERE userid = ?", [
-        amountcc,
-        userid,
-      ]);
-    if(email){
-      await Email(email,couponid,amount)
-    }
     return res.status(200).json({
-        message: `You have successfully created a coupon with ID ${couponid} with amount ${amount}`,
+        message: `You have successfully redeemed a coupon with ID ${couponid} with the amount of ${amount} naira`,
         success: true,
     });
   } catch (error) {
@@ -111,33 +110,7 @@ const coupontran = async (data) => {
     console.warn(error);
   }
 };
-function generateCouponId() {
-  // Helper function to generate a random capital letter
-  function getRandomLetter() {
-    const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-    return letters.charAt(Math.floor(Math.random() * letters.length));
-  }
 
-  // Helper function to generate a random number
-  function getRandomNumber() {
-    return Math.floor(Math.random() * 10); // Generates a number between 0 and 9
-  }
 
-  // Generate three random letters
-  let lettersPart = "";
-  for (let i = 0; i < 3; i++) {
-    lettersPart += getRandomLetter();
-  }
-
-  // Generate six random numbers
-  let numbersPart = "";
-  for (let i = 0; i < 6; i++) {
-    numbersPart += getRandomNumber();
-  }
-
-  // Concatenate letters and numbers to form the referral ID
-  const referralId = lettersPart + numbersPart;
-  return referralId;
-}
-
-module.exports = Createcoupons;
+module.exports = Redeemcoupon;
+ 

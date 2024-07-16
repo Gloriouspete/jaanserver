@@ -3,7 +3,7 @@ const executor = require("../../config/db.js");
 const Getcableprice = (req,res) => {
         const userid = req.user.userid;
         console.log('Received phonenumber:', userid);
-        const selectUserQuery = `SELECT cableprice FROM admin`;
+        const selectUserQuery = `SELECT cableprice FROM admin where username = 'Jaan'`;
         executor(selectUserQuery, [])
             .then(results => {
                 return res.status(200).json({
