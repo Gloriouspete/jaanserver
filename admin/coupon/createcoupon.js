@@ -24,7 +24,7 @@ const Createcoupon = async(req,res) =>{
     
             console.log('Inserted Coupon into the database successfully');
     
-            return res.status(200).json({ message: `You have successfully created a coupon with ID ${couponid} with amount ${amount}`, token: token, success: true });
+            return res.status(200).json({ message: `You have successfully created a coupon with ID ${couponid} with amount ${amount}`, success: true });
         } catch (error) {
             console.error('Error during coupon creation:', error);
             res.status(500).json({ success: false, message: 'Error during coupon creation', token: null });

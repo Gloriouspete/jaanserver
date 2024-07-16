@@ -3,7 +3,7 @@ require("dotenv").config();
 
 const Deletemessage = (req, res) => {
   try {
-    const messageQuery = `UPDATE TABLE message SET text = ?, status = 'inactive' where id = 1`;
+    const messageQuery = `UPDATE message SET text = ?, status = 'inactive' where id = 1`;
     executor(messageQuery, [""]).then((phoneResults) => {
       res
         .status(200)
