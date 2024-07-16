@@ -32,21 +32,30 @@ const Redeemcoupon = async (req, res) => {
         "SELECT * FROM coupon_user WHERE couponid = ?",
         [couponid]
       );
+      const [checkPersonUsed] = await executor(
+        "SELECT count(*) as thecount FROM coupon_user WHERE couponid = ? and userid = ?",
+        [couponid,userid]
+      );
 
-    if (!userData) {
+    if (!userData || userData.length === 0) {
       console.error("Account not found");
       return res.status(404).json({ success: false, message: "Account not found" });
     }
-    if (!checkCoupon) {
+    if (!checkCoupon || checkCoupon.length === 0) {
         console.error("Account not found");
         return res.status(404).json({ success: false, message: "Invalid Coupon" });
       }
+    if (checkPersonUsed.thecount > 0) {
+        console.error("Coupon already redeemed by user");
+        return res.status(404).json({ success: false, message: "You already redeemed this coupon" });
+      }
+    
 
     const { user_name, phone, credit } = userData;
     const {admin,amount} = checkCoupon;
     console.warn("this is userdata", credit);
     const amountcc = Number(amount);
-    if ( checkUsed || admin !== "true") {
+    if ( checkUsed && admin !== "true") {
       return res.status(400).json({
         success: false,
         message: "This coupon has been used by another user",
