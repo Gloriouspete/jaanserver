@@ -4,7 +4,7 @@ const mydate = new Date();
 const apiKey = process.env.VT_SAND_API;
 const secretKey = process.env.VT_SAND_SECRET;
 const axios = require("axios");
-const Gettime = require("../../services/gettime.js");
+const Gettime = require("../../services/time.js");
 const { makePurchaseRequest, getUserData } = require("./prop.js")
 async function Buyelectric(req, res) {
   const { userid } = req.user;
