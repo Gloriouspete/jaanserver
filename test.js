@@ -2,7 +2,7 @@ require("dotenv").config();
 const axios = require("axios");
 const apiKey = process.env.VT_SAND_API;
 const secretKey = process.env.VT_SAND_SECRET;
-const Gettime = require("./services/getTime.js")
+const Gettime = require("./services/gettime.js")
 async function Getelectric(req, res) {
   const requesttime = Gettime();
   const load = {
