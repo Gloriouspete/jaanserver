@@ -5,19 +5,13 @@ const Getusers = (req, res) => {
   const userid = req.user.userid;
   console.log("Received phonenumber:", userid);
 
-  const selectUserQuery = "SELECT * FROM users";
+  const selectUserQuery = "SELECT * FROM users ORDER BY id DESC";
   executor(selectUserQuery, [])
     .then((results) => {
-      const transform = [];
-      const resu = results.reverse();
-      resu.forEach((element) => {
-        transform.push(element);
-      });
-      console.log(transform, "see data o");
       return res.status(200).json({
         success: true,
         message: "This Admin not found",
-        data: transform,
+        data: results
       });
     })
     .catch((error) => {
