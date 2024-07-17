@@ -45,9 +45,11 @@ async function Manualfund(req, res) {
 }
 
 const setpayment = async (data) => {
-  const { userid, phone, deposit, Status, amount, date } = data;
-
+  const { userid, phone, deposit, Status, amount } = data;
+  const today = new Date();
+  const create_date = today.toISOString()
   try {
+  
     const query = `INSERT INTO transactions(userid,recipient, service, status, price, date,name) VALUES (?,?,?,?,?,?,?)`;
     const results = await executor(query, [
       userid,
