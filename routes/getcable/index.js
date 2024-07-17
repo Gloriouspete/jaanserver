@@ -1,6 +1,6 @@
 require('dotenv').config()
 const axios = require('axios')
-const datasecret = process.env.DATA_SECRET;
+const datasecret = process.env.SECRET;
 
 async function Getcable(req, res) {
   const userid = req.user.userid;
@@ -9,35 +9,26 @@ async function Getcable(req, res) {
   console.log("Received phonenumber:", userid);
   try {
     const response = await axios.get(
-      `https://api.connectvaluedataservice.com/api/v1/transactions/cable/plans/${plans}`,
+      `https://sandbox.vtpass.com/api/service-variations?serviceID=${plans}`,
       {
         headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${authToken}`,
+          "username": "jaanservicesmail@gmail.com",
+          "password": datasecret,
         },
       }
     );
-    const filteredData = [];
-    console.log("check me", response.data.data);
-    response.data.data.varations.forEach((item) => {
-      const amount = parseFloat(item.variation_amount);
-      if (!isNaN(amount)) {
-        filteredData.push({
-          ...item,
-          variation_amount: amount + 50,
-        });
-      }
-    });
+    const responseData = response.data;
+    const variations = responseData.content.varations;
     return res.status(200).json({
       success: true,
       message: "Cable Plans retrieved successfully",
-      data: filteredData,
+      data: variations,
     });
   } catch (error) {
     console.error(error);
     res.status(400).json({
       success: false,
-      message: "User details retrieved successfully",
+      message: "Unable to retrieve plans",
       data: null,
     });
   }

@@ -10,18 +10,19 @@ async function Getelectric(req, res) {
     type: "prepaid",
   });
   try {
-    const response = await axios.get(
-      `https://sandbox.vtpass.com/api/service-variations?serviceID=dstv`,
+    const response = await axios.post(
+      "https://api-service.vtpass.com/api/merchant-verify",
+      load,
       {
         headers: {
-          "username": "jaanservicesmail@gmail.com",
-          "password": `Ubbh47&0`,
+          "api-key": apiKey,
+          "secret-key": secretKey,
         },
       }
     );
     const mydata = response.data;
     
-    console.log("check me", mydata.content.varations);
+    console.log("check me", mydata);
   } catch (error) {
     console.error(error);
   }

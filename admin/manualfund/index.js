@@ -21,7 +21,7 @@ async function Manualfund(req, res) {
           userid,
           phone,
           deposit: "funding",
-          Status: "sucessful",
+          Status: "successful",
           amount,
           date: gete(),
         };
@@ -48,7 +48,7 @@ const setpayment = async (data) => {
   const { userid, phone, deposit, Status, amount, date } = data;
 
   try {
-    const query = `INSERT INTO transactions(userid,recipient, service, status, price, date) VALUES (?,?,?,?,?,?)`;
+    const query = `INSERT INTO transactions(userid,recipient, service, status, price, date,name) VALUES (?,?,?,?,?,?,?)`;
     const results = await executor(query, [
       userid,
       phone,
@@ -56,6 +56,7 @@ const setpayment = async (data) => {
       Status,
       amount,
       create_date,
+      "Manual funding"
     ]);
     console.log("successful!", results);
     return true;

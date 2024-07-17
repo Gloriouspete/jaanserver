@@ -91,7 +91,7 @@ const setpayment = async (data) => {
   const { userid, phone, deposit, Status, amount, create_date } = data;
 
   try {
-    const query = `INSERT INTO transactions(userid,recipient, service, status, price, date) VALUES (?,?,?,?,?,?)`;
+    const query = `INSERT INTO transactions(userid,recipient, service, status, price, date,name) VALUES (?,?,?,?,?,?,?)`;
     const results = await executor(query, [
       userid,
       phone,
@@ -99,6 +99,7 @@ const setpayment = async (data) => {
       Status,
       amount,
       create_date,
+      "Bank funding"
     ]);
     console.log("successful!", results);
     // Assuming you want to return the results
