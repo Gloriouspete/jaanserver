@@ -9,7 +9,7 @@ const Gettime = require("../../services/time.js");
 
 async function makePurchaseRequest({ requesttime, billersCode, serviceID, variation_code, phone, amount }) {
     const data = {
-      request_id: `${requesttime}erf`,
+      request_id: requesttime,
       billersCode: 1111111111111,
       serviceID: serviceID.toString(),
       variation_code: variation_code.toString(),

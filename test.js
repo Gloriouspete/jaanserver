@@ -6,7 +6,7 @@ const Gettime = require("./services/time.js")
 async function Getelectric(req, res) {
   const requesttime = Gettime();
   const load = {
-    "request_id":`${requesttime}erf`,
+    "request_id":requesttime,
     serviceID: "ikeja-electric",
     billersCode: "1111111111111",
     variation_code: "prepaid",
