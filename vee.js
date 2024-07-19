@@ -5,10 +5,10 @@ const secretKey = process.env.VT_SAND_SECRET;
 const datasecret = process.env.SECRET;
 const Gettime = require("./services/time.js")
 async function Getelectric(req, res) {
-  const load = JSON.stringify({
+  const load = {
     serviceID: "dstv",
     billersCode: "1212121212",
-  });
+  };
   try {
     const response = await axios.post(
       "https://sandbox.vtpass.com/api/merchant-verify",

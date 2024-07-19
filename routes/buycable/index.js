@@ -1,139 +1,125 @@
 const executor = require("../../config/db.js");
 require("dotenv").config();
-const datasecret = process.env.DATA_SECRET;
+const mydate = new Date();
+const apiKey = process.env.VT_SAND_API;
+const secretKey = process.env.VT_SAND_SECRET;
 const axios = require("axios");
+const Gettime = require("../../services/time.js");
+const { makePurchaseRequest, getUserData } = require("./prop.js")
 async function Buycable(req, res) {
-  // console.log("git here");
   const { userid } = req.user;
   const { billersCode, serviceID, variation_code, phone, amount } = req.body;
+  const datas = { billersCode, serviceID, variation_code, phone, amount };
   const intamount = parseInt(amount, 10);
+
   try {
-    const [userData] = await executor(
-      "SELECT phonenumber, accountbalance FROM appusers WHERE userid = ?",
-      [userid]
-    );
+    console.log("Environment Variables:", { apiKey, secretKey });
+    console.log("Request Data:", datas);
+    
+    const requesttime = Gettime();
+    console.log("Request Time:", requesttime);
+
+    const userData = await getUserData(userid);
     if (!userData) {
-      // console.error("Account not found");
-      return res
-        .status(404)
-        .json({ message: "User authentication failed, Contact support", success: false });
+      return res.status(404).json({
+        message: "User Details not found, Contact support!",
+        success: false,
+      });
     }
-    const { phonenumber, accountbalance } = userData;
-    const balance = parseInt(accountbalance, 10);
-    if (balance < intamount) {
-      // console.log("no money");
+    const { credit } = userData;
+    const balance = parseInt(credit, 10);
+    if (!balance || balance < intamount) {
       return res.status(402).json({
-        message: "You have Insufficient balance to purchase this plan",
+        message: "You have Insufficient balance to purchase this service",
         success: false,
       });
     } else if (balance >= intamount) {
-      let data = JSON.stringify({
-        billersCode: billersCode,
-        serviceID: serviceID,
-        variation_code: variation_code,
-        phone: phone,
-        amount: amount,
-      });
+      const responseData = await makePurchaseRequest({ requesttime, billersCode, serviceID, variation_code, phone, amount });
 
-      // console.log(data);
-      const response = await axios.post(
-        `https://api.connectvaluedataservice.com/api/v1/transactions/cable/subscribe-cable`,
-        data,
-        {
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${datasecret}`,
+      console.warn("API Response Data:", requesttime);
+
+      if (responseData.code === "000") {
+        const {
+          content: {
+            transactions: { unique_element, phone, product_name },
           },
-        }
-      );
-      const responseData = response.data;
-      // console.log(responseData);
-
-      if (responseData.success === true) {
-        const newbalance = balance - intamount;
-        const { phone:recipient, platform:network, plan, created_at } =
-          responseData.data.service;
+          Token,
+          purchased_code,
+          units,
+        } = responseData;
 
         const imade = {
           userid,
-          phonenumber,
-          recipient,
-          Status: "Success",
-          network,
-          plan,
-          intamount,
-          created_at,
+          network: "Cable",
+          recipient: unique_element,
+          Status: "successful",
+          name: product_name,
+          token: Token || purchased_code,
+          plan: units,
+          amount,
         };
+
         await setCable(imade);
-        await executor(
-          "UPDATE appusers SET accountbalance = ? WHERE userid = ?",
-          [newbalance, userid]
-        );
+        await executor("UPDATE users SET credit = credit - ? WHERE userid = ?", [
+          intamount,
+          userid,
+        ]);
+
         return res.status(200).json({
-          message: `Your ${serviceID} plan Purchase was Successful`,
+          message: `Your Cable Purchase Transaction was Successful`,
+          success: true,
+        });
+      } else if (responseData.code === "099") {
+        return res.status(500).json({
+          message: `Cable Purchase is processing, Kindly contact support with the code ${requesttime} `,
           success: true,
         });
       } else {
-        return res.status(200).json({
-          message: `${serviceID} plan Purchase Failed, Kindly Try Again later`,
+        return res.status(500).json({
+          message: `Cable Purchase Failed, Kindly Try Again later ${responseData.code}`,
           success: false,
         });
       }
     }
   } catch (error) {
-    console.log(error)
-    return res.status(500).json({
-      message: `We apologize, but we’re currently unable to process your ${serviceID} plan purchase. Please try again later.`,
+    console.warn("Error occurred:", error);
+    const responsed = {
+      message: "We apologize, we are currently unable to process your cable plan purchase. Please try again later.",
       success: false,
-    });
+      data: error,
+    };
+    res.status(500).json(responsed);
   }
 }
 
+
 const setCable = async (data) => {
-  const {
-    userid,
-    phonenumber,
-    recipient,
-    Status,
-    network,
-    plan,
-    intamount,
-    created_at,
-  } = data;
+  const { userid, token, recipient, Status, network, plan, amount, name } =
+    data;
 
-  const parsedDate = new Date(created_at);
-  const formattedDate = `${parsedDate.getFullYear()}-${(
-    parsedDate.getMonth() + 1
-  )
-    .toString()
-    .padStart(2, "0")}-${parsedDate.getDate().toString().padStart(2, "0")} 
-        ${parsedDate.getHours().toString().padStart(2, "0")}:${parsedDate
-    .getMinutes()
-    .toString()
-    .padStart(2, "0")}:${parsedDate.getSeconds().toString().padStart(2, "0")}`;
-
+  const newDate = new Date();
+  const formattedDate = newDate.toISOString();
   try {
-    const query = `INSERT INTO transactions (userid,phonenumber, buynumber, status, price, date, network, size,service) VALUES (?,?,?,?,?,?,?,?,?)`;
+    const query = `INSERT INTO transactions (userid,recipient, name, status, price, date, network, token,plan,service) VALUES (?,?,?,?,?,?,?,?,?,?)`;
     executor(query, [
       userid,
-      phonenumber,
       recipient,
+      name,
       Status,
-      intamount,
+      amount,
       formattedDate,
       network,
+      token,
       plan,
-      "cable"
+      "cable",
     ])
       .then((results) => {
-         console.log("successful!", results);
+        console.log("successful!", results);
       })
       .catch((error) => {
-        // console.log("error setting transaction");
+        console.warn("error setting transaction", mydate);
       });
-  } catch (error) {
-     console.log(error);
-  }
+  } catch (error) {}
 };
 
 module.exports = Buycable;

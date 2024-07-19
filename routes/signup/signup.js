@@ -98,31 +98,32 @@ async function Signup(req, res) {
     });
   }
 }
-
 const Addcredit = async (refid) => {
   try {
-    const first = `SELECT * FROM user where refer_code = ?`;
-    const results = await executor(first, refid);
-    if (!results) {
+    const first = `SELECT * FROM users WHERE refer_code = ?`;
+    const results = await executor(first, [refid]);
+    if (results.length === 0) {
       return false;
     }
     const { userid, phone } = results[0];
 
-    const query = `UPDATE users set credit = credit + ? where refer_code = ?`;
-    const response = await executor(query, [200, refid]);
-    console.log("Gave referral 200 credit already");
+    const query = `UPDATE users SET credit = credit + ? WHERE refer_code = ?`;
+    await executor(query, [100, refid]);
+    console.log("Gave referral 100 credit already");
+
     const data = {
       userid,
       phone,
       deposit: "funding",
-      Status: "sucessful",
-      amount,
+      Status: "successful",
+      amount: 100, // Assuming the amount to be added is 100
       date: gete(),
     };
     await setpayment(data);
     return true;
   } catch (error) {
-    console.log("error inserting creidt", error + new Date());
+    console.log("Error inserting credit", error);
+    return false;
   }
 };
 
@@ -130,7 +131,7 @@ const setpayment = async (data) => {
   const { userid, phone, deposit, Status, amount, date } = data;
 
   try {
-    const query = `INSERT INTO transactions(userid,recipient, service, status, price, date,name) VALUES (?,?,?,?,?,?,?)`;
+    const query = `INSERT INTO transactions(userid, recipient, service, status, price, date, name) VALUES (?,?,?,?,?,?,?)`;
     const results = await executor(query, [
       userid,
       phone,
@@ -140,19 +141,17 @@ const setpayment = async (data) => {
       date,
       "Referral Bonus"
     ]);
-    console.log("successful!", results);
+    console.log("Transaction successful!", results);
     return true;
-    // Assuming you want to return the results
   } catch (error) {
-    console.log("error setting transaction");
-    throw error; // Re-throw the error to propagate it
+    console.log("Error setting transaction", error);
+    throw error;
   }
 };
+
 const gete = () => {
   const date = new Date();
-
-  const thedate = date.toISOString();
-  return thedate;
+  return date.toISOString();
 };
 
 function generateReferralId() {

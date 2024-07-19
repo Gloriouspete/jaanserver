@@ -59,6 +59,7 @@ const Viewcoupon = require("./admin/coupon/viewcoupon.js");
 const Viewmessage = require("./admin/message/viewmessage.js");
 const Redeemcoupon = require("./routes/coupon/redeem.js");
 const Editprice = require("./admin/editdata/index.js");
+const Verifycable = require("./routes/verifycable/index.js");
 app.use((req, res, next) => {
   res.setHeader("Access-Control-Allow-Origin", "*");
   res.setHeader(
@@ -220,6 +221,8 @@ app.get("/api/v1/getpopup", GetPopup);
 app.post("/api/v1/createcoupon", Createcoupons);
 
 app.post("/api/v1/redeemcoupon", Redeemcoupon);
+
+app.post("/api/v1/verifycable", Verifycable);
 
 app.get("/admin/getusers", Getusers);
 
