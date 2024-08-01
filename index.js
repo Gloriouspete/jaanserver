@@ -60,6 +60,7 @@ const Viewmessage = require("./admin/message/viewmessage.js");
 const Redeemcoupon = require("./routes/coupon/redeem.js");
 const Editprice = require("./admin/editdata/index.js");
 const Verifycable = require("./routes/verifycable/index.js");
+const Convertpoints = require("./routes/points/redeem.js");
 app.use((req, res, next) => {
   res.setHeader("Access-Control-Allow-Origin", "*");
   res.setHeader(
@@ -275,6 +276,7 @@ app.get("/admin/viewmessage", Viewmessage);
 app.get("/api/v1/getrefid", GetRefid);
 
 app.get("/api/v1/getref", GetReferrals);
+app.post("/api/v1/convertpoints", Convertpoints);
 
 const seedata = async (network) => {
   const url = `https://api.connectvaluedataservice.com/api/v1/transactions/data`;
