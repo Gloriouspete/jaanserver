@@ -3,6 +3,7 @@ require("dotenv").config();
 const datasecret = process.env.DATA_SECRET;
 const axios = require("axios");
 const NodeCache = require('node-cache');
+const Points = require("../../services/points/points.js");
 const myCache = new NodeCache();
 async function Buydata(req, res) {
   const userid = req.user.userid;
@@ -27,7 +28,7 @@ async function Buydata(req, res) {
           console.error('Account not found');
           return res.send('Account not found');
       }
-      const { pin, phone, credit } = userData;
+      const { pin, phone, credit,email } = userData;
       const mypin = parseInt(pin, 10)
       const balance = parseInt(credit, 10)
 
@@ -88,7 +89,7 @@ async function Buydata(req, res) {
           if (responseData.Status === 'successful') {
               const newbalancee = balance - dataamount;
               await executor('UPDATE users SET credit = ? WHERE userid = ?', [newbalancee, userid]);
-
+              Points(userid,dataamount,email)
               return res.status(200).json({
                   "success": true,
                   "message": 'Data Purchase Successful ',

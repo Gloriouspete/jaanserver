@@ -3,6 +3,7 @@ require("dotenv").config();
 const datasecret = process.env.DATA_SECRET;
 const axios = require("axios");
 const NodeCache = require('node-cache');
+const Points = require("../../services/points/points.js");
 const myCache = new NodeCache();
 
 const Airtime = async (req, res) => {
@@ -30,7 +31,7 @@ const Airtime = async (req, res) => {
           return res.json({success:false,message:'Account not found'});
       }
 
-      const { pin: mypin, phone, credit } = userData;
+      const { pin: mypin, phone, credit,email } = userData;
       console.log('this is userdata', credit);
 
       if (mypin.toString() !== pincode.toString()) {
@@ -87,6 +88,7 @@ const Airtime = async (req, res) => {
 
       if (responseData.Status === 'successful') {
           await executor('UPDATE users SET credit = ? WHERE userid = ?', [newbalance, userid]);
+          Points(userid,amount,email)
           return res.status(200).json({
               "success": true,
               "message": 'Airtime Purchase Successful',

@@ -1,3 +1,3 @@
-const {welcome} = require("./email.js")
+const Email = require("./services/points/email.js")
 
-welcome('peteroluwaninyo@gmail.com','Peter')
+Email('peteroluwaninyo@gmail.com','4')
