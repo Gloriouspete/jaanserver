@@ -20,8 +20,8 @@ async function makePurchaseRequest({ requesttime, billersCode, serviceID, variat
     try {
       const response = await axios.post(`https://api-service.vtpass.com/api/pay`, data, {
         headers: {
-          "api-key": apiKey,
-          "secret-key": secretKey,
+          "api-key": apiKey.trim(),
+          "secret-key": secretKey.trim(),
         },
       });
       return response.data;
