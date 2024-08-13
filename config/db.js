@@ -7,7 +7,7 @@ const executor = new Executor({
     host:"pld110.truehost.cloud",
     user:"apollomo_jaan",
     password:password,
-    database:"apollomo_jaan"
+    database:"apollomo_jaan",
 }).call
 
 module.exports = executor;

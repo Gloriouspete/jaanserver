@@ -1,21 +1,25 @@
 const executor = require("../../config/db.js");
 require("dotenv").config();
 const mydate = new Date();
-const apiKey = process.env.VT_SAND_API;
-const secretKey = process.env.VT_SAND_SECRET;
 const axios = require("axios");
 const Gettime = require("../../services/time.js");
-const { makePurchaseRequest, getUserData } = require("./prop.js")
+const { makePurchaseRequest, getUserData } = require("./prop.js");
 async function Buyelectric(req, res) {
   const { userid } = req.user;
   const { billersCode, serviceID, variation_code, phone, amount } = req.body;
   const datas = { billersCode, serviceID, variation_code, phone, amount };
   const intamount = parseInt(amount, 10);
+  if (!billersCode || !serviceID || !variation_code || !phone || !amount) {
+    return res.status(400).json({
+      message: "All fields are required",
+      success: false,
+    });
+  }
+  console.log(req.body);
 
   try {
-    console.log("Environment Variables:", { apiKey, secretKey });
     console.log("Request Data:", datas);
-    
+
     const requesttime = Gettime();
     console.log("Request Time:", requesttime);
 
@@ -34,10 +38,15 @@ async function Buyelectric(req, res) {
         success: false,
       });
     } else if (balance >= intamount) {
-      const responseData = await makePurchaseRequest({ requesttime, billersCode, serviceID, variation_code, phone, amount });
-
+      const responseData = await makePurchaseRequest({
+        requesttime,
+        billersCode,
+        serviceID,
+        variation_code,
+        phone,
+        amount,
+      });
       console.warn("API Response Data:", requesttime);
-
       if (responseData.code === "000") {
         const {
           content: {
@@ -60,10 +69,10 @@ async function Buyelectric(req, res) {
         };
 
         await setElectric(imade);
-        await executor("UPDATE users SET credit = credit - ? WHERE userid = ?", [
-          intamount,
-          userid,
-        ]);
+        await executor(
+          "UPDATE users SET credit = credit - ? WHERE userid = ?",
+          [intamount, userid]
+        );
 
         return res.status(200).json({
           message: `Your Electric Purchase Transaction was Successful and the token is ${Token}`,
@@ -84,14 +93,14 @@ async function Buyelectric(req, res) {
   } catch (error) {
     console.warn("Error occurred:", error);
     const responsed = {
-      message: "We apologize, we are currently unable to process your electricity plan purchase. Please try again later.",
+      message:
+        "We apologize, we are currently unable to process your electricity plan purchase. Please try again later.",
       success: false,
       data: error,
     };
     res.status(500).json(responsed);
   }
 }
-
 
 const setElectric = async (data) => {
   const { userid, token, recipient, Status, network, plan, amount, name } =
