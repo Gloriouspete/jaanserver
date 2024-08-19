@@ -7,13 +7,16 @@ const Gettime = require("./services/time.js");
 
 async function Getelectric(req, res) {
   const load = {
+    request_id: Gettime(),
     serviceID: "benin-electric",
     billersCode: "04234760439",
-    type:"prepaid"
+    variation_code: "prepaid",
+    phone: "09039968560",
+    amount: 500,
   };
   try {
     const response = await axios.post(
-      "https://api-service.vtpass.com/api/merchant-verify",
+      "https://api-service.vtpass.com/api/pay",
       load,
       {
         headers: {
@@ -22,8 +25,8 @@ async function Getelectric(req, res) {
         },
       }
     );
+
     const mydata = response.data;
-    
     console.log("check me", mydata);
   } catch (error) {
     console.error(error);

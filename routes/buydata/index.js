@@ -83,7 +83,7 @@ async function Buydata(req, res) {
           const { mobile_number, Status, plan_network, plan_name, plan_amount } = responseData;
           const newdate = new Date()
           const create_date  = newdate.toISOString()
-          const imade = {userid, recipient:mobile_number, Status, network:plan_network, plan:plan_name, amount:plan_amount, create_date };
+          const imade = {userid, recipient:mobile_number, Status, network:plan_network, plan:plan_name, amount:dataamount, create_date };
           await setData(imade);
 
           if (responseData.Status === 'successful') {
