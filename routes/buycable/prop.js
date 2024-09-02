@@ -1,8 +1,8 @@
 const executor = require("../../config/db.js");
 require("dotenv").config();
 const mydate = new Date();
-const apiKey = process.env.VT_SAND_API;
-const secretKey = process.env.VT_SAND_SECRET;
+const apiKey = process.env.VT_LIVE_API;
+const secretKey = process.env.VT_LIVE_SECRET;
 const axios = require("axios");
 const Gettime = require("../../services/time.js");
 
@@ -18,7 +18,7 @@ async function makePurchaseRequest({ requesttime, billersCode, serviceID, variat
     };
   
     try {
-      const response = await axios.post(`https://sandbox.vtpass.com/api/pay`, data, {
+      const response = await axios.post(`https://api.vtpass.com/api/pay`, data, {
         headers: {
           "api-key": apiKey,
           "secret-key": secretKey,

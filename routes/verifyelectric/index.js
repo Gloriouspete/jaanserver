@@ -2,11 +2,12 @@ require("dotenv").config();
 const axios = require("axios");
 const apiKey = process.env.VT_LIVE_API;
 const secretKey = process.env.VT_LIVE_SECRET;
-async function Verifycable(req, res) {
-  const { plans, numbers } = req.body;
+async function Verifyelectric(req, res) {
+  const { plans, numbers,type } = req.body;
   const load = {
     serviceID: plans,
     billersCode: numbers,
+    type
   };
   try {
     if (!plans || !numbers) {
@@ -50,4 +51,4 @@ async function Verifycable(req, res) {
   }
 }
 
-module.exports = Verifycable;
+module.exports = Verifyelectric;

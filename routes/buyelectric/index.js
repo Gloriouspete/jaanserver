@@ -46,7 +46,6 @@ async function Buyelectric(req, res) {
         phone,
         amount,
       });
-      console.warn("API Response Data:", requesttime);
       if (responseData.code === "000") {
         const {
           content: {
@@ -75,7 +74,7 @@ async function Buyelectric(req, res) {
         );
 
         return res.status(200).json({
-          message: `Your Electric Purchase Transaction was Successful and the token is ${Token}`,
+          message: `Your Electric Purchase Transaction was Successful and the token is ${Token || purchased_code}`,
           success: true,
         });
       } else if (responseData.code === "099") {
@@ -91,7 +90,7 @@ async function Buyelectric(req, res) {
       }
     }
   } catch (error) {
-    console.warn("Error occurred:", error);
+    console.error("Error occurred:", error);
     const responsed = {
       message:
         "We apologize, we are currently unable to process your electricity plan purchase. Please try again later.",

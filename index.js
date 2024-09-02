@@ -61,6 +61,7 @@ const Redeemcoupon = require("./routes/coupon/redeem.js");
 const Editprice = require("./admin/editdata/index.js");
 const Verifycable = require("./routes/verifycable/index.js");
 const Convertpoints = require("./routes/points/redeem.js");
+const Verifyelectric = require("./routes/verifyelectric/index.js");
 app.use((req, res, next) => {
   res.setHeader("Access-Control-Allow-Origin", "*");
   res.setHeader(
@@ -224,7 +225,7 @@ app.post("/api/v1/createcoupon", Createcoupons);
 app.post("/api/v1/redeemcoupon", Redeemcoupon);
 
 app.post("/api/v1/verifycable", Verifycable);
-
+app.post("/api/v1/verifyelectric", Verifyelectric);
 app.get("/admin/getusers", Getusers);
 
 app.post("/admin/login", AdminLogin);

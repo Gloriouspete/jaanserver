@@ -1,19 +1,18 @@
 require('dotenv').config()
 const axios = require('axios')
 const datasecret = process.env.SECRET;
+const apiKey = process.env.VT_LIVE_API;
+const publicKey = process.env.VT_LIVE_PUBLIC;
 
 async function Getcable(req, res) {
-  const userid = req.user.userid;
-  const authToken = datasecret;
   const { plans } = req.body;
-  console.log("Received phonenumber:", userid);
   try {
     const response = await axios.get(
-      `https://sandbox.vtpass.com/api/service-variations?serviceID=${plans}`,
+      `https://api-service.vtpass.com/api/service-variations?serviceID=${plans}`,
       {
         headers: {
-          "username": "jaanservicesmail@gmail.com",
-          "password": datasecret,
+          "api-key": apiKey,
+          "public-key": publicKey,
         },
       }
     );

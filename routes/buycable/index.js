@@ -1,20 +1,14 @@
 const executor = require("../../config/db.js");
 require("dotenv").config();
 const mydate = new Date();
-const apiKey = process.env.VT_SAND_API;
-const secretKey = process.env.VT_SAND_SECRET;
-const axios = require("axios");
 const Gettime = require("../../services/time.js");
 const { makePurchaseRequest, getUserData } = require("./prop.js")
 async function Buycable(req, res) {
   const { userid } = req.user;
   const { billersCode, serviceID, variation_code, phone, amount } = req.body;
-  const datas = { billersCode, serviceID, variation_code, phone, amount };
   const intamount = parseInt(amount, 10);
 
   try {
-    console.log("Environment Variables:", { apiKey, secretKey });
-    console.log("Request Data:", datas);
     
     const requesttime = Gettime();
     console.log("Request Time:", requesttime);
@@ -35,9 +29,6 @@ async function Buycable(req, res) {
       });
     } else if (balance >= intamount) {
       const responseData = await makePurchaseRequest({ requesttime, billersCode, serviceID, variation_code, phone, amount });
-
-      console.warn("API Response Data:", requesttime);
-
       if (responseData.code === "000") {
         const {
           content: {
