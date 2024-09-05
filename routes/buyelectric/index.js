@@ -4,11 +4,12 @@ const mydate = new Date();
 const axios = require("axios");
 const Gettime = require("../../services/time.js");
 const { makePurchaseRequest, getUserData } = require("./prop.js");
+const GetPricer = require("../../services/price/price.js");
 async function Buyelectric(req, res) {
   const { userid } = req.user;
   const { billersCode, serviceID, variation_code, phone, amount } = req.body;
   const datas = { billersCode, serviceID, variation_code, phone, amount };
-  const intamount = parseInt(amount, 10);
+  const realamount = parseInt(amount, 10);
   if (!billersCode || !serviceID || !variation_code || !phone || !amount) {
     return res.status(400).json({
       message: "All fields are required",
@@ -24,13 +25,30 @@ async function Buyelectric(req, res) {
     console.log("Request Time:", requesttime);
 
     const userData = await getUserData(userid);
+    const electricresponse = await GetPricer();
+
     if (!userData) {
       return res.status(404).json({
         message: "User Details not found, Contact support!",
         success: false,
       });
     }
+    if (!electricresponse) {
+      return res.status(404).json({
+        message: "Unable to verify charge amuount, Contact support!",
+        success: false,
+      });
+    }
+    const { electricprice } = electricresponse[0];
     const { credit } = userData;
+    if (!electricprice) {
+      return res.status(404).json({
+        message: "Unable to verify charge amount, Contact support!",
+        success: false,
+      });
+    }
+    const intprice = parseInt(electricprice, 10);
+    const intamount = intprice + realamount;
     const balance = parseInt(credit, 10);
     if (!balance || balance < intamount) {
       return res.status(402).json({
@@ -74,7 +92,9 @@ async function Buyelectric(req, res) {
         );
 
         return res.status(200).json({
-          message: `Your Electric Purchase Transaction was Successful and the token is ${Token || purchased_code}`,
+          message: `Your Electric Purchase Transaction was Successful and the token is ${
+            Token || purchased_code
+          }`,
           success: true,
         });
       } else if (responseData.code === "099") {

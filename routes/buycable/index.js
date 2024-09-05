@@ -2,11 +2,12 @@ const executor = require("../../config/db.js");
 require("dotenv").config();
 const mydate = new Date();
 const Gettime = require("../../services/time.js");
+const GetPricer = require("../../services/price/price.js");
 const { makePurchaseRequest, getUserData } = require("./prop.js")
 async function Buycable(req, res) {
   const { userid } = req.user;
   const { billersCode, serviceID, variation_code, phone, amount } = req.body;
-  const intamount = parseInt(amount, 10);
+  const realamount = parseInt(amount, 10);
 
   try {
     
@@ -14,13 +15,25 @@ async function Buycable(req, res) {
     console.log("Request Time:", requesttime);
 
     const userData = await getUserData(userid);
+    const cableresponse = await GetPricer()
     if (!userData) {
       return res.status(404).json({
         message: "User Details not found, Contact support!",
         success: false,
       });
     }
+    if (!cableresponse) {
+      return res.status(404).json({
+        message: "Unable to verify charge amuount, Contact support!",
+        success: false,
+      });
+    }
+    const { cableprice } = cableresponse[0];
+
+
     const { credit } = userData;
+    const intprice = parseInt(cableprice, 10);
+    const intamount = intprice + realamount;
     const balance = parseInt(credit, 10);
     if (!balance || balance < intamount) {
       return res.status(402).json({
