@@ -41,26 +41,25 @@ async function Buycable(req, res) {
         success: false,
       });
     } else if (balance >= intamount) {
-      const responseData = await makePurchaseRequest({ requesttime, billersCode, serviceID, variation_code, phone, amount });
+      const responseData = await makePurchaseRequest({ requesttime, billersCode, serviceID, variation_code, phone });
       if (responseData.code === "000") {
         const {
           content: {
             transactions: { unique_element, phone, product_name },
           },
-          Token,
-          purchased_code,
-          units,
+          response_description,
+          type,
         } = responseData;
 
         const imade = {
           userid,
-          network: "Cable",
-          recipient: unique_element,
+          network: serviceID,
+          recipient: unique_element || phone,
           Status: "successful",
           name: product_name,
-          token: Token || purchased_code,
-          plan: units,
-          amount,
+          token: response_description,
+          plan: type,
+          amount:intamount,
         };
 
         await setCable(imade);

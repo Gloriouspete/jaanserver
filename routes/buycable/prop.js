@@ -7,14 +7,13 @@ const axios = require("axios");
 const Gettime = require("../../services/time.js");
 
 
-async function makePurchaseRequest({ requesttime, billersCode, serviceID, variation_code, phone, amount }) {
+async function makePurchaseRequest({ requesttime, billersCode, serviceID, variation_code, phone }) {
     const data = {
       request_id: requesttime,
-      billersCode: 1111111111111,
+      billersCode: billersCode,
       serviceID: serviceID.toString(),
       variation_code: variation_code.toString(),
       phone: phone.toString(),
-      amount: amount.toString(),
     };
   
     try {

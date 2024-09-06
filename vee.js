@@ -1,22 +1,22 @@
 require("dotenv").config();
 const axios = require("axios");
-const apiKey = process.env.VT_LIVE_API;
-const secretKey = process.env.VT_LIVE_SECRET;
+const apiKey = process.env.VT_SAND_API;
+const secretKey = process.env.VT_SAND_SECRET;
 const datasecret = process.env.SECRET;
 const Gettime = require("./services/time.js");
 
 async function Getelectric(req, res) {
   const load = {
     request_id: Gettime(),
-    serviceID: "benin-electric",
-    billersCode: "04234760439",
-    variation_code: "prepaid",
+    serviceID: "showmax",
+    billersCode: "1212121212",
+    variation_code: "full",
     phone: "09039968560",
-    amount: 500,
+    //amount: 500,
   };
   try {
     const response = await axios.post(
-      "https://api-service.vtpass.com/api/pay",
+      "https://sandbox.vtpass.com/api/pay",
       load,
       {
         headers: {

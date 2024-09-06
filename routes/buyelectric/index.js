@@ -82,7 +82,7 @@ async function Buyelectric(req, res) {
           name: product_name,
           token: Token || purchased_code,
           plan: units,
-          amount,
+          amount:intamount,
         };
 
         await setElectric(imade);
