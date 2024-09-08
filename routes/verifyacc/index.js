@@ -2,7 +2,7 @@ const executor = require("../config/db.js");
 require("dotenv").config();
 const jwt = require("jsonwebtoken");
 const secretKey = process.env.SECRET;
-export default async function Verifyacc(req, res) {
+ async function Verifyacc(req, res) {
   const { param } = req.body;
   try {
     const decoded = jwt.verify(param, secretKey);
@@ -22,3 +22,5 @@ export default async function Verifyacc(req, res) {
     });
   }
 }
+
+module.exports = Verifyacc;
