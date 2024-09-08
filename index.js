@@ -62,6 +62,7 @@ const Editprice = require("./admin/editdata/index.js");
 const Verifycable = require("./routes/verifycable/index.js");
 const Convertpoints = require("./routes/points/redeem.js");
 const Verifyelectric = require("./routes/verifyelectric/index.js");
+const { default: Verifyacc } = require("./routes/verifyacc/index.js");
 app.use((req, res, next) => {
   res.setHeader("Access-Control-Allow-Origin", "*");
   res.setHeader(
@@ -214,18 +215,25 @@ app.post("/api/v1/getcable", Getcable);
 app.post("/api/v1/buycable", Buycable);
 
 app.post("/api/v1/buyelectric", Buyelectric);
+
 app.post("/api/v1/kyc", Kyc);
+
 app.get("/api/v1/genaccount", Genaccount);
 
 app.get("/api/v1/getelectric", Getelectric);
+
 app.get("/api/v1/getprice", GetPrice);
+
 app.get("/api/v1/getpopup", GetPopup);
+
 app.post("/api/v1/createcoupon", Createcoupons);
 
 app.post("/api/v1/redeemcoupon", Redeemcoupon);
 
 app.post("/api/v1/verifycable", Verifycable);
+
 app.post("/api/v1/verifyelectric", Verifyelectric);
+
 app.get("/admin/getusers", Getusers);
 
 app.post("/admin/login", AdminLogin);
@@ -277,7 +285,10 @@ app.get("/admin/viewmessage", Viewmessage);
 app.get("/api/v1/getrefid", GetRefid);
 
 app.get("/api/v1/getref", GetReferrals);
+
 app.post("/api/v1/convertpoints", Convertpoints);
+
+app.post("/api/v1/verifyacc",Verifyacc);
 
 const seedata = async (network) => {
   const url = `https://api.connectvaluedataservice.com/api/v1/transactions/data`;
@@ -477,6 +488,7 @@ app.get("/api/v1/datatransactions", (req, res) => {
       console.log(error.response || "Error getting transactionss");
     });
 });
+
 app.get("/api/v1/airtimetransactions", (req, res) => {
   const userid = req.user.userid;
   const query = `select phonenumber,userid from users where userid = ?`;

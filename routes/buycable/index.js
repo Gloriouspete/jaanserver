@@ -3,7 +3,8 @@ require("dotenv").config();
 const mydate = new Date();
 const Gettime = require("../../services/time.js");
 const GetPricer = require("../../services/price/price.js");
-const { makePurchaseRequest, getUserData } = require("./prop.js")
+const { makePurchaseRequest, getUserData } = require("./prop.js");
+const Vemail = require("../../services/emailverify.js");
 async function Buycable(req, res) {
   const { userid } = req.user;
   const { billersCode, serviceID, variation_code, phone, amount } = req.body;
@@ -21,6 +22,13 @@ async function Buycable(req, res) {
         message: "User Details not found, Contact support!",
         success: false,
       });
+    }
+    const emailverified = await Vemail(userid);
+
+
+    if (emailverified === "no") {
+      console.error("Account not verified");
+      return res.json({ success: false, message: "Your email address has not been verified. Please verify your email address before proceeding with this transaction." });
     }
     if (!cableresponse) {
       return res.status(404).json({

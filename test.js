@@ -61,3 +61,4 @@ async function Getdata(req, res) {
 
 //Getelectric();
 Getdata()
+

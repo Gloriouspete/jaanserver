@@ -24,6 +24,13 @@ const Redeemcoupon = async (req, res) => {
       "SELECT pin, phone, credit FROM users WHERE userid = ?",
       [userid]
     );
+    const emailverified = await Vemail(userid);
+
+
+    if (emailverified === "no") {
+      console.error("Account not verified");
+      return res.status(401).json({ success: false, message: "Your email address has not been verified. Please verify your email address before proceeding with this transaction." });
+    }
     const [checkCoupon] = await executor(
         "SELECT * FROM coupon WHERE couponid = ?",
         [couponid]

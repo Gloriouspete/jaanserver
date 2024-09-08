@@ -1,6 +1,6 @@
 const executor = require("../../config/db.js");
 const getAccount = require("../../account.js");
-const { welcome } = require("../../email.js");
+const { welcome, sendVerificationEmail } = require("../../email.js");
 const jwt = require("jsonwebtoken");
 require("dotenv").config();
 const generateUniqueUserID = require("../../services/generate.js");
@@ -56,12 +56,12 @@ async function Signup(req, res) {
     }
 
     const mydata = response.data;
-
+    const hashedemail = jwt.sign({ email }, secretKey);
 
     const { bankName, accountNumber } = mydata;
 
     const customerbankname = "Jaan - " + name.slice(0, 3);
-    const refcode = generateReferralId()
+    const refcode = generateReferralId();
 
     const insertUserQuery =
       "INSERT INTO users (name, user_name, password, email, phone, status, credit, userid,pin,bankname,accountnumber,accountname,refer_by,refer_code) VALUES (?, ?, ?, ?, ?, ?, ?, ?,?,?,?,?,?,?)";
@@ -80,15 +80,17 @@ async function Signup(req, res) {
       accountNumber,
       customerbankname,
       referrer.toString(),
-      refcode
+      refcode,
     ]);
 
     console.log("Inserted user into the database successfully");
     welcome(email, name);
+    const hashedlink = `https://jaan.ng/verifyemail?q=${hashedemail}`;
+    sendVerificationEmail(email, name, hashedlink);
     await Addcredit(referrer);
     return res
       .status(200)
-      .json({ success: true, message: "Signup successful", data: token });
+      .json({ success: true, message: "Congratulations! Your signup was successful", data: token });
   } catch (error) {
     console.error("Error during user signup:", error);
     return res.status(500).json({
@@ -139,7 +141,7 @@ const setpayment = async (data) => {
       Status,
       amount,
       date,
-      "Referral Bonus"
+      "Referral Bonus",
     ]);
     console.log("Transaction successful!", results);
     return true;

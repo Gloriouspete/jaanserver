@@ -15,6 +15,7 @@ async function Manualfund(req, res) {
     }
     const { userid, phone } = response[0];
     const selectUserQuery = `UPDATE users SET credit = credit + ${theamount} where email = ?`;
+    
     executor(selectUserQuery, [email])
       .then(async (results) => {
         const data = {

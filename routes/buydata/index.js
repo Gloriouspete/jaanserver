@@ -4,6 +4,7 @@ const datasecret = process.env.DATA_SECRET;
 const axios = require("axios");
 const NodeCache = require('node-cache');
 const Points = require("../../services/points/points.js");
+const Vemail = require("../../services/emailverify.js");
 const myCache = new NodeCache();
 async function Buydata(req, res) {
   const userid = req.user.userid;
@@ -27,6 +28,13 @@ async function Buydata(req, res) {
       if (!userData) {
           console.error('Account not found');
           return res.send('Account not found');
+      }
+      const emailverified = await Vemail(userid);
+
+
+      if (emailverified === "no") {
+        console.error("Account not verified");
+        return res.json({ success: false, message: "Your email address has not been verified. Please verify your email address before proceeding with this transaction." });
       }
       const { pin, phone, credit,email } = userData;
       const mypin = parseInt(pin, 10)

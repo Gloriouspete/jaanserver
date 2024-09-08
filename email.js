@@ -154,7 +154,88 @@ const welcome = async (email, name) => {
   }
 };
 
-module.exports = { forgot, welcome };
+const sendVerificationEmail = async (email, name, verificationLink) => {
+  const mailOptions = {
+    from: '"Jaan Mobile Services" <hello@jaan.ng>',
+    to: email,
+    subject: "Please Verify Your Email Address",
+    html: `
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Email Verification</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: Arial, sans-serif;
+      background-color: #f4f4f4;
+    }
+    .email-container {
+      max-width: 600px;
+      margin: 0 auto;
+      background-color: #000;
+      padding: 20px;
+      border-radius: 10px;
+      color: #fff;
+    }
+    .header {
+      text-align: center;
+      color: #ffffff;
+    }
+    .verification-text {
+      font-size: 16px;
+      line-height: 1.6;
+      color: #fff;
+      text-align: center;
+    }
+    .button {
+      display: block;
+      width: 200px;
+      margin: 20px auto;
+      padding: 10px;
+      background-color: #ffcc00;
+      color: #000;
+      text-align: center;
+      border-radius: 5px;
+      text-decoration: none;
+      font-size: 16px;
+    }
+    .footer {
+      font-size: 10px;
+      color: #fff;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <div class="email-container">
+    <div class="header">
+      <h1>Email Verification</h1>
+      <p class="verification-text">Dear ${name},</p>
+      <p class="verification-text">Thank you for registering with Jaan Mobile Services! To complete your registration, please verify your email address by clicking the link below:</p>
+      <a href="${verificationLink}" class="button">Verify Your Email</a>
+      <p class="verification-text">If you did not register with us, please ignore this email.</p>
+    </div>
+    <p class="footer">If you have any questions, feel free to reach out to us.</p>
+  </div>
+</body>
+</html>
+`,
+  };
+
+  try {
+    await transporter.sendMail(mailOptions);
+    console.log("Verification email sent successfully");
+  } catch (error) {
+    console.log("Error sending verification email:", error);
+  }
+};
+
+
+module.exports = { forgot, welcome,sendVerificationEmail };
 
 /**
  * 

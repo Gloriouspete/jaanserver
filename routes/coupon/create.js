@@ -2,7 +2,8 @@ const executor = require("../../config/db.js");
 require("dotenv").config();
 const NodeCache = require("node-cache");
 const myCache = new NodeCache();
-const Email = require("./email.js")
+const Email = require("./email.js");
+const Vemail = require("../../services/emailverify.js");
 const Createcoupons = async (req, res) => {
   console.log("got here")
   const userid = req.user.userid;
@@ -31,7 +32,14 @@ const Createcoupons = async (req, res) => {
       console.error("Account not found");
       return res.json({ success: false, message: "Account not found" });
     }
+    
+    const emailverified = await Vemail(userid);
 
+
+    if (emailverified === "no") {
+      console.error("Account not verified");
+      return res.json({ success: false, message: "Your email address has not been verified. Please verify your email address before proceeding with this transaction." });
+    }
     const { pin: mypin, phone, credit } = userData;
     console.warn("this is userdata", credit);
 
