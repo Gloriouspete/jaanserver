@@ -2,7 +2,9 @@ const executor = require("../../config/db.js");
 require("dotenv").config();
 const NodeCache = require("node-cache");
 const myCache = new NodeCache();
-const Email = require("./email.js")
+const Email = require("./email.js");
+const Vemail = require("../../services/emailverify.js");
+
 const Redeemcoupon = async (req, res) => {
   console.log("got here")
   const userid = req.user.userid;

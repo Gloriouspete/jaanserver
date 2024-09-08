@@ -1,18 +1,21 @@
 const executor = require('../config/db.js');
 
-
 const Vemail = async (userid) => {
     try {
-        const query = `SELECT emailverified FROM users where userid = ? `
-        const result = await executor(query, [userid])
-        if (result) {
-            const newresult = result[0].emailverified;
-            return newresult
+        const query = `SELECT emailverified FROM users WHERE userid = ?`;
+        const result = await executor(query, [userid]);
+
+        if (result.length > 0) {
+            // Ensure that result is an array with at least one item
+            const emailVerifiedStatus = result[0].emailverified;
+            return emailVerifiedStatus;
+        } else {
+       
+            return null; 
         }
-    }
-    catch (error) {
-        console.log(error)
-        throw "Error retrieving email if verified"
+    } catch (error) {
+        console.error("Error retrieving email verification status:", error);
+        throw new Error("Error retrieving email verification status");
     }
 }
 

@@ -31,7 +31,6 @@ async function Buydata(req, res) {
       }
       const emailverified = await Vemail(userid);
 
-
       if (emailverified === "no") {
         console.error("Account not verified");
         return res.json({ success: false, message: "Your email address has not been verified. Please verify your email address before proceeding with this transaction." });
