@@ -62,7 +62,7 @@ const Editprice = require("./admin/editdata/index.js");
 const Verifycable = require("./routes/verifycable/index.js");
 const Convertpoints = require("./routes/points/redeem.js");
 const Verifyelectric = require("./routes/verifyelectric/index.js");
-const { default: Verifyacc } = require("./routes/verifyacc/index.js");
+const Verifyacc = require("./routes/verifyacc/index.js");
 app.use((req, res, next) => {
   res.setHeader("Access-Control-Allow-Origin", "*");
   res.setHeader(
