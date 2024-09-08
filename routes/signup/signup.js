@@ -110,7 +110,7 @@ const Addcredit = async (refid) => {
     const { userid, phone } = results[0];
 
     const query = `UPDATE users SET credit = credit + ? WHERE refer_code = ?`;
-    await executor(query, [100, refid]);
+    await executor(query, [50, refid]);
     console.log("Gave referral 100 credit already");
 
     const data = {
