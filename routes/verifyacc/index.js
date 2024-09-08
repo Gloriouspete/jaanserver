@@ -1,4 +1,4 @@
-import executor from "../config/db.js";
+const executor = require("../config/db.js");
 require("dotenv").config();
 const jwt = require("jsonwebtoken");
 const secretKey = process.env.SECRET;
