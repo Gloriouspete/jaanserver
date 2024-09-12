@@ -63,6 +63,14 @@ const Verifycable = require("./routes/verifycable/index.js");
 const Convertpoints = require("./routes/points/redeem.js");
 const Verifyelectric = require("./routes/verifyelectric/index.js");
 const Verifyacc = require("./routes/verifyacc/index.js");
+const { Server } = require("socket.io");
+const Chat = require("./routes/sockets/chat.js");
+
+const io = new Server(server, {
+  cors: {
+    origin: "*",
+  },
+});
 app.use((req, res, next) => {
   res.setHeader("Access-Control-Allow-Origin", "*");
   res.setHeader(
@@ -103,7 +111,7 @@ const setpayment = async (data) => {
       Status,
       amount,
       create_date,
-      "Bank funding"
+      "Bank funding",
     ]);
     console.log("successful!", results);
     // Assuming you want to return the results
@@ -288,7 +296,7 @@ app.get("/api/v1/getref", GetReferrals);
 
 app.post("/api/v1/convertpoints", Convertpoints);
 
-app.post("/api/v1/verifyacc",Verifyacc);
+app.post("/api/v1/verifyacc", Verifyacc);
 
 const seedata = async (network) => {
   const url = `https://api.connectvaluedataservice.com/api/v1/transactions/data`;
@@ -567,6 +575,11 @@ app.get("/email", (req, res) => {
   } catch (error) {
     console.log(error.response);
   }
+});
+
+io.on("connection", (socket) => {
+  console.log("new connection");
+  Chat(socket, io);
 });
 
 server.listen(port, () => {
