@@ -65,6 +65,7 @@ const Verifyelectric = require("./routes/verifyelectric/index.js");
 const Verifyacc = require("./routes/verifyacc/index.js");
 const { Server } = require("socket.io");
 const Chat = require("./routes/sockets/chat.js");
+const Checkverify = require("./routes/checkverify/index.js");
 
 const io = new Server(server, {
   cors: {
@@ -297,6 +298,7 @@ app.get("/api/v1/getref", GetReferrals);
 app.post("/api/v1/convertpoints", Convertpoints);
 
 app.post("/api/v1/verifyacc", Verifyacc);
+app.post("/api/v1/checkverify", Checkverify);
 
 const seedata = async (network) => {
   const url = `https://api.connectvaluedataservice.com/api/v1/transactions/data`;

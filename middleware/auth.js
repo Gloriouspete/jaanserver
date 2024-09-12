@@ -1,7 +1,7 @@
 require('dotenv').config()
 const jwt = require('jsonwebtoken');
 const secretKey = process.env.SECRET
-const excludedRoutes = ['/api/v1/login','/api/v1/getdata','/api/v1/resetpass', '/api/v1/signup', '/api/v1/forgot', '/', '/webhooksuccess','/email','/admin/login/','/admin/createuser'];
+const excludedRoutes = ['/api/v1/login','/api/v1/getdata','/api/v1/resetpass', '/api/v1/signup', '/api/v1/forgot','/api/v1/verifyacc', '/', '/webhooksuccess','/email','/admin/login/','/admin/createuser'];
 
   function authenticateJWT(req, res, next) {
     if (excludedRoutes.includes(req.url)) {
