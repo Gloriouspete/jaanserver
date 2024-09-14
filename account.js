@@ -1,7 +1,7 @@
 require("dotenv").config();
 const API_KEY = process.env.MONNIFY_CLIENT;
 const SECRET_KEY = process.env.MONNIFY_SECRET;
-const axios = require("axios")
+const axios = require("axios");
 const getAccount = async (userid, email, username) => {
   const credentials = `${API_KEY}:${SECRET_KEY}`;
   const encodedCredentials = Buffer.from(credentials).toString("base64");
@@ -61,4 +61,5 @@ const getAccount = async (userid, email, username) => {
   }
 };
 
-module.exports = getAccount;
+
+module.exports = getAccount

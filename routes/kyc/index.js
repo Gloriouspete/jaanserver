@@ -1,16 +1,15 @@
 const executor = require("../../config/db.js");
 require("dotenv").config();
-const datasecret = process.env.DATA_SECRET;
 async function Kyc (req, res) {
-    const { bvn, nin } = req.body
+    const { type, number } = req.body
     const userid = req.user.userid;
     try {
-        const response = await updateKyc(userid, bvn, nin)
+        const response = await updateKyc(userid, type, number)
         console.log(response)
         const respons = executor(`update users set verified = ? where userid = ?`, ['yes', userid])
         return res.status(200).json({
             "success": true,
-            "message": "Successfully Verified",
+            "message": "Your Identity is successfully Verified",
             "data": null
         })
     }
@@ -23,12 +22,9 @@ async function Kyc (req, res) {
         })
     }
 }
-
-const updateKyc = async (userid, bvn, nin) => {
+const updateKyc = async (userid, type, number) => {
     const API_KEY = process.env.MONNIFY_CLIENT
     const SECRET_KEY = process.env.MONNIFY_SECRET;
-
-
     const credentials = `${API_KEY}:${SECRET_KEY}`;
     const encodedCredentials = Buffer.from(credentials).toString('base64');
     const authHeader = `Basic ${encodedCredentials}`;
@@ -52,12 +48,12 @@ const updateKyc = async (userid, bvn, nin) => {
 
         const requestBody = {};
 
-        if (bvn) {
-            requestBody.bvn = bvn;
+        if (type === "bvn") {
+            requestBody.bvn = number;
         }
 
-        if (nin) {
-            requestBody.nin = nin;
+        if (type === "nin") {
+            requestBody.nin = number;
         }
 
         const response = await axios.put(url, requestBody, { headers });

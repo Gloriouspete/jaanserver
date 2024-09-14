@@ -234,8 +234,7 @@ const sendVerificationEmail = async (email, name, verificationLink) => {
   }
 };
 
-
-module.exports = { forgot, welcome,sendVerificationEmail };
+module.exports = { forgot, welcome, sendVerificationEmail };
 
 /**
  * 
