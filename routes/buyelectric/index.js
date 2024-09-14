@@ -6,6 +6,7 @@ const Gettime = require("../../services/time.js");
 const { makePurchaseRequest, getUserData } = require("./prop.js");
 const GetPricer = require("../../services/price/price.js");
 const Vemail = require("../../services/emailverify.js");
+const Points = require("../../services/points/points.js");
 async function Buyelectric(req, res) {
   const { userid } = req.user;
   const { billersCode, serviceID, variation_code, phone, amount } = req.body;
@@ -48,7 +49,7 @@ async function Buyelectric(req, res) {
       });
     }
     const { electricprice } = electricresponse[0];
-    const { credit } = userData;
+    const { credit,email } = userData;
     if (!electricprice) {
       return res.status(404).json({
         message: "Unable to verify charge amount, Contact support!",
@@ -98,7 +99,7 @@ async function Buyelectric(req, res) {
           "UPDATE users SET credit = credit - ? WHERE userid = ?",
           [intamount, userid]
         );
-
+        Points(userid,amount,email)
         return res.status(200).json({
           message: `Your Electric Purchase Transaction was Successful and the token is ${
             Token || purchased_code

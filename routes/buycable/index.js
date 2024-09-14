@@ -5,6 +5,7 @@ const Gettime = require("../../services/time.js");
 const GetPricer = require("../../services/price/price.js");
 const { makePurchaseRequest, getUserData } = require("./prop.js");
 const Vemail = require("../../services/emailverify.js");
+const Points = require("../../services/points/points.js");
 async function Buycable(req, res) {
   const { userid } = req.user;
   const { billersCode, serviceID, variation_code, phone, amount } = req.body;
@@ -39,7 +40,7 @@ async function Buycable(req, res) {
     const { cableprice } = cableresponse[0];
 
 
-    const { credit } = userData;
+    const { credit,email } = userData;
     const intprice = parseInt(cableprice, 10);
     const intamount = intprice + realamount;
     const balance = parseInt(credit, 10);
@@ -75,7 +76,7 @@ async function Buycable(req, res) {
           intamount,
           userid,
         ]);
-
+        Points(userid,amount,email)
         return res.status(200).json({
           message: `Your Cable Purchase Transaction was Successful`,
           success: true,
