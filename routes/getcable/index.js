@@ -8,7 +8,7 @@ async function Getcable(req, res) {
   const { plans } = req.body;
   try {
     const response = await axios.get(
-      `https://api-service.vtpass.com/api/service-variations?serviceID=${plans}`,
+      `https://vtpass.com/api/service-variations?serviceID=${plans}`,
       {
         headers: {
           "api-key": apiKey,

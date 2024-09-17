@@ -13,7 +13,7 @@ async function Kyc(req, res) {
     ]);
     return res.status(200).json({
       success: true,
-      message: "Your Identity is successfully Verified",
+      message: response.data || "Your Identity is successfully Verified",
       data: null,
     });
   } catch (error) {
