@@ -66,6 +66,8 @@ const Verifyacc = require("./routes/verifyacc/index.js");
 const { Server } = require("socket.io");
 const Chat = require("./routes/sockets/chat.js");
 const Checkverify = require("./routes/checkverify/index.js");
+const Geteducation = require("./routes/geteducation/index.js");
+const Buyeducation = require("./routes/buyeducation/index.js");
 
 const io = new Server(server, {
   cors: {
@@ -220,6 +222,10 @@ app.get("/api/v1/getuser", Getuser);
 app.post("/api/v1/buydata", Buydata);
 
 app.post("/api/v1/getcable", Getcable);
+
+app.post("/api/v1/geteducation", Geteducation);
+
+app.post("/api/v1/buyeducation", Buyeducation);
 
 app.post("/api/v1/buycable", Buycable);
 

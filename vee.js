@@ -8,9 +8,9 @@ const Gettime = require("./services/time.js");
 async function Getelectric(req, res) {
   const load = {
     request_id: Gettime(),
-    serviceID: "showmax",
+    serviceID: "waec-registration",
     billersCode: "1212121212",
-    variation_code: "full",
+    variation_code: "waec-registraion",
     phone: "09039968560",
     //amount: 500,
   };
