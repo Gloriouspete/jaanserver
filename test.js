@@ -1,7 +1,9 @@
 require("dotenv").config();
 const axios = require("axios");
-const apiKey = process.env.VT_SAND_API;
-const secretKey = process.env.VT_SAND_SECRET;
+// const apiKey = process.env.VT_SAND_API;
+// const secretKey = process.env.VT_SAND_SECRET;
+const apiKey = process.env.VT_LIVE_API;
+const publicKey = process.env.VT_LIVE_PUBLIC;
 const Gettime = require("./services/time.js")
 async function Getelectric(req, res) {
   const requesttime = Gettime();
@@ -43,16 +45,16 @@ async function Getdata(req, res) {
   };
   try {
     const response = await axios.get(
-      "https://sandbox.vtpass.com/api/service-variations?serviceID=waec-registration ",
+      "https://vtpass.com/api/service-variations?serviceID=jamb",
       {
         headers: {
           "api-key": apiKey,
-          "secret-key": secretKey,
+          "public-key": publicKey,
         },
       }
     );
     const mydata = response.data;
-
+    console.log(mydata );
     console.log(mydata.content.varations );
   } catch (error) {
     console.error(error);

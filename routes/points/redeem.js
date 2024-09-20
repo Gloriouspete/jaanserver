@@ -53,10 +53,11 @@ const Convertpoints = async (req, res) => {
         message: "You have insufficient points to convert",
       });
     } else {
+      const newbalance = amountcc * 10;
       const updateBalanceAndPointsQuery =
         "UPDATE users SET credit = credit + ?, points = points - ? WHERE userid = ?";
 
-      await executor(updateBalanceAndPointsQuery, [amountcc, amountcc, userid]);
+      await executor(updateBalanceAndPointsQuery, [newbalance, amountcc, userid]);
       console.log("Updated Points into the database successfully");
       const newdate = new Date();
       const create_date = newdate.toISOString();
@@ -65,13 +66,13 @@ const Convertpoints = async (req, res) => {
         recipient: phone,
         Status: "Successful",
         network: "points",
-        plan: amount,
-        amount,
+        plan: `${amount} points`,
+        amount:newbalance,
         create_date,
       };
       await coupontran(imade);
       return res.status(200).json({
-        message: `You have successfully converted your points to the amount of ${amount} naira`,
+        message: `You have successfully converted your points to the amount of ${newbalance} naira`,
         success: true,
       });
     }
