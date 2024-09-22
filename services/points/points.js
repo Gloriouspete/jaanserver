@@ -14,7 +14,7 @@ const Points = async (userid, amount,email) => {
 
   try {
     const query = `UPDATE users SET points = points + ?,loyalty = loyalty + ? where userid = ?`;
-    await executor(query, [points,userid]);
+    await executor(query, [points,points,userid]);
     Email(email,points)
     return true
   } catch (error) {
