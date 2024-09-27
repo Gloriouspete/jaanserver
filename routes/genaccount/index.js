@@ -1,6 +1,7 @@
 const executor = require("../../config/db.js");
 const getAccount = require("../../account.js");
 async function Genaccount(req, res) {
+  const {type,number} = req.body;
   const { userid } = req.user;
   console.log("Received phonenumber:", userid);
   try {
@@ -14,7 +15,7 @@ async function Genaccount(req, res) {
     }
     const user = results[0];
     const { email, phone, name } = user;
-    getAccount(userid, email, name)
+    getAccount(userid, email, name,type,number)
       .then(async (results) => {
         const mydata = results.data;
         const { bankName, accountNumber } = mydata;
@@ -37,7 +38,7 @@ async function Genaccount(req, res) {
         return res.status(500).json({
           success: false,
           message:
-            "We're currently unable to generate an account for you, please try again later",
+            error || "We're currently unable to generate an account for you, please try again later",
           data: null,
         });
       });

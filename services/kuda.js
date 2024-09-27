@@ -4,36 +4,33 @@ const kudaapi = process.env.KUDA_API;
 
 async function Get() {
   try {
-    // Define the request payload
     const payload = {
       email: "payments@jaan.ng",
       apiKey: kudaapi,
     };
 
-    // Send a POST request
+    // Here I'm sending a post request to get the token
     const response = await axios.post(
-      "https://kuda-openapi.kuda.com/v2.1/Account/GetToken",
+      "https://kuda-openapi-uat.kudabank.com/v2.1/Account/GetToken",
       payload,
       {
         headers: {
-          "Content-Type": "application/json", // Ensure the Content-Type is set to application/json
+          "Content-Type": "application/json",
         },
       }
     );
-
-    // Log the response from the server
-    
     if(response.data){
+      // The response is mostly received successfully so i do not have an issue with this part
       return response.data;
     }
     else {
       return false
     }
   } catch (error) {
-    // Handle errors (e.g., network issues, invalid responses)
+    console.error(error)
     console.error(
-      "Error:",
-      error.response ? error.response.data : error.message
+      "Errors:",
+      error.response.data 
     );
   }
 }

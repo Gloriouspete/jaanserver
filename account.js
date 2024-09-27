@@ -2,7 +2,7 @@ require("dotenv").config();
 const API_KEY = process.env.MONNIFY_CLIENT;
 const SECRET_KEY = process.env.MONNIFY_SECRET;
 const axios = require("axios");
-const getAccount = async (userid, email, username) => {
+const getAccount = async (userid, email, username,type,number) => {
   const credentials = `${API_KEY}:${SECRET_KEY}`;
   const encodedCredentials = Buffer.from(credentials).toString("base64");
   const authHeader = `Basic ${encodedCredentials}`;
@@ -36,6 +36,8 @@ const getAccount = async (userid, email, username) => {
       contractCode: "832728158702",
       customerEmail: email,
       customerName: email,
+      bvn: type === "bvn" ? number :"",
+      nin:type === "nin" ? number :"",
       getAllAvailableBanks: false,
       preferredBanks: ["035"],
     };
@@ -56,8 +58,9 @@ const getAccount = async (userid, email, username) => {
       throw new Error("Error creating account");
     }
   } catch (error) {
-    console.error(error.response ? error.response.data : error.message);
-    throw new Error("Error creating account");
+    console.error(error.response ? error.response.data.responseMessage : error.message);
+    const newmessage = error.response ? error.response.data.responseMessage : error.message;
+    throw newmessage;;
   }
 };
 

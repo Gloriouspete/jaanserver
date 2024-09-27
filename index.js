@@ -233,7 +233,7 @@ app.post("/api/v1/buyelectric", Buyelectric);
 
 app.post("/api/v1/kyc", Kyc);
 
-app.get("/api/v1/genaccount", Genaccount);
+app.post("/api/v1/genaccount", Genaccount);
 
 app.get("/api/v1/getelectric", Getelectric);
 

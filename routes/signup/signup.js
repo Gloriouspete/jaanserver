@@ -1,5 +1,4 @@
 const executor = require("../../config/db.js");
-const getAccount = require("../../account.js");
 const { welcome, sendVerificationEmail } = require("../../email.js");
 const jwt = require("jsonwebtoken");
 require("dotenv").config();
@@ -44,21 +43,21 @@ async function Signup(req, res) {
     const token = jwt.sign({ userid }, secretKey);
     const hashed = jwt.sign({ password }, secretKey);
 
-    const response = await getAccount(userid, email, name);
+    // const response = await getAccount(userid, email, name);
 
-    if (!response) {
-      return res.status(500).json({
-        success: false,
-        message:
-          "There is an issue generating an automatic account for you, please try again later",
-        data: null,
-      });
-    }
+    // if (!response) {
+    //   return res.status(500).json({
+    //     success: false,
+    //     message:
+    //       "There is an issue generating an automatic account for you, please try again later",
+    //     data: null,
+    //   });
+    // }
 
-    const mydata = response.data;
+    // const mydata = response.data;
     const hashedemail = jwt.sign({ email }, secretKey);
 
-    const { bankName, accountNumber } = mydata;
+    // const { bankName, accountNumber } = mydata;
 
     const customerbankname = "Jaan - " + name.slice(0, 3);
     const refcode = generateReferralId();
@@ -76,8 +75,8 @@ async function Signup(req, res) {
       0,
       userid,
       "1234",
-      bankName,
-      accountNumber,
+      "generate",
+      "generate",
       customerbankname,
       referrer.toString(),
       refcode,
