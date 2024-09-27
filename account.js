@@ -28,19 +28,26 @@ const getAccount = async (userid, email, username,type,number) => {
       "Content-Type": "application/json",
       Authorization: `Bearer ${accessToken}`,
     };
+    
+     let requestBody;
 
-    const requestBody = {
+     requestBody = {
       accountReference: userid,
       accountName: username,
       currencyCode: "NGN",
       contractCode: "832728158702",
       customerEmail: email,
       customerName: email,
-      bvn: type === "bvn" ? number :"",
-      nin:type === "nin" ? number :"",
+      type:number ,
       getAllAvailableBanks: false,
       preferredBanks: ["035"],
     };
+      
+    if(type === "bvn"){
+      requestBody.bvn = number
+    }else{
+      requestBody.nin = number
+    }
 
     const response = await axios.post(url, requestBody, { headers });
     const responseData = response.data;
