@@ -68,6 +68,7 @@ const Chat = require("./routes/sockets/chat.js");
 const Checkverify = require("./routes/checkverify/index.js");
 const Geteducation = require("./routes/geteducation/index.js");
 const Buyeducation = require("./routes/buyeducation/index.js");
+const Genemail = require("./routes/genemail/index.js");
 
 const io = new Server(server, {
   cors: {
@@ -248,6 +249,8 @@ app.post("/api/v1/redeemcoupon", Redeemcoupon);
 app.post("/api/v1/verifycable", Verifycable);
 
 app.post("/api/v1/verifyelectric", Verifyelectric);
+
+app.get("/api/v1/genemail", Genemail);
 
 app.get("/admin/getusers", Getusers);
 

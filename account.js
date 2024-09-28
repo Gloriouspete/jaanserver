@@ -38,7 +38,6 @@ const getAccount = async (userid, email, username,type,number) => {
       contractCode: "832728158702",
       customerEmail: email,
       customerName: email,
-      type:number ,
       getAllAvailableBanks: false,
       preferredBanks: ["035"],
     };
@@ -67,7 +66,7 @@ const getAccount = async (userid, email, username,type,number) => {
   } catch (error) {
     console.error(error.response ? error.response.data.responseMessage : error.message);
     const newmessage = error.response ? error.response.data.responseMessage : error.message;
-    throw newmessage;;
+    throw newmessage;
   }
 };
 
