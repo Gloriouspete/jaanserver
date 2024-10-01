@@ -69,6 +69,7 @@ const Checkverify = require("./routes/checkverify/index.js");
 const Geteducation = require("./routes/geteducation/index.js");
 const Buyeducation = require("./routes/buyeducation/index.js");
 const Genemail = require("./routes/genemail/index.js");
+const Getbetting = require("./routes/getbetting/index.js");
 
 const io = new Server(server, {
   cors: {
@@ -237,6 +238,7 @@ app.post("/api/v1/kyc", Kyc);
 app.post("/api/v1/genaccount", Genaccount);
 
 app.get("/api/v1/getelectric", Getelectric);
+app.get("/api/v1/getbetting", Getbetting);
 
 app.get("/api/v1/getprice", GetPrice);
 

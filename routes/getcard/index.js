@@ -1,7 +1,7 @@
 require("dotenv").config();
 const axios = require("axios");
 const GetKuda = require("../../services/kuda");
-async function Getcable(req, res) {
+async function Getcard(req, res) {
   try {
     const accesstoken = await GetKuda();
     if (!accesstoken) {
@@ -12,11 +12,9 @@ async function Getcable(req, res) {
       });
     }
     const payload = {
-      serviceType: "GET_BILLERS_BY_TYPE",
+      serviceType: "GET_GIFT_CARD",
       requestRef: Gettime(),
-      data: {
-        "BillTypeName": "cableTv",
-      },
+      data: {},
     };
     const response = await axios.post(
       "https://kuda-openapi-uat.kudabank.com/v2.1",
@@ -30,27 +28,27 @@ async function Getcable(req, res) {
     );
     const responseData = response.data;
     if (responseData.status) {
-      const bettingResponse = responseData.data.billers;
+      const giftCard = responseData.data.giftCardData;
       return res.status(200).json({
         success: true,
         message: "Cable Plans retrieved successfully",
-        data: bettingResponse,
+        data: giftCard,
       });
     } else {
       return res.status(400).json({
         success: false,
-        message: "Unable to retrieve Cable plans",
+        message: "Unable to retrieve giftcard plans",
         data: null,
       });
     }
   } catch (error) {
     console.error(error);
-    return res.status(500).json({
+    return res.status(400).json({
       success: false,
-      message: "Unable to retrieve Cable plans",
+      message: "Unable to retrieve plans",
       data: null,
     });
   }
 }
 
-module.exports = Getcable;
+module.exports = Getcard;

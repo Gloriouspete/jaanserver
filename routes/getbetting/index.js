@@ -1,7 +1,7 @@
 require("dotenv").config();
 const axios = require("axios");
 const GetKuda = require("../../services/kuda");
-async function Getcable(req, res) {
+async function Getbetting(req, res) {
   try {
     const accesstoken = await GetKuda();
     if (!accesstoken) {
@@ -15,7 +15,7 @@ async function Getcable(req, res) {
       serviceType: "GET_BILLERS_BY_TYPE",
       requestRef: Gettime(),
       data: {
-        "BillTypeName": "cableTv",
+        "BillTypeName": "betting",
       },
     };
     const response = await axios.post(
@@ -33,13 +33,13 @@ async function Getcable(req, res) {
       const bettingResponse = responseData.data.billers;
       return res.status(200).json({
         success: true,
-        message: "Cable Plans retrieved successfully",
+        message: "Betting Plans retrieved successfully",
         data: bettingResponse,
       });
     } else {
       return res.status(400).json({
         success: false,
-        message: "Unable to retrieve Cable plans",
+        message: "Unable to retrieve Betting plans",
         data: null,
       });
     }
@@ -47,10 +47,10 @@ async function Getcable(req, res) {
     console.error(error);
     return res.status(500).json({
       success: false,
-      message: "Unable to retrieve Cable plans",
+      message: "Unable to retrieve plans",
       data: null,
     });
   }
 }
 
-module.exports = Getcable;
+module.exports = Getbetting;

@@ -2,7 +2,7 @@ const axios = require("axios");
 require("dotenv").config();
 const kudaapi = process.env.KUDA_API;
 
-async function Get() {
+async function GetKuda() {
   try {
     const payload = {
       email: "payments@jaan.ng",
@@ -35,4 +35,4 @@ async function Get() {
   }
 }
 
-module.exports = Get;
+module.exports = GetKuda;

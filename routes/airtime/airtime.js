@@ -42,7 +42,12 @@ const Airtime = async (req, res) => {
       return res.json({ success: false, message: "Your email address has not been verified. Please verify your email address before proceeding with this transaction." });
     }
 
-    const { pin: mypin, phone, credit, email } = userData;
+    const { pin: mypin, phone, credit, email,verified } = userData;
+
+    if (verified === "no") {
+      console.error("identity not verified");
+      return res.status(401).json({ success: false, message: "Your Kyc Account has not been verified. Please go to profile to verify your Identity before proceeding with this transaction." });
+    }
     console.log("this is userdata", credit);
 
     if (mypin.toString() !== pincode.toString()) {

@@ -9,14 +9,10 @@ async function Make() {
       return;
     }
     const payload = {
-      serviceType: "ADMIN_PURCHASE_BILL",
+      serviceType: "GET_BILLERS_BY_TYPE",
       requestRef: Gettime(),
       data: {
-        CustomerFirstName: "Test",
-        CustomerIdentifier: "07030000000",
-        PhoneNumber: "07030000000",
-        BillItemIdentifier: "KUD-BET-MSPT-001",
-        Amount: "29000",
+        "BillTypeName": "electricity",
       },
     };
 
@@ -29,11 +25,11 @@ async function Make() {
           Authorization: `Bearer ${accesstoken}`,
         },
       }
-    );
+    ); 
 
     const mydata = response.data;
 
-    console.log("see response:", mydata);
+    console.log("see response:", mydata.data);
     // const mydata = response.data.data;
     // const gift = mydata.giftCardData;
     // console.log(gift);
