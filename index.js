@@ -76,6 +76,13 @@ const io = new Server(server, {
     origin: "https://jaan.ng ",
   },
 });
+app.use(authenticateJWT);
+app.options(
+  "https://jaan.ng",
+  cors({
+    optionsSuccessStatus: 200,
+  })
+);
 corsOptions = {
   origin: "https://jaan.ng",
   methods: "GET, POST, PUT, PATCH, DELETE, OPTIONS",
@@ -85,7 +92,7 @@ corsOptions = {
 
 app.use(cors(corsOptions));
 
-app.use(authenticateJWT);
+
 
 app.get("/", (req, res) => {
   res.send("Server is working correctly");
