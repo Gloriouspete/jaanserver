@@ -78,13 +78,13 @@ const io = new Server(server, {
 });
 app.use(authenticateJWT);
 app.options(
-  "https://jaan.ng",
+  "*",
   cors({
     optionsSuccessStatus: 200,
   })
 );
 corsOptions = {
-  origin: "https://jaan.ng",
+  origin: "*",
   methods: "GET, POST, PUT, PATCH, DELETE, OPTIONS",
   allowedHeaders: "Origin, Content-Type, X-Auth-Token",
   optionsSuccessStatus: 200,
