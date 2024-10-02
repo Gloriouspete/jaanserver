@@ -1,17 +1,16 @@
 const executor = require("../../config/db.js");
 require("dotenv").config();
 const NodeCache = require("node-cache");
-const myCache = new NodeCache();
+const myCache = new NodeCache({stdTTL:10});
 const Email = require("./email.js");
 const Vemail = require("../../services/emailverify.js");
 const Createcoupons = async (req, res) => {
-  console.log("got here")
+  console.log("got here");
   const userid = req.user.userid;
-  const { amount,email } = req.body;
+  const { amount, email } = req.body;
   try {
-   
     const couponid = generateCouponId();
-    const lockExists = myCache.get(`couponLocks:${userid}`);
+    const lockExists = await myCache.get(`couponLocks:${userid}`);
     if (lockExists) {
       console.log("Existing Transaction in progress");
       return res.status(429).json({
@@ -21,7 +20,7 @@ const Createcoupons = async (req, res) => {
       });
     }
 
-    myCache.set(`couponLocks:${userid}`, "locked", 10);
+    myCache.set(`couponLocks:${userid}`, "locked");
 
     const [userData] = await executor(
       "SELECT pin, phone, credit FROM users WHERE userid = ?",
@@ -32,13 +31,16 @@ const Createcoupons = async (req, res) => {
       console.error("Account not found");
       return res.json({ success: false, message: "Account not found" });
     }
-    
-    const emailverified = await Vemail(userid);
 
+    const emailverified = await Vemail(userid);
 
     if (emailverified === "no") {
       console.error("Account not verified");
-      return res.json({ success: false, message: "Your email address has not been verified. Please verify your email address before proceeding with this transaction." });
+      return res.json({
+        success: false,
+        message:
+          "Your email address has not been verified. Please verify your email address before proceeding with this transaction.",
+      });
     }
     const { pin: mypin, phone, credit } = userData;
     console.warn("this is userdata", credit);
@@ -46,43 +48,60 @@ const Createcoupons = async (req, res) => {
     const balancc = Number(credit);
     const amountcc = Number(amount);
     const newbalance = balancc - amountcc;
-
+    if (isNaN(balancc) || isNaN(amountcc)) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid credit or amount value",
+        data: null,
+      });
+    }
+    
+    if (amountcc > balancc) {
+      return res.status(400).json({
+        success: false,
+        message: "Insufficient Balance",
+        data: null,
+      });
+    }
+    
     if (newbalance < 0 || newbalance === undefined) {
       console.log("Insufficient funds");
-      return res.status(200).json({
+      return res.status(400).json({
         success: false,
         message: "Insufficient Balance",
         data: null,
       });
     }
 
-    const insertCouponQuery = "INSERT INTO coupon (couponid, amount,creator,admin) VALUES (?, ?,?,?)";
+    const insertCouponQuery =
+      "INSERT INTO coupon (couponid, amount,creator,admin) VALUES (?, ?,?,?)";
 
-    await executor(insertCouponQuery, [couponid, amount, userid,"false"]);
+    await executor(insertCouponQuery, [couponid, amount, userid, "false"]);
     console.log("Inserted Coupon into the database successfully");
     const newdate = new Date();
     const create_date = newdate.toISOString();
     const imade = {
       userid,
       recipient: phone,
-      Status:"Successful",
+      Status: "Successful",
       network: "coupon",
-      plan:couponid,
+      plan: couponid,
       amount,
       create_date,
     };
+
     await coupontran(imade);
 
     await executor("UPDATE users SET credit = credit - ? WHERE userid = ?", [
-        amountcc,
-        userid,
-      ]);
-    if(email){
-      await Email(email,couponid,amount)
+      amountcc,
+      userid,
+    ]);
+    if (email) {
+      await Email(email, couponid, amount);
     }
     return res.status(200).json({
-        message: `You have successfully created a coupon with ID ${couponid} with amount ${amount}`,
-        success: true,
+      message: `You have successfully created a coupon with ID ${couponid} with amount ${amount}`,
+      success: true,
     });
   } catch (error) {
     console.error(error);
@@ -94,7 +113,8 @@ const Createcoupons = async (req, res) => {
   }
 };
 const coupontran = async (data) => {
-  const { userid, recipient, Status, network,plan, amount, create_date } = data;
+  const { userid, recipient, Status, network, plan, amount, create_date } =
+    data;
   // console.log(data, "see data o");
 
   try {

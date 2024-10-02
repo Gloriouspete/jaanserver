@@ -63,6 +63,23 @@ const Airtime = async (req, res) => {
     const amountcc = Number(amount);
     const newbalance = balancc - amountcc;
 
+    if (isNaN(balancc) || isNaN(amountcc)) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid credit or amount value",
+        data: null,
+      });
+    }
+    
+    if (amountcc > balancc) {
+      return res.status(400).json({
+        success: false,
+        message: "Insufficient Balance",
+        data: null,
+      });
+    }
+    
+
     if (newbalance < 0 || newbalance === undefined) {
       console.log("Insufficient funds");
       return res.status(200).json({
