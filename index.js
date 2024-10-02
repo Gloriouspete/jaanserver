@@ -73,11 +73,11 @@ const Getbetting = require("./routes/getbetting/index.js");
 
 const io = new Server(server, {
   cors: {
-    origin: "*",
+    origin: "https://jaan.ng ",
   },
 });
 app.use((req, res, next) => {
-  res.setHeader("Access-Control-Allow-Origin", "*");
+  res.setHeader("Access-Control-Allow-Origin", "https://jaan.ng");
   res.setHeader(
     "Access-Control-Allow-Methods",
     "GET, POST, PUT, PATCH, DELETE, OPTIONS"
@@ -88,13 +88,15 @@ app.use((req, res, next) => {
   );
   next();
 });
+const corsOptions = {
+  origin: "https://jaan.ng",
+  methods: "GET, POST, PUT, PATCH, DELETE, OPTIONS",
+  allowedHeaders: "Origin, Content-Type, X-Auth-Token",
+  optionsSuccessStatus: 200,
+};
 
-app.options(
-  "*",
-  cors({
-    optionsSuccessStatus: 200,
-  })
-);
+// Use CORS middleware
+app.use(cors(corsOptions));
 
 app.use(authenticateJWT);
 
