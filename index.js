@@ -76,7 +76,7 @@ const io = new Server(server, {
     origin: "https://jaan.ng ",
   },
 });
-app.use(authenticateJWT);
+
 app.options(
   "https://jaan.ng",
   cors({
@@ -92,7 +92,7 @@ corsOptions = {
 
 app.use(cors(corsOptions));
 
-
+app.use(authenticateJWT);
 
 app.get("/", (req, res) => {
   res.send("Server is working correctly");
