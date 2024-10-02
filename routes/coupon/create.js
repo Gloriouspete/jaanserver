@@ -10,6 +10,11 @@ const Createcoupons = async (req, res) => {
   const { amount, email } = req.body;
   try {
     const couponid = generateCouponId();
+    return res.status(429).json({
+      success: false,
+      message: "Coupon creation currently suspended!",
+      data: null,
+    })
     const lockExists = await myCache.get(`couponLocks:${userid}`);
     if (lockExists) {
       console.log("Existing Transaction in progress");
