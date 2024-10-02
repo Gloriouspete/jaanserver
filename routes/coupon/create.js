@@ -1,7 +1,7 @@
 const executor = require("../../config/db.js");
 require("dotenv").config();
 const NodeCache = require("node-cache");
-const myCache = new NodeCache({stdTTL:10});
+const myCache = new NodeCache({ stdTTL: 10 });
 const Email = require("./email.js");
 const Vemail = require("../../services/emailverify.js");
 const Createcoupons = async (req, res) => {
@@ -14,7 +14,7 @@ const Createcoupons = async (req, res) => {
       success: false,
       message: "Coupon creation currently suspended!",
       data: null,
-    })
+    });
     const lockExists = await myCache.get(`couponLocks:${userid}`);
     if (lockExists) {
       console.log("Existing Transaction in progress");
@@ -60,7 +60,7 @@ const Createcoupons = async (req, res) => {
         data: null,
       });
     }
-    
+
     if (amountcc > balancc) {
       return res.status(400).json({
         success: false,
@@ -68,7 +68,7 @@ const Createcoupons = async (req, res) => {
         data: null,
       });
     }
-    
+
     if (newbalance < 0 || newbalance === undefined) {
       console.log("Insufficient funds");
       return res.status(400).json({
