@@ -76,26 +76,13 @@ const io = new Server(server, {
     origin: "https://jaan.ng ",
   },
 });
-app.use((req, res, next) => {
-  res.setHeader("Access-Control-Allow-Origin", "https://jaan.ng");
-  res.setHeader(
-    "Access-Control-Allow-Methods",
-    "GET, POST, PUT, PATCH, DELETE, OPTIONS"
-  );
-  res.setHeader(
-    "Access-Control-Allow-Headers",
-    "Origin, Content-Type, X-Auth-Token"
-  );
-  next();
-});
-const corsOptions = {
+corsOptions = {
   origin: "https://jaan.ng",
   methods: "GET, POST, PUT, PATCH, DELETE, OPTIONS",
   allowedHeaders: "Origin, Content-Type, X-Auth-Token",
   optionsSuccessStatus: 200,
 };
 
-// Use CORS middleware
 app.use(cors(corsOptions));
 
 app.use(authenticateJWT);
