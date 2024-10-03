@@ -70,6 +70,7 @@ const Geteducation = require("./routes/geteducation/index.js");
 const Buyeducation = require("./routes/buyeducation/index.js");
 const Genemail = require("./routes/genemail/index.js");
 const Getbetting = require("./routes/getbetting/index.js");
+const { validateAirtimeRequest,validateDataRequest,validateAmount } = require("./validator.js");
 
 const io = new Server(server, {
   cors: {
@@ -208,11 +209,11 @@ app.post("/api/v1/setpass", Setpass);
 
 app.post("/api/v1/getdata", Getdata);
 
-app.post("/api/v1/buyairtime", Airtime);
+app.post("/api/v1/buyairtime",validateAirtimeRequest, Airtime);
 
 app.get("/api/v1/getuser", Getuser);
 
-app.post("/api/v1/buydata", Buydata);
+app.post("/api/v1/buydata",validateDataRequest, Buydata);
 
 app.post("/api/v1/getcable", Getcable);
 
@@ -297,7 +298,7 @@ app.get("/api/v1/getrefid", GetRefid);
 
 app.get("/api/v1/getref", GetReferrals);
 
-app.post("/api/v1/convertpoints", Convertpoints);
+app.post("/api/v1/convertpoints",validateAmount, Convertpoints);
 
 app.post("/api/v1/verifyacc", Verifyacc);
 app.post("/api/v1/checkverify", Checkverify);

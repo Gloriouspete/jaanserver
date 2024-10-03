@@ -9,6 +9,16 @@ const myCache = new NodeCache();
 
 const Airtime = async (req, res) => {
   const userid = req.user.userid;
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    console.error(errors.array());
+    return res
+      .status(400)
+      .json({
+        success: false,
+        message: "Input Sanitization Failed, Check the inputs value",
+      });
+  }
 
   try {
     const { netcode, amount, number, pincode } = req.body;
@@ -29,24 +39,33 @@ const Airtime = async (req, res) => {
       "SELECT pin, phone, credit FROM users WHERE userid = ?",
       [userid]
     );
-    
+
     if (!userData) {
       console.error("Account not found");
       return res.json({ success: false, message: "Account not found" });
     }
     const emailverified = await Vemail(userid);
 
-
     if (emailverified === "no") {
       console.error("Account not verified");
-      return res.json({ success: false, message: "Your email address has not been verified. Please verify your email address before proceeding with this transaction." });
+      return res.json({
+        success: false,
+        message:
+          "Your email address has not been verified. Please verify your email address before proceeding with this transaction.",
+      });
     }
 
-    const { pin: mypin, phone, credit, email,verified } = userData;
+    const { pin: mypin, phone, credit, email, verified } = userData;
 
     if (verified === "no") {
       console.error("identity not verified");
-      return res.status(401).json({ success: false, message: "Your Kyc Account has not been verified. Please go to profile to verify your Identity before proceeding with this transaction." });
+      return res
+        .status(401)
+        .json({
+          success: false,
+          message:
+            "Your Kyc Account has not been verified. Please go to profile to verify your Identity before proceeding with this transaction.",
+        });
     }
     console.log("this is userdata", credit);
 
@@ -70,7 +89,7 @@ const Airtime = async (req, res) => {
         data: null,
       });
     }
-    
+
     if (amountcc > balancc) {
       return res.status(400).json({
         success: false,
@@ -78,7 +97,6 @@ const Airtime = async (req, res) => {
         data: null,
       });
     }
-    
 
     if (newbalance < 0 || newbalance === undefined) {
       console.log("Insufficient funds");

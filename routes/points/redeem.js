@@ -2,10 +2,20 @@ const executor = require("../../config/db.js");
 require("dotenv").config();
 const NodeCache = require("node-cache");
 const myCache = new NodeCache();
+const { check, validationResult } = require("express-validator");
+
+
 const Convertpoints = async (req, res) => {
   console.log("got here");
   const userid = req.user.userid;
   const { amount } = req.body;
+
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    console.error(errors.array())
+    return res.status(400).json({ success: false, message: "Input Sanitization Failed, Check the amount value" });
+  }
+
   try {
     const lockExists = myCache.get(`pointsLocks:${userid}`);
     if (lockExists) {
@@ -57,7 +67,11 @@ const Convertpoints = async (req, res) => {
       const updateBalanceAndPointsQuery =
         "UPDATE users SET credit = credit + ?, points = points - ? WHERE userid = ?";
 
-      await executor(updateBalanceAndPointsQuery, [newbalance, amountcc, userid]);
+      await executor(updateBalanceAndPointsQuery, [
+        newbalance,
+        amountcc,
+        userid,
+      ]);
       console.log("Updated Points into the database successfully");
       const newdate = new Date();
       const create_date = newdate.toISOString();
@@ -67,7 +81,7 @@ const Convertpoints = async (req, res) => {
         Status: "Successful",
         network: "points",
         plan: `${amount} points`,
-        amount:newbalance,
+        amount: newbalance,
         create_date,
       };
       await coupontran(imade);

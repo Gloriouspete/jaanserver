@@ -8,6 +8,12 @@ const Vemail = require("../../services/emailverify.js");
 const myCache = new NodeCache();
 async function Buydata(req, res) {
   const userid = req.user.userid;
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    console.error(errors.array())
+    return res.status(400).json({ success: false, message: "Input Sanitization Failed, Check the Inputs value" });
+  }
+
   try {
     const { netcode, dataplan, number, dataamount, pincode } = req.body;
 
