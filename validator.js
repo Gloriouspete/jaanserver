@@ -7,8 +7,7 @@ const { check, validationResult } = require("express-validator");
   
     check('amount')
       .exists().withMessage('Amount is required') // Check if amount exists
-      .isNumeric().withMessage('Amount must be a number') // Ensure it's a number
-      .isInt({ gt: 99 }).withMessage('Minimum amount to convert is 100 points'), // Check that it's greater than 99
+      .isNumeric().withMessage('Amount must be a number'),
   
     check('number')
       .exists().withMessage('Phone number is required') // Ensure number exists
