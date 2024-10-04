@@ -191,10 +191,10 @@ async function checkLimit(load) {
   try {
     const result = await executor(query, [load, "coupon"]);
     if (result[0] && result[0].total !== null) {
-      console.log(`Total price for today: ${result[0].total}`);
+      console.error(`Total price for today: ${result[0].total}`);
       return { success: true, price: result[0].total };
     } else {
-      console.log("No transactions found for today.");
+      console.error("No transactions found for today.");
       return { success: true, price: 0 };
     }
   } catch (error) {
