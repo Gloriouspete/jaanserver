@@ -4,17 +4,19 @@ const NodeCache = require("node-cache");
 const myCache = new NodeCache({ stdTTL: 10 });
 const Email = require("./email.js");
 const Vemail = require("../../services/emailverify.js");
+const { check, validationResult } = require("express-validator");
+
 const Createcoupons = async (req, res) => {
   console.log("got here");
   const userid = req.user.userid;
   const { amount, email } = req.body;
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    console.error(errors.array())
+    return res.status(400).json({ success: false, message: "Input Sanitization Failed, Check the Amount value" });
+  }
   try {
     const couponid = generateCouponId();
-    return res.status(429).json({
-      success: false,
-      message: "Coupon creation currently suspended!",
-      data: null,
-    });
     const lockExists = await myCache.get(`couponLocks:${userid}`);
     if (lockExists) {
       console.log("Existing Transaction in progress");
@@ -24,7 +26,6 @@ const Createcoupons = async (req, res) => {
         data: null,
       });
     }
-
     myCache.set(`couponLocks:${userid}`, "locked");
 
     const [userData] = await executor(
@@ -46,13 +47,26 @@ const Createcoupons = async (req, res) => {
         message:
           "Your email address has not been verified. Please verify your email address before proceeding with this transaction.",
       });
-    }
+    };
+
+    const limit = await checkLimit(userid);
+    if (limit.success) {
+      if (limit.price >= 10000) {
+        return res.status(400).json({
+          success: false,
+          message:
+            "Your Coupon Creation Limit for the day has reached its limit!",
+          data: null,
+        });
+      }
+    };
+
     const { pin: mypin, phone, credit } = userData;
     console.warn("this is userdata", credit);
-
     const balancc = Number(credit);
     const amountcc = Number(amount);
     const newbalance = balancc - amountcc;
+
     if (isNaN(balancc) || isNaN(amountcc)) {
       return res.status(400).json({
         success: false,
@@ -112,7 +126,7 @@ const Createcoupons = async (req, res) => {
     console.error(error);
     return res.status(500).json({
       success: false,
-      message: "Coupon Purchase Failed",
+      message: "Unable to Purchase Coupon",
       data: null,
     });
   }
@@ -171,6 +185,22 @@ function generateCouponId() {
   // Concatenate letters and numbers to form the referral ID
   const referralId = lettersPart + numbersPart;
   return referralId;
+}
+async function checkLimit(load) {
+  const query = `SELECT SUM(price) AS total FROM transactions where userid = ? AND service = ? and Date(date) = CURDATE();`;
+  try {
+    const result = await executor(query, [load, "coupon"]);
+    if (result[0] && result[0].total !== null) {
+      console.log(`Total price for today: ${result[0].total}`);
+      return { success: true, price: result[0].total };
+    } else {
+      console.log("No transactions found for today.");
+      return { success: true, price: 0 };
+    }
+  } catch (error) {
+    console.error("Coupon transaction chrck failed");
+    return { success: false, price: 0 };
+  }
 }
 
 module.exports = Createcoupons;

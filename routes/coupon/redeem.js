@@ -33,6 +33,17 @@ const Redeemcoupon = async (req, res) => {
       console.error("Account not verified");
       return res.status(401).json({ success: false, message: "Your email address has not been verified. Please verify your email address before proceeding with this transaction." });
     }
+    const limit = await checkLimit(userid);
+    if (limit.success) {
+      if (limit.price >= 10000) {
+        return res.status(400).json({
+          success: false,
+          message:
+            "Your Coupon Creation Limit for the day has reached its limit!",
+          data: null,
+        });
+      }
+    }
     const [checkCoupon] = await executor(
         "SELECT * FROM coupon WHERE couponid = ?",
         [couponid]
@@ -134,7 +145,22 @@ const coupontran = async (data) => {
     console.warn(error);
   }
 };
-
+async function checkLimit(load) {
+  const query = `SELECT SUM(price) AS total FROM transactions where userid = ? AND service = ? and Date(date) = CURDATE();`;
+  try {
+    const result = await executor(query, [load, "coupon"]);
+    if (result[0] && result[0].total !== null) {
+      console.log(`Total price for today: ${result[0].total}`);
+      return { success: true, price: result[0].total };
+    } else {
+      console.log("No transactions found for today.");
+      return { success: true, price: 0 };
+    }
+  } catch (error) {
+    console.error("Coupon transaction chrck failed");
+    return { success: false, price: 0 };
+  }
+}
 
 module.exports = Redeemcoupon;
  

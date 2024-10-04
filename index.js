@@ -230,13 +230,14 @@ app.post("/api/v1/kyc", Kyc);
 app.post("/api/v1/genaccount", Genaccount);
 
 app.get("/api/v1/getelectric", Getelectric);
+
 app.get("/api/v1/getbetting", Getbetting);
 
 app.get("/api/v1/getprice", GetPrice);
 
 app.get("/api/v1/getpopup", GetPopup);
 
-app.post("/api/v1/createcoupon", Createcoupons);
+app.post("/api/v1/createcoupon",validateAmount, Createcoupons);
 
 app.post("/api/v1/redeemcoupon", Redeemcoupon);
 
