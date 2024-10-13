@@ -4,7 +4,7 @@ const user = process.env.DB_USER;
 const password = process.env.DB_PASSWORD
 
 const executor = new Executor({
-    host:"pld110.truehost.cloud",
+    host:"localhost",
     user:"apollomo_jaan",
     password:password,
     database:"apollomo_jaan",
