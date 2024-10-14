@@ -7,8 +7,10 @@ async function Kyc(req, res) {
   try {
     const response = await updateKyc(userid, type, number);
     console.log(response);
-    await executor(`update users set verified = ? where userid = ?`, [
+    await executor(`update users set verified = ?,kycnumber = ? , kyctype = ? where userid = ?`, [
       "yes",
+      number,
+      type,
       userid,
     ]);
     return res.status(200).json({
