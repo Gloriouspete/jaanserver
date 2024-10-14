@@ -4,7 +4,7 @@ const jwt = require('jsonwebtoken');
 const secretKey = process.env.SECRET;
 function Login(req, res) {
   const { username, password } = req.body;
-  const query = `SELECT userid, password FROM users WHERE user_name = ?`;
+  const query = `SELECT userid, password,ban FROM users WHERE user_name = ?`;
   executor(query, [username])
     .then((results) => {
       console.log(results)
