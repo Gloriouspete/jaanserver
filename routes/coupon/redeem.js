@@ -45,31 +45,41 @@ const Redeemcoupon = async (req, res) => {
       }
     }
     const [checkCoupon] = await executor(
-        "SELECT * FROM coupon WHERE couponid = ?",
-        [couponid]
-      );
+      "SELECT * FROM coupon WHERE couponid = ?",
+      [couponid]
+    );
     const [checkUsed] = await executor(
-        "SELECT * FROM coupon_user WHERE couponid = ?",
-        [couponid]
-      );
-      const [checkPersonUsed] = await executor(
-        "SELECT count(*) as thecount FROM coupon_user WHERE couponid = ? and userid = ?",
-        [couponid,userid]
-      );
+      "SELECT * FROM coupon_user WHERE couponid = ?",
+      [couponid]
+    );
+    const [checkPersonUsed] = await executor(
+      "SELECT count(*) as thecount FROM coupon_user WHERE couponid = ? and userid = ?",
+      [couponid, userid]
+    );
 
     if (!userData || userData.length === 0) {
       console.error("Account not found");
       return res.status(404).json({ success: false, message: "Account not found" });
     }
     if (!checkCoupon || checkCoupon.length === 0) {
-        console.error("Account not found");
-        return res.status(404).json({ success: false, message: "Invalid Coupon" });
-      }
+      console.error("Account not found");
+      return res.status(404).json({ success: false, message: "Invalid Coupon" });
+    }
     if (checkPersonUsed.thecount > 0) {
-        console.error("Coupon already redeemed by user");
-        return res.status(404).json({ success: false, message: "You already redeemed this coupon" });
-      }
-    const { user_name, phone, credit,verified } = userData;
+      console.error("Coupon already redeemed by user");
+      return res.status(404).json({ success: false, message: "You already redeemed this coupon" });
+    }
+    const { user_name, phone, credit, verified, ban } = userData;
+    if (ban === "yes") {
+      console.error("This user has been banned");
+      return res
+        .status(401)
+        .json({
+          success: false,
+          message:
+            "You have been banned from using Jaan services.",
+        });
+    }
     if (Number(credit) < 10) {
       console.error("Balance too low");
       return res.status(401).json({ success: false, message: "Your Account Balance is too low, Kindly ensure that you've top up your account with at least 100 naira to be able to claim coupon" });
@@ -78,10 +88,10 @@ const Redeemcoupon = async (req, res) => {
       console.error("identity not verified");
       return res.status(401).json({ success: false, message: "Your Kyc Account has not been verified. Please go to profile to verify your Identity before proceeding with this transaction." });
     }
-    const {admin,amount} = checkCoupon;
+    const { admin, amount } = checkCoupon;
     console.warn("this is userdata", credit);
     const amountcc = Number(amount);
-    if ( checkUsed && admin !== "true") {
+    if (checkUsed && admin !== "true") {
       return res.status(400).json({
         success: false,
         message: "This coupon has been used by another user",
@@ -99,16 +109,16 @@ const Redeemcoupon = async (req, res) => {
     const imade = {
       userid,
       recipient: phone,
-      Status:"Successful",
+      Status: "Successful",
       network: "coupon",
-      plan:couponid,
+      plan: couponid,
       amount,
       create_date,
     };
     await coupontran(imade);
     return res.status(200).json({
-        message: `You have successfully redeemed a coupon with ID ${couponid} with the amount of ${amount} naira`,
-        success: true,
+      message: `You have successfully redeemed a coupon with ID ${couponid} with the amount of ${amount} naira`,
+      success: true,
     });
   } catch (error) {
     console.error(error);
@@ -120,7 +130,7 @@ const Redeemcoupon = async (req, res) => {
   }
 };
 const coupontran = async (data) => {
-  const { userid, recipient, Status, network,plan, amount, create_date } = data;
+  const { userid, recipient, Status, network, plan, amount, create_date } = data;
   // console.log(data, "see data o");
 
   try {
@@ -163,4 +173,3 @@ async function checkLimit(load) {
 }
 
 module.exports = Redeemcoupon;
- 

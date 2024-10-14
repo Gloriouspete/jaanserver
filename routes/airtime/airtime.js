@@ -57,8 +57,17 @@ const Airtime = async (req, res) => {
       });
     }
 
-    const { pin: mypin, phone, credit, email, verified } = userData;
-
+    const { pin: mypin, phone, credit, email, verified, ban } = userData;
+    if (ban === "yes") {
+      console.error("This user has been banned");
+      return res
+        .status(401)
+        .json({
+          success: false,
+          message:
+            "You have been banned from using Jaan services.",
+        });
+    }
     if (verified === "no") {
       console.error("identity not verified");
       return res

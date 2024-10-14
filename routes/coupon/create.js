@@ -61,7 +61,17 @@ const Createcoupons = async (req, res) => {
       }
     };
 
-    const { pin: mypin, phone, credit } = userData;
+    const { pin: mypin, phone, credit,ban } = userData;
+    if (ban === "yes") {
+      console.error("This user has been banned");
+      return res
+        .status(401)
+        .json({
+          success: false,
+          message:
+            "You have been banned from using Jaan services.",
+        });
+    }
     console.warn("this is userdata", credit);
     const balancc = Number(credit);
     const amountcc = Number(amount);

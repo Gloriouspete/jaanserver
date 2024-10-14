@@ -50,9 +50,19 @@ async function Buydata(req, res) {
           "Your email address has not been verified. Please verify your email address before proceeding with this transaction.",
       });
     }
-    const { pin, phone, credit, email, verified } = userData;
+    const { pin, phone, credit, email, verified, ban } = userData;
     const mypin = parseInt(pin, 10);
     const balance = parseInt(credit, 10);
+    if (ban === "yes") {
+      console.error("This user has been banned");
+      return res
+        .status(401)
+        .json({
+          success: false,
+          message:
+            "You have been banned from using Jaan services.",
+        });
+    }
     if (verified === "no") {
         console.error("identity not verified");
         return res.status(401).json({ success: false, message: "Your Kyc Account has not been verified. Please go to profile to verify your Identity before proceeding with this transaction." });

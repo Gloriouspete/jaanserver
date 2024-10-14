@@ -71,6 +71,8 @@ const Buyeducation = require("./routes/buyeducation/index.js");
 const Genemail = require("./routes/genemail/index.js");
 const Getbetting = require("./routes/getbetting/index.js");
 const { validateAirtimeRequest, validateDataRequest, validateAmount } = require("./validator.js");
+const Banuser = require("./admin/banuser/index.js");
+const Unbanuser = require("./admin/unbanuser/index.js");
 
 const io = new Server(server, {
   cors: {
@@ -79,7 +81,8 @@ const io = new Server(server, {
 });
 
 corsOptions = {
-  origin: ["https://jaan.ng", "https://admin.jaan.ng"],
+  //origin: ["https://jaan.ng", "https://admin.jaan.ng"],
+  origin: "*",
   methods: "GET, POST, PUT, PATCH, DELETE, OPTIONS",
   allowedHeaders: "Origin, Content-Type,Authorization, X-Auth-Token",
   optionsSuccessStatus: 200,
@@ -255,6 +258,10 @@ app.get("/admin/getbalance", Getbalance);
 app.get("/admin/totalfund", Totalfunds);
 
 app.post("/admin/deleteuser", Deleteuser);
+
+app.post("/admin/banuser", Banuser);
+
+app.post("/admin/unbanuser", Unbanuser);
 
 app.post("/admin/checkuser", Checkuser);
 
