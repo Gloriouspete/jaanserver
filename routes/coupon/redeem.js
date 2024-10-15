@@ -4,6 +4,7 @@ const NodeCache = require("node-cache");
 const myCache = new NodeCache();
 const Email = require("./email.js");
 const Vemail = require("../../services/emailverify.js");
+const { finished } = require("nodemailer/lib/xoauth2/index.js");
 
 const Redeemcoupon = async (req, res) => {
   console.log("got here")
@@ -35,11 +36,11 @@ const Redeemcoupon = async (req, res) => {
     }
     const limit = await checkLimit(userid);
     if (limit.success) {
-      if (limit.price >= 10000) {
+      if (limit.price >= 200) {
         return res.status(400).json({
           success: false,
           message:
-            "Your Coupon Creation Limit for the day has reached its limit!",
+            "Your Coupon Creation Limit for the day has reached its limit which is 200!",
           data: null,
         });
       }
@@ -127,7 +128,10 @@ const Redeemcoupon = async (req, res) => {
       message: "Coupon Purchase Failed",
       data: null,
     });
+  } finally{
+    myCache.del(`redeemLocks:${userid}`);
   }
+  
 };
 const coupontran = async (data) => {
   const { userid, recipient, Status, network, plan, amount, create_date } = data;

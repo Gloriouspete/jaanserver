@@ -24,7 +24,6 @@ const Airtime = async (req, res) => {
 
   try {
     const { netcode, amount, number, pincode } = req.body;
-
     const lockExists = myCache.get(`airtransactionLocks:${userid}`);
     if (lockExists) {
       console.log("Existing Transaction in progress");
@@ -34,20 +33,17 @@ const Airtime = async (req, res) => {
         data: null,
       });
     }
-
     myCache.set(`airtransactionLocks:${userid}`, "locked", 10);
 
     const [userData] = await executor(
       "SELECT pin, phone, credit FROM users WHERE userid = ?",
       [userid]
     );
-
     if (!userData) {
       console.error("Account not found");
       return res.json({ success: false, message: "Account not found" });
     }
     const emailverified = await Vemail(userid);
-
     if (emailverified === "no") {
       console.error("Account not verified");
       return res.json({
@@ -79,7 +75,6 @@ const Airtime = async (req, res) => {
         });
     }
     console.log("this is userdata", credit);
-
     if (mypin.toString() !== pincode.toString()) {
       console.log("Incorrect pin");
       return res.status(200).json({
@@ -140,7 +135,6 @@ const Airtime = async (req, res) => {
 
     const response = await axios(config);
     const responseData = response.data;
-
     const { mobile_number, Status, plan_network } = responseData;
     const newdate = new Date();
     const create_date = newdate.toISOString();
@@ -181,6 +175,8 @@ const Airtime = async (req, res) => {
       message: "Airtime Purchase Failed",
       data: null,
     });
+  } finally {
+    myCache.del(`airtransactionLocks:${userid}`);
   }
 };
 

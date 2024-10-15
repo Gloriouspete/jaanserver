@@ -26,7 +26,7 @@ const Createcoupons = async (req, res) => {
         data: null,
       });
     }
-    myCache.set(`couponLocks:${userid}`, "locked");
+    myCache.set(`couponLocks:${userid}`, "locked",10);
 
     const [userData] = await executor(
       "SELECT pin, phone, credit FROM users WHERE userid = ?",
@@ -55,13 +55,14 @@ const Createcoupons = async (req, res) => {
         return res.status(400).json({
           success: false,
           message:
-            "Your Coupon Creation Limit for the day has reached its limit!",
+            "Your Coupon Creation Limit for the day has reached its limit which is 200!",
           data: null,
         });
       }
     };
 
-    const { pin: mypin, phone, credit,ban } = userData;
+    const { pin: mypin, phone, credit, ban } = userData;
+    console.error(`see user balance ${credit} ${phone}`)
     if (ban === "yes") {
       console.error("This user has been banned");
       return res
@@ -101,37 +102,38 @@ const Createcoupons = async (req, res) => {
         data: null,
       });
     }
+    else if (balancc >= amountcc) {
+      const insertCouponQuery =
+        "INSERT INTO coupon (couponid, amount,creator,admin) VALUES (?, ?,?,?)";
 
-    const insertCouponQuery =
-      "INSERT INTO coupon (couponid, amount,creator,admin) VALUES (?, ?,?,?)";
+      await executor(insertCouponQuery, [couponid, amount, userid, "false"]);
+      console.log("Inserted Coupon into the database successfully");
+      const newdate = new Date();
+      const create_date = newdate.toISOString();
+      const imade = {
+        userid,
+        recipient: phone,
+        Status: "Successful",
+        network: "coupon",
+        plan: couponid,
+        amount,
+        create_date,
+      };
 
-    await executor(insertCouponQuery, [couponid, amount, userid, "false"]);
-    console.log("Inserted Coupon into the database successfully");
-    const newdate = new Date();
-    const create_date = newdate.toISOString();
-    const imade = {
-      userid,
-      recipient: phone,
-      Status: "Successful",
-      network: "coupon",
-      plan: couponid,
-      amount,
-      create_date,
-    };
+      await coupontran(imade);
 
-    await coupontran(imade);
-
-    await executor("UPDATE users SET credit = credit - ? WHERE userid = ?", [
-      amountcc,
-      userid,
-    ]);
-    if (email) {
-      await Email(email, couponid, amount);
+      await executor("UPDATE users SET credit = credit - ? WHERE userid = ?", [
+        amountcc,
+        userid,
+      ]);
+      if (email) {
+        await Email(email, couponid, amount);
+      }
+      return res.status(200).json({
+        message: `You have successfully created a coupon with ID ${couponid} with amount ${amount}`,
+        success: true,
+      });
     }
-    return res.status(200).json({
-      message: `You have successfully created a coupon with ID ${couponid} with amount ${amount}`,
-      success: true,
-    });
   } catch (error) {
     console.error(error);
     return res.status(500).json({
@@ -140,6 +142,9 @@ const Createcoupons = async (req, res) => {
       data: null,
     });
   }
+  finally{
+    myCache.del(`couponLocks:${userid}`)
+  }
 };
 const coupontran = async (data) => {
   const { userid, recipient, Status, network, plan, amount, create_date } =
@@ -147,7 +152,7 @@ const coupontran = async (data) => {
   // console.log(data, "see data o");
 
   try {
-    const query = `INSERT INTO transactions(userid , recipient, status, price, date, network,plan,service) VALUES (?,?,?,?,?,?,?,?)`;
+    const query = `INSERT INTO transactions(userid , recipient, status, price, date, network,plan,service,name) VALUES (?,?,?,?,?,?,?,?,?)`;
     executor(query, [
       userid,
       recipient,
@@ -157,6 +162,7 @@ const coupontran = async (data) => {
       network,
       plan,
       "coupon",
+      "Coupon Creation"
     ])
       .then((results) => {
         // console.log("successfully inserted into transaction");

@@ -5,6 +5,15 @@ async function Kyc(req, res) {
   const { type, number } = req.body;
   const userid = req.user.userid;
   try {
+    const query = `Select * from users where kycnumber = ?`
+    const returned = await executor(query,number);
+    if(returned && returned.length > 0){
+      return res.status(200).json({
+        success: false,
+        message: "This Identification Number is already linked to another user",
+        data: null,
+      });
+    }
     const response = await updateKyc(userid, type, number);
     console.log(response);
     await executor(`update users set verified = ?,kycnumber = ? , kyctype = ? where userid = ?`, [

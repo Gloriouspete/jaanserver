@@ -73,6 +73,18 @@ const Getbetting = require("./routes/getbetting/index.js");
 const { validateAirtimeRequest, validateDataRequest, validateAmount } = require("./validator.js");
 const Banuser = require("./admin/banuser/index.js");
 const Unbanuser = require("./admin/unbanuser/index.js");
+const rateLimit = require('express-rate-limit');
+const slowDown = require('express-slow-down');
+const requestLimiter = rateLimit({
+  windowMs: 10 * 1000, // 10 seconds
+  max: 1, // Limit each user to 1 coupon creation per window
+  message: "You can only make one request every 10 seconds.",
+});
+const speedLimiter = slowDown({
+  windowMs: 10 * 1000, // 10 seconds
+  delayAfter: 1, // Delay after 1 request
+  delayMs: 1000, // Delay of 1 second per additional request
+});
 
 const io = new Server(server, {
   cors: {
@@ -81,8 +93,8 @@ const io = new Server(server, {
 });
 
 corsOptions = {
-  //origin: ["https://jaan.ng", "https://admin.jaan.ng"],
-  origin: "*",
+  origin: ["https://jaan.ng", "https://admin.jaan.ng"],
+  //origin: "*",
   methods: "GET, POST, PUT, PATCH, DELETE, OPTIONS",
   allowedHeaders: "Origin, Content-Type,Authorization, X-Auth-Token",
   optionsSuccessStatus: 200,
@@ -211,11 +223,11 @@ app.post("/api/v1/setpass", Setpass);
 
 app.post("/api/v1/getdata", Getdata);
 
-app.post("/api/v1/buyairtime", validateAirtimeRequest, Airtime);
+app.post("/api/v1/buyairtime", validateAirtimeRequest,requestLimiter,speedLimiter, Airtime);
 
 app.get("/api/v1/getuser", Getuser);
 
-app.post("/api/v1/buydata", validateDataRequest, Buydata);
+app.post("/api/v1/buydata", validateDataRequest,requestLimiter,speedLimiter, Buydata);
 
 app.post("/api/v1/getcable", Getcable);
 
@@ -239,9 +251,9 @@ app.get("/api/v1/getprice", GetPrice);
 
 app.get("/api/v1/getpopup", GetPopup);
 
-app.post("/api/v1/createcoupon", validateAmount, Createcoupons);
+app.post("/api/v1/createcoupon", validateAmount,requestLimiter,speedLimiter, Createcoupons);
 
-app.post("/api/v1/redeemcoupon", Redeemcoupon);
+app.post("/api/v1/redeemcoupon",requestLimiter,speedLimiter, Redeemcoupon);
 
 app.post("/api/v1/verifycable", Verifycable);
 
@@ -310,113 +322,6 @@ app.post("/api/v1/convertpoints", validateAmount, Convertpoints);
 app.post("/api/v1/verifyacc", Verifyacc);
 app.post("/api/v1/checkverify", Checkverify);
 
-const seedata = async (network) => {
-  const url = `https://api.connectvaluedataservice.com/api/v1/transactions/data`;
-  const authToken = datasecret;
-  console.log("whats api", authToken);
-  try {
-    const response = await get(url, {
-      headers: {
-        Authorization: `Bearer ${authToken}`,
-        Accept: "application/json",
-      },
-    });
-    const mydata = response.data;
-    console.log(mydata, "this the response" + network);
-    if (mydata.success !== true) {
-      return;
-    }
-    if (network === "mtn") {
-      const data = mydata.data;
-      const filteredData = data.filter((product) => product.network === "mtn");
-      const transformedData = filteredData.map((product) => {
-        const { api_price, name, plan_id, network, duration, type } = product;
-        const multipliedAmount = parseFloat(api_price) * multiply;
-        const rounded = Math.round(multipliedAmount);
-        const refactored = {
-          name,
-          duration,
-          type,
-          network: network,
-          dataid: plan_id,
-          amount: rounded,
-        };
-        console.log(refactored, "This one is mtn too o");
-        return refactored;
-      });
-
-      res.json(transformedData);
-    } else if (network === "glo") {
-      const data = mydata.data;
-      const filteredData = data.filter((product) => product.network === "glo");
-
-      const transformedData = filteredData.map((product) => {
-        const { api_price, name, plan_id, network, duration, type } = product;
-        const multipliedAmount = parseFloat(api_price) * multiply;
-        const rounded = Math.round(multipliedAmount);
-        const refactored = {
-          name,
-          duration,
-          type,
-          network: network,
-          dataid: plan_id,
-          amount: rounded,
-        };
-
-        return refactored;
-      });
-
-      res.json(transformedData);
-    } else if (network === "airtel") {
-      const data = mydata.data;
-      const filteredData = data.filter(
-        (product) => product.network === "airtel"
-      );
-
-      const transformedData = filteredData.map((product) => {
-        const { api_price, name, plan_id, network, duration, type } = product;
-        const multipliedAmount = parseFloat(api_price) * multiply;
-        const rounded = Math.round(multipliedAmount);
-        const refactored = {
-          name,
-          duration,
-          type,
-          network: network,
-          dataid: plan_id,
-          amount: rounded,
-        };
-        return refactored;
-      });
-
-      res.json(transformedData);
-    } else if (network === "9mobile") {
-      const data = mydata.data;
-      const filteredData = data.filter((product) => product.network === "mtn");
-
-      const transformedData = filteredData.map((product) => {
-        const { api_price, name, plan_id, network, duration, type } = product;
-        const multipliedAmount = parseFloat(api_price) * multiply;
-        const rounded = Math.round(multipliedAmount);
-        const refactored = {
-          name,
-          duration,
-          type,
-          network: network,
-          dataid: plan_id,
-          amount: rounded,
-        };
-        return refactored;
-      });
-
-      res.json(transformedData);
-    } else {
-      const data = response.data;
-      console.log(data, "too real");
-    }
-  } catch (error) {
-    console.log(error.response?.data);
-  }
-};
 
 app.get("/api/v1/transactions", (req, res) => {
   const userid = req.user.userid;
@@ -456,111 +361,7 @@ app.get("/api/v1/transactions", (req, res) => {
   }
 });
 
-app.get("/api/v1/datatransactions", (req, res) => {
-  const userid = req.user.userid;
-  const query = `select phonenumber,userid from users where userid = ?`;
-  executor(query, [userid])
-    .then((results) => {
-      console.log(results);
-      const phonenumber = results[0].phonenumber;
-      const pquery = `select * from datatransactions where phonenumber = ?`;
-      executor(pquery, [phonenumber])
-        .then((results) => {
-          console.log(results, "chai" + phonenumber);
-          const transform = [];
-          const resu = results.reverse();
-          resu.forEach((element) => {
-            const { buynumber, status, price, date, network, size } = element;
-            console.log(date);
-            const dateObject = new Date(date);
-            console.log(dateObject);
-            const year = dateObject.getFullYear();
-            const month = (dateObject.getMonth() + 1)
-              .toString()
-              .padStart(2, "0");
-            const day = dateObject.getDate().toString().padStart(2, "0");
-            const hours = dateObject.getHours().toString().padStart(2, "0");
-            const minutes = dateObject.getMinutes().toString().padStart(2, "0");
-            const seconds = dateObject.getSeconds().toString().padStart(2, "0");
-            const formattedDate = `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
 
-            console.log(formattedDate); // Output: "2023-08-22 12:58:24"
-
-            transform.push({
-              buynumber,
-              status,
-              price,
-              date: formattedDate,
-              network,
-              size,
-            });
-          });
-          transform.map((idan) => {
-            console.log(idan);
-          });
-          res.json(transform);
-        })
-        .catch((error) => {
-          console.log(error.response || "Error getting transactionss");
-        });
-    })
-    .catch((error) => {
-      console.log(error.response || "Error getting transactionss");
-    });
-});
-
-app.get("/api/v1/airtimetransactions", (req, res) => {
-  const userid = req.user.userid;
-  const query = `select phonenumber,userid from users where userid = ?`;
-  executor(query, [userid])
-    .then((results) => {
-      console.log(results);
-      const phonenumber = results[0].phonenumber;
-      const pquery = `select * from airtimetransactions where phonenumber = ?`;
-      executor(pquery, [phonenumber])
-        .then((results) => {
-          console.log(results, "chai" + phonenumber);
-          const transform = [];
-          const resu = results.reverse();
-          resu.forEach((element) => {
-            const { buynumber, status, price, date, network, size } = element;
-            console.log(date);
-            const dateObject = new Date(date);
-            console.log(dateObject);
-            const year = dateObject.getFullYear();
-            const month = (dateObject.getMonth() + 1)
-              .toString()
-              .padStart(2, "0");
-            const day = dateObject.getDate().toString().padStart(2, "0");
-            const hours = dateObject.getHours().toString().padStart(2, "0");
-            const minutes = dateObject.getMinutes().toString().padStart(2, "0");
-            const seconds = dateObject.getSeconds().toString().padStart(2, "0");
-            const formattedDate = `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
-
-            console.log(formattedDate); // Output: "2023-08-22 12:58:24"
-
-            transform.push({
-              buynumber,
-              status,
-              price,
-              date: formattedDate,
-              network,
-              size,
-            });
-          });
-          transform.map((idan) => {
-            console.log(idan);
-          });
-          res.json(transform);
-        })
-        .catch((error) => {
-          console.log(error.response || "Error getting transactionss");
-        });
-    })
-    .catch((error) => {
-      console.log(error.response || "Error getting transactionss");
-    });
-});
 
 app.get("/api/v1/callbalance", async (req, res) => {
   const email = req.session.email;
@@ -578,15 +379,6 @@ app.get("/api/v1/callbalance", async (req, res) => {
     console.log("Fetched data", user);
     res.send(user);
   });
-});
-
-app.get("/email", (req, res) => {
-  try {
-    forgot("peterninyo4@gmail.com", "11223");
-    res.send("sent");
-  } catch (error) {
-    console.log(error.response);
-  }
 });
 
 io.on("connection", (socket) => {
