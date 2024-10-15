@@ -29,7 +29,7 @@ const Createcoupons = async (req, res) => {
     myCache.set(`couponLocks:${userid}`, "locked",10);
 
     const [userData] = await executor(
-      "SELECT pin, phone, credit FROM users WHERE userid = ?",
+      "SELECT * FROM users WHERE userid = ?",
       [userid]
     );
 

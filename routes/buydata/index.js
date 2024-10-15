@@ -32,7 +32,7 @@ async function Buydata(req, res) {
     myCache.set(`datatransactionLocks:${userid}`, "locked", 10);
 
     const [userData] = await executor(
-      "SELECT pin, phone, credit FROM users WHERE userid = ?",
+      "SELECT * FROM users WHERE userid = ?",
       [userid]
     );
 

@@ -36,7 +36,7 @@ const Airtime = async (req, res) => {
     myCache.set(`airtransactionLocks:${userid}`, "locked", 10);
 
     const [userData] = await executor(
-      "SELECT pin, phone, credit FROM users WHERE userid = ?",
+      "SELECT * FROM users WHERE userid = ?",
       [userid]
     );
     if (!userData) {
