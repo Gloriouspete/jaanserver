@@ -38,7 +38,7 @@ const Createcoupons = async (req, res) => {
       return res.json({ success: false, message: "Account not found" });
     }
 
-    const emailverified = await Vemail(userid);
+   const emailverified = await Vemail(userid);
 
     if (emailverified === "no") {
       console.error("Account not verified");
@@ -61,7 +61,7 @@ const Createcoupons = async (req, res) => {
       }
     };
 
-    const { pin: mypin, phone, credit, ban } = userData;
+    const { pin: mypin, phone, credit, ban,verified } = userData;
     console.error(`see user balance ${credit} ${phone}`)
     if (ban === "yes") {
       console.error("This user has been banned");
@@ -71,6 +71,16 @@ const Createcoupons = async (req, res) => {
           success: false,
           message:
             "You have been banned from using Jaan services.",
+        });
+    }
+    if (verified === "no") {
+      console.error("identity not verified");
+      return res
+        .status(401)
+        .json({
+          success: false,
+          message:
+            "Your Kyc Account has not been verified. Please go to profile to verify your Identity before proceeding with this transaction.",
         });
     }
     console.warn("this is userdata", credit);
