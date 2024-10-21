@@ -9,5 +9,11 @@ const executor = new Executor({
     password:password,
     database:"apollomo_jaan",
 }).call
+// const executor = new Executor({
+//     host:"localhost",
+//     user:"root",
+//     password:"",
+//     database:"sys",
+// }).call
 
 module.exports = executor;

@@ -1,5 +1,6 @@
 require("dotenv").config();
 const axios = require("axios");
+const Gettime = require("../../services/time.js");
 const GetKuda = require("../../services/kuda");
 async function Getcable(req, res) {
   try {
@@ -15,7 +16,7 @@ async function Getcable(req, res) {
       serviceType: "GET_BILLERS_BY_TYPE",
       requestRef: Gettime(),
       data: {
-        "BillTypeName": "cableTv",
+        "BillTypeName": "cabletv",
       },
     };
     const response = await axios.post(
@@ -29,6 +30,7 @@ async function Getcable(req, res) {
       }
     );
     const responseData = response.data;
+    console.log(responseData)
     if (responseData.status) {
       const bettingResponse = responseData.data.billers;
       return res.status(200).json({

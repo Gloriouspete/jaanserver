@@ -1,6 +1,7 @@
 require("dotenv").config();
 const axios = require("axios");
 const GetKuda = require("../../services/kuda");
+const Gettime = require("../../services/time.js");
 async function Getelectric(req, res) {
   try {
     const accesstoken = await GetKuda();
@@ -29,8 +30,10 @@ async function Getelectric(req, res) {
       }
     );
     const responseData = response.data;
+    //console.log(responseData)
     if (responseData.status) {
       const Response = responseData.data.billers;
+      console.log(Response)
       return res.status(200).json({
         success: true,
         message: "Electricity Plans retrieved successfully",

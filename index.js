@@ -83,7 +83,7 @@ const requestLimiter = rateLimit({
 const speedLimiter = slowDown({
   windowMs: 10 * 1000, // 10 seconds
   delayAfter: 1, // Delay after 1 request
-  delayMs: 1000, // Delay of 1 second per additional request
+  delayMs:() =>  1000, // Delay of 1 second per additional request
 });
 
 const io = new Server(server, {
@@ -93,7 +93,7 @@ const io = new Server(server, {
 });
 
 corsOptions = {
-  origin: ["https://jaan.ng", "https://admin.jaan.ng"],
+  origin: ["https://jaan.ng","https://www.jaan.ng","www.jaan.ng", "https://admin.jaan.ng"],
   //origin: "*",
   methods: "GET, POST, PUT, PATCH, DELETE, OPTIONS",
   allowedHeaders: "Origin, Content-Type,Authorization, X-Auth-Token",
