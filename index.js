@@ -75,6 +75,11 @@ const Banuser = require("./admin/banuser/index.js");
 const Unbanuser = require("./admin/unbanuser/index.js");
 const rateLimit = require('express-rate-limit');
 const slowDown = require('express-slow-down');
+const Viewadvert = require("./routes/adverts/viewadvert.js");
+const Viewadverts = require("./admin/adverts/viewadvert.js");
+const Createadvert = require("./admin/adverts/create.js");
+const DeleteAdvert = require("./admin/adverts/delete.js");
+const ChangeAdvertStatus = require("./admin/adverts/changestatus.js");
 const requestLimiter = rateLimit({
   windowMs: 10 * 1000, // 10 seconds
   max: 1, // Limit each user to 1 coupon creation per window
@@ -83,7 +88,7 @@ const requestLimiter = rateLimit({
 const speedLimiter = slowDown({
   windowMs: 10 * 1000, // 10 seconds
   delayAfter: 1, // Delay after 1 request
-  delayMs:() =>  1000, // Delay of 1 second per additional request
+  delayMs: () => 1000, // Delay of 1 second per additional request
 });
 
 const io = new Server(server, {
@@ -223,11 +228,11 @@ app.post("/api/v1/setpass", Setpass);
 
 app.post("/api/v1/getdata", Getdata);
 
-app.post("/api/v1/buyairtime", validateAirtimeRequest,requestLimiter,speedLimiter, Airtime);
+app.post("/api/v1/buyairtime", validateAirtimeRequest, requestLimiter, speedLimiter, Airtime);
 
 app.get("/api/v1/getuser", Getuser);
 
-app.post("/api/v1/buydata", validateDataRequest,requestLimiter,speedLimiter, Buydata);
+app.post("/api/v1/buydata", validateDataRequest, requestLimiter, speedLimiter, Buydata);
 
 app.post("/api/v1/getcable", Getcable);
 
@@ -251,15 +256,17 @@ app.get("/api/v1/getprice", GetPrice);
 
 app.get("/api/v1/getpopup", GetPopup);
 
-app.post("/api/v1/createcoupon", validateAmount,requestLimiter,speedLimiter, Createcoupons);
+app.post("/api/v1/createcoupon", validateAmount, requestLimiter, speedLimiter, Createcoupons);
 
-app.post("/api/v1/redeemcoupon",requestLimiter,speedLimiter, Redeemcoupon);
+app.post("/api/v1/redeemcoupon", requestLimiter, speedLimiter, Redeemcoupon);
 
 app.post("/api/v1/verifycable", Verifycable);
 
 app.post("/api/v1/verifyelectric", Verifyelectric);
 
 app.get("/api/v1/genemail", Genemail);
+
+app.get("/api/v1/getadverts", Viewadvert)
 
 app.get("/admin/getusers", Getusers);
 
@@ -312,6 +319,14 @@ app.post("/admin/deletemessage", Deletemessage);
 app.get("/admin/viewcoupon", Viewcoupon);
 
 app.get("/admin/viewmessage", Viewmessage);
+
+app.get("/admin/getadverts", Viewadverts);
+
+app.post("/admin/createadvert", Createadvert);
+
+app.post("/admin/deleteadvert", DeleteAdvert);
+
+app.post("/admin/changeadvertstatus", ChangeAdvertStatus)
 
 app.get("/api/v1/getrefid", GetRefid);
 
