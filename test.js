@@ -16,7 +16,7 @@ async function Make() {
         CustomerIdentifier: "07030000000",
         PhoneNumber: "07030000000",
         BillItemIdentifier: "KUD-BET-MSPT-001",
-        Amount: "29000",
+        Amount: "10000",
       },
     };
 
@@ -46,3 +46,9 @@ async function Make() {
 }
 
 Make();
+// see response: {
+//   message: 'Your bill purchase request is successful',
+//   status: true,
+//   data: { reference: '2024110111418886', pin: null },
+//   statusCode: '00'
+// }

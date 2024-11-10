@@ -11,7 +11,7 @@ async function GetKuda() {
 
     // Here I'm sending a post request to get the token
     const response = await axios.post(
-      "https://kuda-openapi-uat.kudabank.com/v2.1/Account/GetToken",
+      "https://kuda-openapi.kuda.com/v2.1/Account/GetToken",
       payload,
       {
         headers: {

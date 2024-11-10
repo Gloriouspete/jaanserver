@@ -20,7 +20,7 @@ async function Getelectric(req, res) {
       },
     };
     const response = await axios.post(
-      "https://kuda-openapi-uat.kudabank.com/v2.1",
+      "https://kuda-openapi.kuda.com/v2.1",
       payload,
       {
         headers: {
@@ -33,7 +33,7 @@ async function Getelectric(req, res) {
     //console.log(responseData)
     if (responseData.status) {
       const Response = responseData.data.billers;
-      console.log(Response)
+      //console.log(Response)
       return res.status(200).json({
         success: true,
         message: "Electricity Plans retrieved successfully",

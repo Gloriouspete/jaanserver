@@ -80,6 +80,10 @@ const Viewadverts = require("./admin/adverts/viewadvert.js");
 const Createadvert = require("./admin/adverts/create.js");
 const DeleteAdvert = require("./admin/adverts/delete.js");
 const ChangeAdvertStatus = require("./admin/adverts/changestatus.js");
+const Verifybet = require("./routes/verifybet/index.js");
+const Buybetting = require("./routes/buybetting/index.js");
+const Getcard = require("./routes/getcard/index.js");
+const Buygiftcard = require("./routes/buygiftcard/index.js");
 const requestLimiter = rateLimit({
   windowMs: 10 * 1000, // 10 seconds
   max: 1, // Limit each user to 1 coupon creation per window
@@ -98,8 +102,8 @@ const io = new Server(server, {
 });
 
 corsOptions = {
-  origin: ["https://jaan.ng","https://www.jaan.ng","www.jaan.ng", "https://admin.jaan.ng"],
-  //origin: "*",
+  //origin: ["https://jaan.ng","https://www.jaan.ng","www.jaan.ng", "https://admin.jaan.ng"],
+  origin: "*",
   methods: "GET, POST, PUT, PATCH, DELETE, OPTIONS",
   allowedHeaders: "Origin, Content-Type,Authorization, X-Auth-Token",
   optionsSuccessStatus: 200,
@@ -234,23 +238,29 @@ app.get("/api/v1/getuser", Getuser);
 
 app.post("/api/v1/buydata", validateDataRequest, requestLimiter, speedLimiter, Buydata);
 
-app.post("/api/v1/getcable", Getcable);
+app.get("/api/v1/getcable", Getcable);
 
 app.post("/api/v1/geteducation", Geteducation);
-
-app.post("/api/v1/buyeducation", Buyeducation);
-
-app.post("/api/v1/buycable", Buycable);
-
-app.post("/api/v1/buyelectric", Buyelectric);
-
-app.post("/api/v1/kyc", Kyc);
-
-app.post("/api/v1/genaccount", Genaccount);
 
 app.get("/api/v1/getelectric", Getelectric);
 
 app.get("/api/v1/getbetting", Getbetting);
+
+app.get("/api/v1/getgiftcard", Getcard);
+
+app.post("/api/v1/buyeducation", Buyeducation);
+
+app.post("/api/v1/buycable", speedLimiter, requestLimiter, Buycable);
+
+app.post("/api/v1/buyelectric",speedLimiter,requestLimiter, Buyelectric);
+
+app.post("/api/v1/buybetting", speedLimiter, requestLimiter, Buybetting);
+
+app.post("/api/v1/buygiftcard",speedLimiter,requestLimiter, Buygiftcard);
+
+app.post("/api/v1/kyc", Kyc);
+
+app.post("/api/v1/genaccount", Genaccount);
 
 app.get("/api/v1/getprice", GetPrice);
 
@@ -263,6 +273,8 @@ app.post("/api/v1/redeemcoupon", requestLimiter, speedLimiter, Redeemcoupon);
 app.post("/api/v1/verifycable", Verifycable);
 
 app.post("/api/v1/verifyelectric", Verifyelectric);
+
+app.post("/api/v1/verifybet", Verifybet);
 
 app.get("/api/v1/genemail", Genemail);
 

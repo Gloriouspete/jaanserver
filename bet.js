@@ -2,6 +2,7 @@ const axios = require("axios");
 require("dotenv").config();
 const GetKuda = require("./services/kuda.js");
 const Gettime = require("./services/time.js");
+const dataapi = process.env.DATA_SECRET;
 async function Make() {
   try {
     const accesstoken = await GetKuda(); // Returns my accesstoken for each requests
@@ -16,20 +17,19 @@ async function Make() {
       },
     };
 
-    const response = await axios.post(
-      "https://kuda-openapi-uat.kudabank.com/v2.1",
-      payload,
+    const response = await axios.get(
+      "https://datastation.com.ng/api/rechargepin/",
       {
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${accesstoken}`,
+          Authorization: `Token ${dataapi}`,
         },
       }
-    ); 
+    );
 
     const mydata = response.data;
 
-    console.log("see response:", mydata.data);
+    console.log("see response:", mydata);
     // const mydata = response.data.data;
     // const gift = mydata.giftCardData;
     // console.log(gift);

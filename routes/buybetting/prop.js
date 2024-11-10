@@ -39,7 +39,7 @@ async function makePurchaseRequest({ requesttime, meternumber, type, phone, amou
 }
 async function getUserData(userid) {
   try {
-    const [userData] = await executor("SELECT credit,email FROM users WHERE userid = ?", [userid]);
+    const [userData] = await executor("SELECT credit,email,phone FROM users WHERE userid = ?", [userid]);
     return userData;
   } catch (error) {
     console.error("Error fetching user data:", error);

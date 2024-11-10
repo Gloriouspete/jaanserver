@@ -1,6 +1,7 @@
 require("dotenv").config();
 const axios = require("axios");
 const GetKuda = require("../../services/kuda");
+const Gettime = require("../../services/time.js");
 async function Getcard(req, res) {
   try {
     const accesstoken = await GetKuda();
@@ -27,6 +28,7 @@ async function Getcard(req, res) {
       }
     );
     const responseData = response.data;
+    //console.log(responseData);
     if (responseData.status) {
       const giftCard = responseData.data.giftCardData;
       return res.status(200).json({

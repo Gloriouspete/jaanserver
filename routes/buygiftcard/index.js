@@ -1,18 +1,18 @@
 const executor = require("../../config/db.js");
 require("dotenv").config();
 const mydate = new Date();
-const axios = require("axios");
 const Gettime = require("../../services/time.js");
 const { makePurchaseRequest, getUserData } = require("./prop.js");
 const GetPricer = require("../../services/price/price.js");
 const Vemail = require("../../services/emailverify.js");
 const Points = require("../../services/points/points.js");
-async function Buyelectric(req, res) {
+async function Buygiftcard(req, res) {
+  console.log(req.body);
   const { userid } = req.user;
-  const { meternumber, type, phone, amount } = req.body;
-  const datas = { meternumber, type, phone, amount };
-  const realamount = parseInt(amount, 10);
-  if (!meternumber || !type || !phone || !amount) {
+  const { giftname, kudaIdentifier, email, amount, nairaAmount } = req.body;
+  const datas = { giftname, kudaIdentifier, email, amount, nairaAmount }
+  const realamount = parseInt(nairaAmount, 10);
+  if (!giftname || !kudaIdentifier || !email || !amount || !nairaAmount) {
     return res.status(400).json({
       message: "All fields are required",
       success: false,
@@ -22,7 +22,6 @@ async function Buyelectric(req, res) {
   try {
     console.log("Request Data:", datas);
     const requesttime = Gettime();
-    console.log("Request Time:", requesttime);
     const userData = await getUserData(userid);
     const electricresponse = await GetPricer();
     if (!userData) {
@@ -38,12 +37,12 @@ async function Buyelectric(req, res) {
     }
     if (!electricresponse) {
       return res.status(404).json({
-        message: "Unable to verify charge amuount, Contact support!",
+        message: "Unable to verify charge amount, Contact support!",
         success: false,
       });
     }
     const { electricprice } = electricresponse[0];
-    const { credit, email } = userData;
+    const { credit, email: useremail, phone, user_name } = userData;
     if (!electricprice) {
       return res.status(404).json({
         message: "Unable to verify charge amount, Contact support!",
@@ -61,43 +60,41 @@ async function Buyelectric(req, res) {
     } else if (balance >= intamount) {
       const responseData = await makePurchaseRequest({
         requesttime,
-        meternumber,
-        type,
+        identifier: kudaIdentifier,
+        email,
+        amount,
         phone,
-        amount: Number(amount) * 100,
+        name: user_name
       });
       if (responseData.status) {
         const {
-          pin,
-          reference
+          pin
         } = responseData.data;
 
         const imade = {
           userid,
-          network: "Electricity",
+          network: "giftcard",
           recipient: meternumber,
           Status: "successful",
-          name: type,
-          token: pin || "null",
-          plan: reference,
+          name: giftname,
+          token: pin?.number || "null",
+          plan: pin?.serial,
           amount: intamount,
+          email: email
         };
-
-        await setElectric(imade);
+        await setGiftcard(imade);
         await executor(
           "UPDATE users SET credit = credit - ? WHERE userid = ?",
           [intamount, userid]
         );
         Points(userid, amount, email)
         return res.status(200).json({
-          message: `Your Electric Purchase Transaction was Successful and the token is ${pin || reference
-            }`,
+          message: `Your Giftcard Purchase Transaction was Successful and the pin is ${pin?.number}`,
           success: true,
         });
-      }
-      else {
+      } else {
         return res.status(500).json({
-          message: `Electricity Purchase Failed, Kindly Try Again later`,
+          message: `Giftcard Purchase Failed, Kindly Try Again later`,
           success: false,
         });
       }
@@ -114,14 +111,14 @@ async function Buyelectric(req, res) {
   }
 }
 
-const setElectric = async (data) => {
-  const { userid, token, recipient, Status, network, plan, amount, name } =
+const setGiftcard = async (data) => {
+  const { userid, token, recipient, Status, network, plan, amount, name, email } =
     data;
 
   const newDate = new Date();
   const formattedDate = newDate.toISOString();
   try {
-    const query = `INSERT INTO transactions (userid,recipient, name, status, price, date, network, token,plan,service) VALUES (?,?,?,?,?,?,?,?,?,?)`;
+    const query = `INSERT INTO transactions (userid,recipient, name, status, price, date, network, token,plan,service,email) VALUES (?,?,?,?,?,?,?,?,?,?,?)`;
     executor(query, [
       userid,
       recipient,
@@ -132,7 +129,8 @@ const setElectric = async (data) => {
       network,
       token,
       plan,
-      "electric",
+      "giftcard",
+      email
     ])
       .then((results) => {
         console.log("successful!", results);
@@ -143,4 +141,4 @@ const setElectric = async (data) => {
   } catch (error) { }
 };
 
-module.exports = Buyelectric;
+module.exports = Buygiftcard;

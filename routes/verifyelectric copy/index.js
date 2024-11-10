@@ -4,7 +4,6 @@ const GetKuda = require("../../services/kuda.js");
 const Gettime = require("../../services/time.js");
 async function Verifyelectric(req, res) {
   const { number, type } = req.body;
-  console.log(req.body)
   try {
     const accesstoken = await GetKuda();
     if (!type || !number) {
@@ -25,13 +24,9 @@ async function Verifyelectric(req, res) {
       serviceType: "VERIFY_BILL_CUSTOMER",
       requestRef: Gettime(),
       data: {
-        "KudaBillItemIdentifier": type,
-        "CustomerIdentification": number
+        "KudaBillItemIdentifier": "KUD-ELE-AEDC-001",
+        "CustomerIdentification": "46432634278"
       },
-      // data: {
-      //   "KudaBillItemIdentifier": "KUD-ELE-AEDC-001",
-      //   "CustomerIdentification": "46432634278"
-      // },
     };
 
     const response = await axios.post(
@@ -45,7 +40,6 @@ async function Verifyelectric(req, res) {
       }
     );
     const responseData = response.data;
-    console.log(responseData)
     if (responseData.status) {
       return res.status(200).json({
         success: true,
@@ -55,7 +49,7 @@ async function Verifyelectric(req, res) {
     } else {
       return res.status(400).json({
         success: true,
-        message: responseData?.message || "Unable to verify Number",
+        message: "Unable to verify Number",
         data: null,
       });
     }

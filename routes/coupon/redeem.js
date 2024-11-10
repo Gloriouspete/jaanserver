@@ -85,10 +85,10 @@ const Redeemcoupon = async (req, res) => {
       console.error("Balance too low");
       return res.status(401).json({ success: false, message: "Your Account Balance is too low, Kindly ensure that you've top up your account with at least 100 naira to be able to claim coupon" });
     }
-    if (verified === "no") {
-      console.error("identity not verified");
-      return res.status(401).json({ success: false, message: "Your Kyc Account has not been verified. Please go to profile to verify your Identity before proceeding with this transaction." });
-    }
+    // if (verified === "no") {
+    //   console.error("identity not verified");
+    //   return res.status(401).json({ success: false, message: "Your Kyc Account has not been verified. Please go to profile to verify your Identity before proceeding with this transaction." });
+    // }
     const { admin, amount } = checkCoupon;
     console.warn("this is userdata", credit);
     const amountcc = Number(amount);

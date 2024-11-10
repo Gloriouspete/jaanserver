@@ -2,7 +2,7 @@ require("dotenv").config();
 const axios = require("axios");
 const GetKuda = require("../../services/kuda.js");
 const Gettime = require("../../services/time.js");
-async function Verifyelectric(req, res) {
+async function Verifybet(req, res) {
   const { number, type } = req.body;
   console.log(req.body)
   try {
@@ -28,10 +28,6 @@ async function Verifyelectric(req, res) {
         "KudaBillItemIdentifier": type,
         "CustomerIdentification": number
       },
-      // data: {
-      //   "KudaBillItemIdentifier": "KUD-ELE-AEDC-001",
-      //   "CustomerIdentification": "46432634278"
-      // },
     };
 
     const response = await axios.post(
@@ -49,13 +45,13 @@ async function Verifyelectric(req, res) {
     if (responseData.status) {
       return res.status(200).json({
         success: true,
-        message: "Cable Plans verified",
+        message: "Betting verified",
         data: responseData.data,
       });
     } else {
       return res.status(400).json({
         success: true,
-        message: responseData?.message || "Unable to verify Number",
+        message: responseData?.message || "Unable to verify Betting ID",
         data: null,
       });
     }
@@ -69,4 +65,4 @@ async function Verifyelectric(req, res) {
   }
 }
 
-module.exports = Verifyelectric;
+module.exports = Verifybet;
