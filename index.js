@@ -102,8 +102,8 @@ const io = new Server(server, {
 });
 
 corsOptions = {
-  //origin: ["https://jaan.ng","https://www.jaan.ng","www.jaan.ng", "https://admin.jaan.ng"],
-  origin: "*",
+  origin: ["https://jaan.ng","https://www.jaan.ng","www.jaan.ng", "https://admin.jaan.ng"],
+  //origin: "*",
   methods: "GET, POST, PUT, PATCH, DELETE, OPTIONS",
   allowedHeaders: "Origin, Content-Type,Authorization, X-Auth-Token",
   optionsSuccessStatus: 200,
