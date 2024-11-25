@@ -19,5 +19,5 @@ const executor = new Executor({
 module.exports = executor;
 
 //scp /Users/glo/dumps/Dump20241122.sql root@104.167.198.12:/home/jaan/
-Bjelbfh0O0S9Rj1oaNiO
+//Bjelbfh0O0S9Rj1oaNiO
 
