@@ -6,8 +6,8 @@ async function Make() {
     try {
         const accesstoken = await GetKuda(); // Returns my accesstoken for each requests
         if (!accesstoken) {
-            return;
-        }
+            return
+        };
         const payload = {
             serviceType: "VERIFY_BILL_CUSTOMER",
             requestRef: Gettime(),
@@ -38,6 +38,6 @@ async function Make() {
         console.log(error);
         console.error("Error:", error.response);
     }
-}
+};
 
 Make();

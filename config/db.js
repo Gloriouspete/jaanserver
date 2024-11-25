@@ -5,9 +5,9 @@ const password = process.env.DB_PASSWORD
 
 const executor = new Executor({
     host:"localhost",
-    user:"apollomo_jaan",
+    user:"beumapvt_jaan",
     password:password,
-    database:"apollomo_jaan",
+    database:"beumapvt_jaan",
 }).call
 // const executor = new Executor({
 //     host:"localhost",
@@ -17,3 +17,7 @@ const executor = new Executor({
 // }).call
 
 module.exports = executor;
+
+//scp /Users/glo/dumps/Dump20241122.sql root@104.167.198.12:/home/jaan/
+Bjelbfh0O0S9Rj1oaNiO
+
