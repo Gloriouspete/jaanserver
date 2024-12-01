@@ -13,13 +13,18 @@ async function Signup(req, res) {
     const emailQuery =
       "SELECT COUNT(*) AS emailCount FROM users WHERE email = ?";
 
-    const [phoneResults, emailResults] = await Promise.all([
+    const userQuery =
+      "SELECT COUNT(*) AS userCount FROM users WHERE user_name = ?";
+
+    const [phoneResults, emailResults, userResults] = await Promise.all([
       executor(phoneQuery, [phone]),
       executor(emailQuery, [email]),
+      executor(userQuery, [username]),
     ]);
 
     const phoneCount = phoneResults[0].phoneCount;
     const emailCount = emailResults[0].emailCount;
+    const userCount = userResults[0].userCount
 
     if (phoneCount > 0) {
       console.log("The phone number already exists");
@@ -38,6 +43,15 @@ async function Signup(req, res) {
         data: null,
       });
     }
+    if (userCount > 0) {
+      console.log("The username already exists");
+      return res.status(400).json({
+        success: false,
+        message: "This Username Already exists, Please use another one",
+        data: null,
+      });
+    }
+
 
     const userid = generateUniqueUserID();
     const token = jwt.sign({ userid }, secretKey);
