@@ -6,12 +6,11 @@ const Points = async (userid, amount,email) => {
   if (!userid || !amount) {
     return false;
   }
-  if (Number(amount) > 1000) {
-    points = 4;
-  } else {
+  if (Number(amount) >= 100 && Number(amount) < 1000) {
     points = 2;
+  } else if(Number(amount) > 1000) {
+    points = 4;
   }
-
   try {
     const query = `UPDATE users SET points = points + ?,loyalty = loyalty + ? where userid = ?`;
     await executor(query, [points,points,userid]);
