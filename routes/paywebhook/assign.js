@@ -11,7 +11,7 @@ const Assign = async (eventData) =>{
     await setBank(bankName,accountNumber,accountName,email)
   }
   catch(error){
-
+   console.error(error);
   }
 }
 module.exports = Assign;

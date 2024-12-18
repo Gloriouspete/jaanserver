@@ -4,7 +4,7 @@ const paymentSuccess = require("./payment");
 require("dotenv").config();
 const clientSecretKey = process.env.PAYSTACK_SECRET;
 const PayWebhook = async (req, res) => {
-    const paystackSignature = req.headers("x-paystack-signature");
+    const paystackSignature = req.headers["x-paystack-signature"];
     if (!paystackSignature) {
         return res.status(400).send("Missing Paystack Signature Header");
     }
