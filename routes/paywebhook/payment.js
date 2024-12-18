@@ -16,7 +16,8 @@ const paymentSuccess = async (eventData) => {
         const { phone, credit, userid } = user;
         const balance = parseInt(credit, 10);
         const parsedAmount = parseInt(amount, 10);
-        const plusedamount = balance + parsedAmount;
+        const deducted = parsedAmount / 100;
+        const plusedamount = balance + deducted;
         const anotherquery = `UPDATE users SET credit = ? WHERE userid = ?`;
         await executor(anotherquery, [plusedamount, userid]);
         const deposit = "Funding";
