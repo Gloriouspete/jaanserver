@@ -1,7 +1,7 @@
 const executor = require("../../config/db.js");
 const getAccount = require("../../account.js");
 async function Genaccount(req, res) {
-  const {type,number} = req.body;
+  const { type, number } = req.body;
   const { userid } = req.user;
   console.log("Received phonenumber:", userid);
   try {
@@ -15,15 +15,15 @@ async function Genaccount(req, res) {
     }
     const user = results[0];
     const { email, phone, name } = user;
-    getAccount(userid, email, name,type,number)
+    getAccount(userid, email, name, phone, type, number)
       .then(async (results) => {
-        const mydata = results.data;
-        const { bankName, accountNumber } = mydata;
-        const fact = await setBank(bankName, accountNumber,name, userid);
-        if (fact) {
+        // const mydata = results.data;
+        // const { bankname: bankName, accountnumber: accountNumber, accountname: accountName } = mydata;
+        // const fact = await setBank(bankName, accountNumber, accountName, userid);
+        if (results) {
           res.status(200).json({
             success: true,
-            message: "A new bank account has been generated for you ",
+            message: results || "A new bank account has been generated for you ",
             data: null,
           });
         } else
@@ -50,11 +50,11 @@ async function Genaccount(req, res) {
   }
 }
 
-const setBank = async (bankname, accountnumber,name, userid) => {
+const setBank = async (bankname, accountnumber, name, userid) => {
   try {
-    const customerbankname = 'Jaan - ' + name.slice(0,3);
+    const customerbankname = name;
     const query = `UPDATE users SET bankname = ? , accountnumber = ?, accountname = ? where userid = ?`;
-    executor(query, [bankname, accountnumber,customerbankname, userid]).then((response) => {
+    executor(query, [bankname, accountnumber, customerbankname, userid]).then((response) => {
       return true;
     });
   } catch (error) {

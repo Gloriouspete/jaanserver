@@ -84,6 +84,7 @@ const Verifybet = require("./routes/verifybet/index.js");
 const Buybetting = require("./routes/buybetting/index.js");
 const Getcard = require("./routes/getcard/index.js");
 const Buygiftcard = require("./routes/buygiftcard/index.js");
+const PayWebhook = require("./routes/paywebhook/index.js");
 const requestLimiter = rateLimit({
   windowMs: 10 * 1000, // 10 seconds
   max: 1, // Limit each user to 1 coupon creation per window
@@ -216,6 +217,8 @@ app.post("/webhooksuccess", async (req, res) => {
   }
 });
 
+app.post("/paywebhook", PayWebhook)
+
 app.post("/api/v1/signup", Signup);
 
 app.post("/api/v1/login", Login);
@@ -252,11 +255,11 @@ app.post("/api/v1/buyeducation", Buyeducation);
 
 app.post("/api/v1/buycable", speedLimiter, requestLimiter, Buycable);
 
-app.post("/api/v1/buyelectric",speedLimiter,requestLimiter, Buyelectric);
+app.post("/api/v1/buyelectric", speedLimiter, requestLimiter, Buyelectric);
 
 app.post("/api/v1/buybetting", speedLimiter, requestLimiter, Buybetting);
 
-app.post("/api/v1/buygiftcard",speedLimiter,requestLimiter, Buygiftcard);
+app.post("/api/v1/buygiftcard", speedLimiter, requestLimiter, Buygiftcard);
 
 app.post("/api/v1/kyc", Kyc);
 

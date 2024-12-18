@@ -1,33 +1,30 @@
 const executor = require("../../config/db.js");
 require("dotenv").config();
 const axios = require("axios");
-const Gettime = require("../../services/time.js");
-const GetKuda = require("../../services/kuda.js");
+const secretKey = process.env.RE_TEST_SECRET;
 
 
-async function makePurchaseRequest({ requesttime, meternumber, type, phone, amount }) {
+async function makePurchaseRequest({ requesttime, meternumber, type, phone, amount,email }) {
 
   const payload = {
-    serviceType: "ADMIN_PURCHASE_BILL",
-    requestRef: Gettime(),
-    data: {
-      CustomerFirstName: "Test",
-      CustomerIdentifier: meternumber,
-      PhoneNumber: phone,
-      BillItemIdentifier: type,
-      Amount: amount,
-    },
+    email: email,
+    transactionRef: requesttime,
+    name: "Test",
+    customerId: meternumber,
+    phoneNumber: phone,
+    billPaymentProductId: type,
+    amount: amount,
+
   };
 
   try {
-    const accesstoken = await GetKuda();
     const response = await axios.post(
-      "https://kuda-openapi.kuda.com/v2.1",
+      "https://api-demo.systemspecsng.com/services/connect-gateway/api/v1/biller/initiate",
       payload,
       {
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${accesstoken}`,
+          "secretKey": secretKey,
         },
       }
     );

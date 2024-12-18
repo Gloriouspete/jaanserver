@@ -1,12 +1,10 @@
 require("dotenv").config();
 const axios = require("axios");
-const GetKuda = require("../../services/kuda.js");
-const Gettime = require("../../services/time.js");
+const secretKey = process.env.RE_TEST_SECRET;
 async function Verifyelectric(req, res) {
   const { number, type } = req.body;
   console.log(req.body)
   try {
-    const accesstoken = await GetKuda();
     if (!type || !number) {
       return res.status(400).json({
         success: false,
@@ -14,39 +12,23 @@ async function Verifyelectric(req, res) {
         data: null,
       });
     }
-    if (!accesstoken) {
-      return res.status(400).json({
-        success: false,
-        message: "Unable to verify, Contact Support",
-        data: null,
-      });
-    }
-    const payload = {
-      serviceType: "VERIFY_BILL_CUSTOMER",
-      requestRef: Gettime(),
-      data: {
-        "KudaBillItemIdentifier": type,
-        "CustomerIdentification": number
-      },
-      // data: {
-      //   "KudaBillItemIdentifier": "KUD-ELE-AEDC-001",
-      //   "CustomerIdentification": "46432634278"
-      // },
+    var data = {
+      "billPaymentProductId": type,
+      "customerId": number
     };
 
     const response = await axios.post(
-      "https://kuda-openapi.kuda.com/v2.1",
-      payload,
+      "https://api-demo.systemspecsng.com/services/connect-gateway/api/v1/biller/validate-customer",
+      data,
       {
         headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${accesstoken}`,
+          "secretKey":secretKey,
         },
       }
     );
     const responseData = response.data;
     console.log(responseData)
-    if (responseData.status) {
+    if (responseData.status === "00") {
       return res.status(200).json({
         success: true,
         message: "Cable Plans verified",
@@ -67,6 +49,6 @@ async function Verifyelectric(req, res) {
       data: null,
     });
   }
-}
+};
 
 module.exports = Verifyelectric;

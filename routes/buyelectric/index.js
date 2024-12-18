@@ -8,6 +8,7 @@ const GetPricer = require("../../services/price/price.js");
 const Vemail = require("../../services/emailverify.js");
 const Points = require("../../services/points/points.js");
 async function Buyelectric(req, res) {
+  console.log(req.body)
   const { userid } = req.user;
   const { meternumber, type, phone, amount } = req.body;
   const datas = { meternumber, type, phone, amount };
@@ -65,6 +66,7 @@ async function Buyelectric(req, res) {
         type,
         phone,
         amount: Number(amount) * 100,
+        email
       });
       if (responseData.status) {
         const {
