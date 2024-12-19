@@ -4,22 +4,18 @@ const paymentSuccess = async (eventData) => {
     console.error(eventData)
     try {
         const data = eventData.data;
-        const amount = data.amount;
+        const amount = data.fees_breakdown.amount;
         const email = data.customer.email;
         const query = `SELECT phone, credit, userid FROM users WHERE email = ?`;
         const results = await executor(query, [email]);
-
         if (results.length === 0) {
             throw new Error("User not found");
         }
         const user = results[0];
-        const { phone, credit, userid } = user;
-        const balance = parseInt(credit, 10);
+        const { phone, userid } = user;
         const parsedAmount = parseInt(amount, 10);
-        const deducted = parsedAmount / 100;
-        const plusedamount = balance + deducted;
-        const anotherquery = `UPDATE users SET credit = ? WHERE userid = ?`;
-        await executor(anotherquery, [plusedamount, userid]);
+        const anotherquery = `UPDATE users SET credit = credit + ? WHERE userid = ?`;
+        await executor(anotherquery, [parsedAmount, userid]);
         const deposit = "Funding";
         const Status = "successful";
         const newdate = new Date();

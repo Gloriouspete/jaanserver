@@ -1,6 +1,6 @@
 const executor = require("../../config/db.js");
 async function Manualfund(req, res) {
-  const { email, amount } = req.body;
+  const { email, amount, type } = req.body;
   const theamount = Number(amount);
   const userid = req.user.userid;
   try {
@@ -14,31 +14,46 @@ async function Manualfund(req, res) {
       });
     }
     const { userid, phone } = response[0];
-    const selectUserQuery = `UPDATE users SET credit = credit + ${theamount} where email = ?`;
-    
-    executor(selectUserQuery, [email])
-      .then(async (results) => {
-        const data = {
-          userid,
-          phone,
-          deposit: "funding",
-          Status: "successful",
-          amount,
-          date: gete(),
-        };
-        await setpayment(data);
-        return res.status(200).json({
-          success: true,
-          message: "Transaction successfully completed",
-          data: null,
+    let selectUserQuery;
+    if (type === "credit") {
+      selectUserQuery = `UPDATE users SET credit = credit + ${theamount} where email = ?`;
+    } else if (type === "debit") {
+      selectUserQuery = `UPDATE users SET credit = credit - ${theamount} where email = ?`;
+    }
+
+    if (type === "credit") {
+      executor(selectUserQuery, [email])
+        .then(async (results) => {
+          const data = {
+            userid,
+            phone,
+            deposit: "funding",
+            Status: "successful",
+            amount,
+            date: gete(),
+          };
+          await setpayment(data);
+          return res.status(200).json({
+            success: true,
+            message: "Transaction successfully completed",
+            data: null,
+          });
+        })
+        .catch((error) => {
+          console.error("Error finding user credentials:", error);
+          return res
+            .status(500)
+            .json({ success: false, message: "Unable to fund" });
         });
-      })
-      .catch((error) => {
-        console.error("Error finding user credentials:", error);
-        return res
-          .status(500)
-          .json({ success: false, message: "Unable to fund" });
+    }
+    else{
+      return res.status(200).json({
+        success: true,
+        message: "Transaction successfully completed",
+        data: null,
       });
+    }
+
   } catch (error) {
     console.log(error);
     return res.status(500).json({ success: false, message: "Unable to fund " });
@@ -50,7 +65,7 @@ const setpayment = async (data) => {
   const today = new Date();
   const create_date = today.toISOString()
   try {
-  
+
     const query = `INSERT INTO transactions(userid,recipient, service, status, price, date,name) VALUES (?,?,?,?,?,?,?)`;
     const results = await executor(query, [
       userid,
