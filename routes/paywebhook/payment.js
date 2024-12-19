@@ -1,7 +1,6 @@
 const executor = require("../../config/db");
 
 const paymentSuccess = async (eventData) => {
-    console.error(eventData)
     try {
         const data = eventData.data;
         const amount = data.fees_breakdown.amount;
