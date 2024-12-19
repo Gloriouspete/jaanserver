@@ -21,7 +21,6 @@ async function Manualfund(req, res) {
       selectUserQuery = `UPDATE users SET credit = credit - ${theamount} where email = ?`;
     }
 
-
     executor(selectUserQuery, [email])
       .then(async (results) => {
         if (type === "credit") {
