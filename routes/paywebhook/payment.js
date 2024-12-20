@@ -13,7 +13,7 @@ const paymentSuccess = async (eventData) => {
     const user = results[0];
     const { phone, userid } = user;
     const parsedAmount = parseInt(amount, 10);
-    let amountToCredit;
+    let amountToCredit = parsedAmount;
     if (parsedAmount <= 500) {
       amountToCredit = parsedAmount * 0.9;
     } else {

@@ -154,7 +154,7 @@ const Airtime = async (req, res) => {
         newbalance,
         userid,
       ]);
-      Points(userid, amount, email);
+      Points(userid, amountcc, email);
       return res.status(200).json({
         success: true,
         message: "Airtime Purchase Successful",
