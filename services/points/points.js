@@ -2,11 +2,11 @@ const executor = require("../../config/db.js");
 const Email = require("./email.js");
 
 const Points = async (userid, amount, email) => {
-  let points = 1;
+  let points = 0;
   if (!userid || !amount) {
     return false;
   }
-  if (Number(amount) >= 100 && Number(amount) < 1000) {
+  if (Number(amount) >= 500 && Number(amount) < 1000) {
     points = 2;
   } else if (Number(amount) >= 1000) {
     points = 4;
