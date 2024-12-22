@@ -70,7 +70,7 @@ const Geteducation = require("./routes/geteducation/index.js");
 const Buyeducation = require("./routes/buyeducation/index.js");
 const Genemail = require("./routes/genemail/index.js");
 const Getbetting = require("./routes/getbetting/index.js");
-const { validateAirtimeRequest, validateDataRequest, validateAmount } = require("./validator.js");
+const { validateAirtimeRequest, validateDataRequest, validateAmount, validateAllDataRequest } = require("./validator.js");
 const Banuser = require("./admin/banuser/index.js");
 const Unbanuser = require("./admin/unbanuser/index.js");
 const rateLimit = require('express-rate-limit');
@@ -85,6 +85,8 @@ const Buybetting = require("./routes/buybetting/index.js");
 const Getcard = require("./routes/getcard/index.js");
 const Buygiftcard = require("./routes/buygiftcard/index.js");
 const PayWebhook = require("./routes/paywebhook/index.js");
+const Getalldata = require("./routes/getalldata/index.js");
+const BuyAlldata = require("./routes/alldata/index.js");
 const requestLimiter = rateLimit({
   windowMs: 10 * 1000, // 10 seconds
   max: 1, // Limit each user to 1 coupon creation per window
@@ -235,11 +237,15 @@ app.post("/api/v1/setpass", Setpass);
 
 app.post("/api/v1/getdata", Getdata);
 
+app.post("/api/v1/getalldata", Getalldata);
+
 app.post("/api/v1/buyairtime", validateAirtimeRequest, requestLimiter, speedLimiter, Airtime);
 
 app.get("/api/v1/getuser", Getuser);
 
 app.post("/api/v1/buydata", validateDataRequest, requestLimiter, speedLimiter, Buydata);
+
+app.post("/api/v1/alldata", validateAllDataRequest, requestLimiter, speedLimiter, BuyAlldata);
 
 app.get("/api/v1/getcable", Getcable);
 
