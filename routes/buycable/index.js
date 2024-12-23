@@ -87,7 +87,7 @@ async function Buycable(req, res) {
       }
       else {
         return res.status(500).json({
-          message: `Cable Purchase Failed, Kindly Try Again later`,
+          message: `Cable Purchase Failed, kindly try again later`,
           success: false,
         });
       }
