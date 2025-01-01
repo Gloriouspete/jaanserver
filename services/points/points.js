@@ -6,7 +6,7 @@ const Points = async (userid, amount, email) => {
   if (!userid || !amount) {
     return false;
   }
-  if (Number(amount) >= 500 && Number(amount) < 1000) {
+  if (Number(amount) >= 200 && Number(amount) < 1000) {
     points = 2;
   } else if (Number(amount) >= 1000) {
     points = 4;
