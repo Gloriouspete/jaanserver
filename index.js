@@ -38,7 +38,7 @@ const Getbalance = require("./admin/getbalance/index.js");
 const Getadmindata = require("./admin/getdata/index.js");
 const Airtimetransaction = require("./admin/airtimetransaction/index.js");
 const Datatransaction = require("./admin/datatransaction/index.js");
-const Editdata = require("./admin/editdata/index.js");
+const Editdata = require("./admin/price/changedata.js");
 const Getcableprice = require("./admin/price/cable.js");
 const Getelectricprice = require("./admin/price/electric.js");
 const Editcable = require("./admin/price/changecable.js");
@@ -87,6 +87,7 @@ const Buygiftcard = require("./routes/buygiftcard/index.js");
 const PayWebhook = require("./routes/paywebhook/index.js");
 const Getalldata = require("./routes/getalldata/index.js");
 const BuyAlldata = require("./routes/alldata/index.js");
+const Getdataprice = require("./admin/price/data.js");
 const requestLimiter = rateLimit({
   windowMs: 10 * 1000, // 10 seconds
   max: 1, // Limit each user to 1 coupon creation per window
@@ -319,11 +320,15 @@ app.post("/admin/editprice", Editprice);
 
 app.post("/admin/editcable", Editcable);
 
+app.post("/admin/editdata", Editdata);
+
 app.post("/admin/editelectric", Editelectric);
 
 app.get("/admin/electricprice", Getelectricprice);
 
 app.get("/admin/cableprice", Getcableprice);
+
+app.get("/admin/dataprice", Getdataprice);
 
 app.get("/admin/datatransaction", Datatransaction);
 
