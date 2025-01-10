@@ -18,7 +18,7 @@ async function makePurchaseRequest({
     billersCode,
     serviceID,
     variation_code,
-    phone: phone,
+    phone: billersCode,
   };
   console.error("This is the second one", data)
   try {
