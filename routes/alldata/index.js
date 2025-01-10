@@ -11,15 +11,18 @@ const { makePurchaseRequest } = require("./prop.js");
 const myCache = new NodeCache();
 async function BuyAlldata(req, res) {
   const userid = req.user.userid;
+
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
-    //console.error(errors.array())
-    return res.status(400).json({ success: false, message: "Input Sanitization Failed, Check the Inputs value" });
+    return res.status(400).json({
+       success: false,
+       message: "Input Sanitization Failed, Check the Inputs value"
+       });
   }
 
   try {
     const { network, netcode, dataplan, number, dataAmount, pincode } = req.body;
-    console.log(req.body)
+
     const lockExists = myCache.get(`datatransactionLocks:${userid}`);
     if (lockExists) {
       console.log("Transaction in progress");
@@ -36,27 +39,24 @@ async function BuyAlldata(req, res) {
       [userid]
     );
     if (!userData) {
-      console.error("Account not found");
-      return res.send("Account not found");
+      return res.status(404).json({ success: false, message: "Account not found" });
     }
     const emailverified = await Vemail(userid);
 
     if (emailverified === "no") {
-      console.error("Account not verified");
-      return res.json({
+      return res.status(403).json({
         success: false,
-        message:
-          "Your email address has not been verified. Please verify your email address before proceeding with this transaction.",
+        message: "Your email address has not been verified. Please verify your email before proceeding.",
       });
     }
-    console.log("reached here")
+
     const { pin, phone, credit, email, verified, ban } = userData;
     const mypin = parseInt(pin, 10);
     const balance = parseInt(credit, 10);
     if (ban === "yes") {
       console.error("This user has been banned");
       return res
-        .status(401)
+        .status(403)
         .json({
           success: false,
           message:
@@ -65,7 +65,7 @@ async function BuyAlldata(req, res) {
     }
     if (verified === "no") {
       console.error("identity not verified");
-      return res.status(401).json({ success: false, message: "Your Kyc Account has not been verified. Please go to profile to verify your Identity before proceeding with this transaction." });
+      return res.status(403).json({ success: false, message: "Your Kyc Account has not been verified. Please go to profile to verify your Identity before proceeding with this transaction." });
     }
     if (mypin.toString().trim() !== pincode.toString().trim()) {
       console.log("incorect pin");
@@ -76,29 +76,20 @@ async function BuyAlldata(req, res) {
       });
     }
     const parsedAmount = Number(dataAmount)
-    if (!parsedAmount) {
-      return res.status(500).json({
-        success: false,
-        message: "Internal server error, Unable to parse data amount",
-        data: null
-      })
+    if (isNaN(parsedAmount) || parsedAmount <= 0) {
+      return res.status(400).json({ success: false, message: "Invalid data amount" });
     }
     const newbalance = balance - parsedAmount;
-    if (newbalance < 0 || newbalance === undefined) {
+    if (newbalance < 0) {
       console.log("Insufficient funds");
       return res.status(200).json({
         success: false,
         message: "Insufficient Funds",
         data: null,
       });
-    } else if (balance < parsedAmount) {
-      console.log("no money");
-      return res.status(200).json({
-        success: false,
-        message: "Insufficient Funds",
-        data: null,
-      });
-    } else if (balance >= parsedAmount) {
+    }
+    else if (balance >= parsedAmount) {
+      console.error("This is the first one", number)
       const response = await makePurchaseRequest({
         requesttime: new Date(),
         serviceID: netcode,

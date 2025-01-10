@@ -13,15 +13,14 @@ async function makePurchaseRequest({
   variation_code,
   phone,
 }) {
-  const request = Gettime();
   const data = {
-    request_id: request,
+    request_id: requesttime,
     billersCode,
     serviceID,
     variation_code,
     phone: phone,
   };
-
+  console.error("This is the second one", data)
   try {
     const response = await axios.post(`https://vtpass.com/api/pay`, data, {
       headers: {
