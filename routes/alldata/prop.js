@@ -8,23 +8,24 @@ const Gettime = require("../../services/time.js");
 
 async function makePurchaseRequest({
   requesttime,
-  billersCode,
   serviceID,
+  billersCode,
   variation_code,
   phone,
 }) {
-  const request = Gettime()
+  const request = Gettime();
   const data = {
     request_id: request,
-    billersCode: billersCode,
-    serviceID: serviceID.toString(),
-    variation_code: variation_code.toString(),
-    phone: phone.toString(),
+    billersCode,
+    serviceID,
+    variation_code,
+    phone: phone,
   };
 
   try {
     const response = await axios.post(`https://vtpass.com/api/pay`, data, {
       headers: {
+        "Content-Type": "application/json",
         "api-key": apiKey,
         "secret-key": secretKey,
       },
