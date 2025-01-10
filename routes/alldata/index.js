@@ -29,18 +29,16 @@ async function BuyAlldata(req, res) {
         data: null,
       });
     }
- 
+
     myCache.set(`datatransactionLocks:${userid}`, "locked", 10);
     const [userData] = await executor(
       "SELECT * FROM users WHERE userid = ?",
       [userid]
     );
-
     if (!userData) {
       console.error("Account not found");
       return res.send("Account not found");
     }
-   
     const emailverified = await Vemail(userid);
 
     if (emailverified === "no") {
@@ -77,8 +75,14 @@ async function BuyAlldata(req, res) {
         data: null,
       });
     }
-    
     const parsedAmount = Number(dataAmount)
+    if (!parsedAmount) {
+      return res.status(500).json({
+        success: false,
+        message: "Internal server error, Unable to parse data amount",
+        data: null
+      })
+    }
     const newbalance = balance - parsedAmount;
     if (newbalance < 0 || newbalance === undefined) {
       console.log("Insufficient funds");
@@ -95,7 +99,6 @@ async function BuyAlldata(req, res) {
         data: null,
       });
     } else if (balance >= parsedAmount) {
-     
       const response = await makePurchaseRequest({
         requesttime: new Date(),
         serviceID: netcode,
@@ -103,7 +106,6 @@ async function BuyAlldata(req, res) {
         variation_code: dataplan,
         phone
       })
-
       if (response.code === "000" || response.code === "099") {
         await executor("UPDATE users SET credit = credit - ? WHERE userid = ?", [
           parsedAmount,
@@ -114,9 +116,9 @@ async function BuyAlldata(req, res) {
         const imade = {
           userid,
           recipient: number,
-          Status:"successful",
+          Status: response.code === "000" ? "successful" : "pending",
           network: network,
-          plan: parsedAmount,
+          plan: dataplan,
           amount: parsedAmount,
           create_date,
         };
@@ -124,13 +126,13 @@ async function BuyAlldata(req, res) {
         Points(userid, parsedAmount, email);
         return res.status(200).json({
           success: true,
-          message: "Data Purchase Successful ",
+          message: `Data Purchase Successful ${response.code === "000" ? "successful" : "pending"}`,
           data: null,
         });
       } else {
         return res.status(200).json({
           success: false,
-          message: "Data Purchase" + " " + responseData.Status,
+          message: "Data Purchase Failed, Try again later",
           data: null,
         });
       }
@@ -144,7 +146,6 @@ async function BuyAlldata(req, res) {
         success: false,
       });
   } finally {
-    // Release transaction lock
     myCache.del(`datatransactionLocks:${userid}`);
   }
 }

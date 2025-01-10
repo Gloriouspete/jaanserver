@@ -18,7 +18,6 @@ const excludedRoutes = ['/api/v1/login','/api/v1/getdata','/api/v1/resetpass', '
         console.log(token,"dde")
         const decodedToken = jwt.verify(token, secretKey);
         req.user = decodedToken;
-        console.log('this is', req.user)
         next();
     } catch (error) {
         console.log(error)

@@ -2,7 +2,6 @@ const executor = require("../../config/db.js");
 
  function Getuser(req, res) {
   const { userid } = req.user;
-  console.log("Received phonenumber:", userid);
 
   const selectUserQuery = "SELECT * FROM users WHERE userid = ?";
   executor(selectUserQuery, [userid])

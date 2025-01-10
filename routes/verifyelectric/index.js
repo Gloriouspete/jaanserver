@@ -1,43 +1,45 @@
 require("dotenv").config();
 const axios = require("axios");
-const secretKey = process.env.RE_TEST_SECRET;
+const apiKey = process.env.VT_LIVE_API;
+const secretKey = process.env.VT_LIVE_SECRET;
 async function Verifyelectric(req, res) {
-  const { number, type } = req.body;
+  const { plans, number, type } = req.body;
+  const load = {
+    serviceID: plans,
+    billersCode: number,
+    type
+  };
   console.log(req.body)
   try {
-    if (!type || !number) {
+    if (!plans || !number) {
       return res.status(400).json({
         success: false,
-        message: "Input validation failed",
+        message: "Unable to verify",
         data: null,
       });
     }
-    var data = {
-      "billPaymentProductId": type,
-      "customerId": number
-    };
-
     const response = await axios.post(
-      "https://api-demo.systemspecsng.com/services/connect-gateway/api/v1/biller/validate-customer",
-      data,
+      `https://api-service.vtpass.com/api/merchant-verify`, load,
       {
         headers: {
-          "secretKey":secretKey,
+          "Content-Type": "application/json",
+          "api-key": apiKey,
+          "secret-key": secretKey,
         },
       }
     );
     const responseData = response.data;
     console.log(responseData)
-    if (responseData.status === "00") {
+    if (responseData.code === "000") {
       return res.status(200).json({
         success: true,
         message: "Cable Plans verified",
-        data: responseData.data,
+        data: responseData.content,
       });
     } else {
       return res.status(400).json({
         success: true,
-        message: responseData?.message || "Unable to verify Number",
+        message: "Unable to verify Number",
         data: null,
       });
     }
@@ -45,10 +47,10 @@ async function Verifyelectric(req, res) {
     console.error(error);
     res.status(400).json({
       success: false,
-      message: "Unable to verify, Internal server error",
+      message: "Unable to verify",
       data: null,
     });
   }
-};
+}
 
 module.exports = Verifyelectric;

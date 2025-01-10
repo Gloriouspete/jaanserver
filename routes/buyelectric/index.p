@@ -8,27 +8,24 @@ const GetPricer = require("../../services/price/price.js");
 const Vemail = require("../../services/emailverify.js");
 const Points = require("../../services/points/points.js");
 async function Buyelectric(req, res) {
+  console.log(req.body)
   const { userid } = req.user;
-  const { billersCode, serviceID, variation_code, phone, amount } = req.body;
-  const datas = { billersCode, serviceID, variation_code, phone, amount };
+  const { meternumber, type, phone, amount } = req.body;
+  const datas = { meternumber, type, phone, amount };
   const realamount = parseInt(amount, 10);
-  if (!billersCode || !serviceID || !variation_code || !phone || !amount) {
+  if (!meternumber || !type || !phone || !amount) {
     return res.status(400).json({
       message: "All fields are required",
       success: false,
     });
   }
   console.log(req.body);
-
   try {
     console.log("Request Data:", datas);
-
     const requesttime = Gettime();
     console.log("Request Time:", requesttime);
-
     const userData = await getUserData(userid);
     const electricresponse = await GetPricer();
-
     if (!userData) {
       return res.status(404).json({
         message: "User Details not found, Contact support!",
@@ -36,11 +33,9 @@ async function Buyelectric(req, res) {
       });
     }
     const emailverified = await Vemail(userid);
-
-
     if (emailverified === "no") {
       console.error("Account not verified");
-      return res.json({ success: false, message: "Your email address has not been verified. Please verify your email address before proceeding with this transaction." });
+      return res.status(401).json({ success: false, message: "Your email address has not been verified. Please verify your email address before proceeding with this transaction." });
     }
     if (!electricresponse) {
       return res.status(404).json({
@@ -49,13 +44,13 @@ async function Buyelectric(req, res) {
       });
     }
     const { electricprice } = electricresponse[0];
-    const { credit,email } = userData;
+    const { credit, email } = userData;
     if (!electricprice) {
       return res.status(404).json({
         message: "Unable to verify charge amount, Contact support!",
         success: false,
       });
-    }
+    };
     const intprice = parseInt(electricprice, 10);
     const intamount = intprice + realamount;
     const balance = parseInt(credit, 10);
@@ -67,31 +62,27 @@ async function Buyelectric(req, res) {
     } else if (balance >= intamount) {
       const responseData = await makePurchaseRequest({
         requesttime,
-        billersCode,
-        serviceID,
-        variation_code,
+        meternumber,
+        type,
         phone,
-        amount,
+        amount: Number(amount) * 100,
+        email
       });
-      if (responseData.code === "000") {
+      if (responseData.status) {
         const {
-          content: {
-            transactions: { unique_element, phone, product_name },
-          },
-          Token,
-          purchased_code,
-          units,
-        } = responseData;
+          pin,
+          reference
+        } = responseData.data;
 
         const imade = {
           userid,
           network: "Electricity",
-          recipient: unique_element,
+          recipient: meternumber,
           Status: "successful",
-          name: product_name,
-          token: Token || purchased_code,
-          plan: units,
-          amount:intamount,
+          name: type,
+          token: pin || "null",
+          plan: reference,
+          amount: intamount,
         };
 
         await setElectric(imade);
@@ -99,21 +90,16 @@ async function Buyelectric(req, res) {
           "UPDATE users SET credit = credit - ? WHERE userid = ?",
           [intamount, userid]
         );
-        Points(userid,amount,email)
+        Points(userid, amount, email)
         return res.status(200).json({
-          message: `Your Electric Purchase Transaction was Successful and the token is ${
-            Token || purchased_code
-          }`,
+          message: `Your Electric Purchase Transaction was Successful and the token is ${pin || reference
+            }`,
           success: true,
         });
-      } else if (responseData.code === "099") {
+      }
+      else {
         return res.status(500).json({
-          message: `Electricity Purchase is processing, Kindly contact support with the code ${requesttime} `,
-          success: true,
-        });
-      } else {
-        return res.status(500).json({
-          message: `Electricity Purchase Failed, Kindly Try Again later ${responseData.code}`,
+          message: `Electricity Purchase Failed, Kindly Try Again later`,
           success: false,
         });
       }
@@ -156,7 +142,7 @@ const setElectric = async (data) => {
       .catch((error) => {
         console.warn("error setting transaction", mydate);
       });
-  } catch (error) {}
+  } catch (error) { }
 };
 
 module.exports = Buyelectric;

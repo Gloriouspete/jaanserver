@@ -12,7 +12,7 @@ async function Buyeducation(req, res) {
   const realamount = parseInt(amount, 10);
 
   try {
-    
+
     const requesttime = Gettime();
     console.log("Request Time:", requesttime);
 
@@ -40,7 +40,7 @@ async function Buyeducation(req, res) {
     const { cableprice } = cableresponse[0];
 
 
-    const { credit,email } = userData;
+    const { credit, email } = userData;
     const intprice = parseInt(cableprice, 10);
     const intamount = intprice + realamount;
     const balance = parseInt(credit, 10);
@@ -59,6 +59,7 @@ async function Buyeducation(req, res) {
           response_description,
           purchased_code,
           tokens,
+          cards,
           type,
         } = responseData;
 
@@ -68,9 +69,9 @@ async function Buyeducation(req, res) {
           recipient: unique_element || phone,
           Status: "successful",
           name: product_name,
-          token: purchased_code || tokens[0],
+          token: purchased_code || tokens[0] || JSON.stringify(cards),
           plan: type,
-          amount:intamount,
+          amount: intamount,
         };
 
         await setEducation(imade);
@@ -78,7 +79,7 @@ async function Buyeducation(req, res) {
           intamount,
           userid,
         ]);
-        Points(userid,amount,email)
+        Points(userid, amount, email)
         return res.status(200).json({
           message: `Your Cable Purchase Transaction was Successful`,
           success: true,
@@ -133,7 +134,7 @@ const setEducation = async (data) => {
       .catch((error) => {
         console.warn("error setting transaction", mydate);
       });
-  } catch (error) {}
+  } catch (error) { }
 };
 
 module.exports = Buyeducation;
