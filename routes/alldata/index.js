@@ -130,6 +130,7 @@ async function BuyAlldata(req, res) {
           data: null,
         });
       } else {
+        console.error(response)
         return res.status(200).json({
           success: false,
           message: "Data Purchase Failed, Try again later",
