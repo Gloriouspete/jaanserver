@@ -19,6 +19,7 @@ async function Buyelectric(req, res) {
       success: false,
     });
   }
+  let deductedAmount = 0;
   try {
     const lockExists = myCache.get(`electrictransactionLocks:${userid}`);
     if (lockExists) {
@@ -66,59 +67,69 @@ async function Buyelectric(req, res) {
         message: "You have Insufficient balance to purchase this service",
         success: false,
       });
-    } else if (balance >= intamount) {
-      const responseData = await makePurchaseRequest({
-        requesttime,
-        billersCode: meternumber,
-        serviceID: provider,
-        variation_code: type,
-        phone,
-        amount,
-      });
-      if (responseData.code === "000") {
-        const {
-          content: {
-            transactions: { unique_element, phone, product_name },
-          },
-          Token,
-          purchased_code,
-          units,
-        } = responseData;
-
-        const imade = {
-          userid,
-          network: "Electricity",
-          recipient: unique_element,
-          Status: "successful",
-          name: product_name,
-          token: Token || purchased_code,
-          plan: units,
-          amount: intamount,
-        };
-        await executor(
-          "UPDATE users SET credit = credit - ? WHERE userid = ?",
-          [intamount, userid]
-        );
-        await setElectric(imade);
-        Points(userid, intamount, email)
-        return res.status(200).json({
-          message: `Your Electric Purchase Transaction was Successful and the token is ${Token || purchased_code
-            }`,
-          success: true,
-        });
-      } else if (responseData.code === "099") {
-        return res.status(500).json({
-          message: `Electricity Purchase is processing, Kindly contact support with the code ${requesttime} `,
-          success: true,
-        });
-      } else {
-        return res.status(500).json({
-          message: `Electricity Purchase Failed, Kindly Try Again later ${responseData.code}`,
-          success: false,
-        });
-      }
     }
+    await executor("UPDATE users SET credit = credit - ? WHERE userid = ?", [
+      intamount,
+      userid,
+    ]);
+    deductedAmount = intamount;
+    const responseData = await makePurchaseRequest({
+      requesttime,
+      billersCode: meternumber,
+      serviceID: provider,
+      variation_code: type,
+      phone,
+      amount,
+    });
+    if (responseData.code === "000") {
+      const {
+        content: {
+          transactions: { unique_element, phone, product_name },
+        },
+        Token,
+        purchased_code,
+        units,
+      } = responseData;
+
+      const imade = {
+        userid,
+        network: "Electricity",
+        recipient: unique_element,
+        Status: "successful",
+        name: product_name,
+        token: Token || purchased_code,
+        plan: units,
+        amount: intamount,
+      };
+
+      await setElectric(imade);
+      Points(userid, intamount, email)
+      return res.status(200).json({
+        message: `Your Electric Purchase Transaction was Successful and the token is ${Token || purchased_code
+          }`,
+        success: true,
+      });
+    } else if (responseData.code === "099") {
+      return res.status(500).json({
+        message: `Electricity Purchase is processing, Kindly contact support with the code ${requesttime} `,
+        success: true,
+      });
+    } else {
+      await executor("UPDATE users SET credit = credit + ? WHERE userid = ?", [
+        deductedAmount,
+        userid,
+      ]);
+      return res.status(500).json({
+        message: `Electricity Purchase Failed, Kindly Try Again later ${responseData.code}`,
+        success: false,
+      });
+    }
+
   } catch (error) {
+    await executor("UPDATE users SET credit = credit + ? WHERE userid = ?", [
+      deductedAmount,
+      userid,
+    ]);
     console.error("Error occurred:", error);
     const responsed = {
       message:
@@ -127,7 +138,7 @@ async function Buyelectric(req, res) {
       data: error,
     };
     res.status(500).json(responsed);
-  }finally{
+  } finally {
     myCache.del(`electrictransactionLocks:${userid}`);
   }
 }

@@ -10,6 +10,7 @@ async function Buycable(req, res) {
   const { userid } = req.user;
   const { cableid, planid, cardnumber, cablename, phone, amount } = req.body;
   const realamount = parseInt(amount, 10);
+  let deductedAmount = 0;
   try {
     if (!cableid || !cardnumber || !cablename || !phone || !amount || !planid) {
       return res.status(402).json({
@@ -17,6 +18,7 @@ async function Buycable(req, res) {
         success: false,
       });
     }
+   
     const requesttime = Gettime();
     console.log("Request Time:", requesttime);
     const userData = await getUserData(userid);
@@ -59,48 +61,57 @@ async function Buycable(req, res) {
         message: "You have Insufficient balance to purchase this service",
         success: false,
       });
-    } else if (balance >= intamount) {
-      const responseData = await makePurchaseRequest({ cableid, planid, cardnumber });
-      const { package, cable } = responseData
-      if (responseData.Status === "successful" || "pending" || "Pending") {
-        const imade = {
-          userid,
-          network: cable,
-          recipient: cardnumber,
-          Status: responseData.Status,
-          name: package,
-          token: "null",
-          plan: package,
-          amount: intamount,
-        };
-
-        await setCable(imade);
-        await executor("UPDATE users SET credit = credit - ? WHERE userid = ?", [
-          intamount,
-          userid,
-        ]);
-        Points(userid, amount, email)
-        return res.status(200).json({
-          message: `Your ${cablename} Purchase Transaction ${responseData.Status}`,
-          success: true,
-        });
-      }
-      else {
-        return res.status(500).json({
-          message: `Cable Purchase Failed, kindly try again later`,
-          success: false,
-        });
-      }
     }
+    await executor("UPDATE users SET credit = credit - ? WHERE userid = ?", [
+      intamount,
+      userid,
+    ]);
+    deductedAmount = intamount;
+    const responseData = await makePurchaseRequest({ cableid, planid, cardnumber });
+    const { package, cable } = responseData
+    if (responseData.Status === "successful" || responseData.Status === "pending" || responseData.Status === "Pending") {
+      const imade = {
+        userid,
+        network: cable,
+        recipient: cardnumber,
+        Status: responseData.Status,
+        name: package,
+        token: "null",
+        plan: package,
+        amount: intamount,
+      };
+
+      await setCable(imade);
+      Points(userid, amount, email)
+      return res.status(200).json({
+        message: `Your ${cablename} Purchase Transaction ${responseData.Status}`,
+        success: true,
+      });
+    }
+    else {
+      await executor("UPDATE users SET credit = credit + ? WHERE userid = ?", [
+        deductedAmount,
+        userid,
+      ]);
+      return res.status(500).json({
+        message: `Cable Purchase Failed, kindly try again later`,
+        success: false,
+      });
+    }
+  
   } catch (error) {
-    console.warn("Error occurred:", error);
-    const responsed = {
-      message: "We apologize, we are currently unable to process your cable plan purchase. Please try again later.",
-      success: false,
-      data: error,
-    };
-    res.status(500).json(responsed);
-  }
+    await executor("UPDATE users SET credit = credit + ? WHERE userid = ?", [
+      deductedAmount,
+      userid,
+    ]);
+  console.warn("Error occurred:", error);
+  const responsed = {
+    message: "We apologize, we are currently unable to process your cable plan purchase. Please try again later.",
+    success: false,
+    data: error,
+  };
+  res.status(500).json(responsed);
+}
 }
 
 

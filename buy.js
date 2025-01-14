@@ -6,9 +6,10 @@ const Gettime = require("./services/time.js");
 async function Getelectric(req, res) {
   const load = {
     request_id: Gettime(),
-    serviceID: "mtn-data",
-    billersCode: "09039968560",
-    variation_code:"mtn-10mb-100",
+    serviceID: "benin-electric",
+    billersCode: "04234760439",
+    variation_code:"prepaid",
+    amount:"500",
     phone:"09039968560"
   };
   

@@ -11,13 +11,13 @@ const { makePurchaseRequest } = require("./prop.js");
 const myCache = new NodeCache();
 async function BuyAlldata(req, res) {
   const userid = req.user.userid;
-
+  let deductedAmount = 0
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     return res.status(400).json({
-       success: false,
-       message: "Input Sanitization Failed, Check the Inputs value"
-       });
+      success: false,
+      message: "Input Sanitization Failed, Check the Inputs value"
+    });
   }
 
   try {
@@ -32,7 +32,6 @@ async function BuyAlldata(req, res) {
         data: null,
       });
     }
-
     myCache.set(`datatransactionLocks:${userid}`, "locked", 10);
     const [userData] = await executor(
       "SELECT * FROM users WHERE userid = ?",
@@ -42,14 +41,12 @@ async function BuyAlldata(req, res) {
       return res.status(404).json({ success: false, message: "Account not found" });
     }
     const emailverified = await Vemail(userid);
-
     if (emailverified === "no") {
       return res.status(403).json({
         success: false,
         message: "Your email address has not been verified. Please verify your email before proceeding.",
       });
     }
-
     const { pin, phone, credit, email, verified, ban } = userData;
     const mypin = parseInt(pin, 10);
     const balance = parseInt(credit, 10);
@@ -82,54 +79,61 @@ async function BuyAlldata(req, res) {
     const newbalance = balance - parsedAmount;
     if (newbalance < 0) {
       console.log("Insufficient funds");
-      return res.status(200).json({
+      return res.status(400).json({
         success: false,
         message: "Insufficient Funds",
         data: null,
       });
     }
-    else if (balance >= parsedAmount) {
-      console.error("This is the first one", number)
-      const response = await makePurchaseRequest({
-        requesttime: new Date(),
-        serviceID: netcode,
-        billersCode: number,
-        variation_code: dataplan,
-        phone
-      })
-      if (response.code === "000" || response.code === "099") {
-        await executor("UPDATE users SET credit = credit - ? WHERE userid = ?", [
-          parsedAmount,
-          userid,
-        ]);
-        const newdate = new Date();
-        const create_date = newdate.toISOString();
-        const imade = {
-          userid,
-          recipient: number,
-          Status: response.code === "000" ? "successful" : "pending",
-          network: network,
-          plan: dataplan,
-          amount: parsedAmount,
-          create_date,
-        };
-        await setData(imade);
-        Points(userid, parsedAmount, email);
-        return res.status(200).json({
-          success: true,
-          message: `Data Purchase Successful ${response.code === "000" ? "successful" : "pending"}`,
-          data: null,
-        });
-      } else {
-        console.error(response)
-        return res.status(200).json({
-          success: false,
-          message: "Data Purchase Failed, Try again later",
-          data: null,
-        });
-      }
+    await executor("UPDATE users SET credit = credit - ? WHERE userid = ?", [
+      parsedAmount,
+      userid,
+    ]);
+    deductedAmount = parsedAmount;
+    const response = await makePurchaseRequest({
+      requesttime: new Date(),
+      serviceID: netcode,
+      billersCode: number,
+      variation_code: dataplan,
+      phone
+    })
+    if (response.code === "000" || response.code === "099") {
+
+      const newdate = new Date();
+      const create_date = newdate.toISOString();
+      const imade = {
+        userid,
+        recipient: number,
+        Status: response.code === "000" ? "successful" : "pending",
+        network: network,
+        plan: dataplan,
+        amount: parsedAmount,
+        create_date,
+      };
+      await setData(imade);
+      Points(userid, parsedAmount, email);
+      return res.status(200).json({
+        success: true,
+        message: `Data Purchase Successful ${response.code === "000" ? "successful" : "pending"}`,
+        data: null,
+      });
+    } else {
+      await executor("UPDATE users SET credit = credit + ? WHERE userid = ?", [
+        deductedAmount,
+        userid,
+      ]);
+      return res.status(200).json({
+        success: false,
+        message: "Data Purchase Failed, Try again later",
+        data: null,
+      });
     }
+
   } catch (error) {
+    await executor("UPDATE users SET credit = credit + ? WHERE userid = ?", [
+      deductedAmount,
+      userid,
+    ]);
     console.error(error);
     res
       .status(500)

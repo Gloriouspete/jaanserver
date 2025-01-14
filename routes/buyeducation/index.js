@@ -10,7 +10,7 @@ async function Buyeducation(req, res) {
   const { userid } = req.user;
   const { billersCode, serviceID, variation_code, phone, amount } = req.body;
   const realamount = parseInt(amount, 10);
-
+  let deductedAmount = 0
   try {
 
     const requesttime = Gettime();
@@ -25,8 +25,6 @@ async function Buyeducation(req, res) {
       });
     }
     const emailverified = await Vemail(userid);
-
-
     if (emailverified === "no") {
       console.error("Account not verified");
       return res.json({ success: false, message: "Your email address has not been verified. Please verify your email address before proceeding with this transaction." });
@@ -38,8 +36,6 @@ async function Buyeducation(req, res) {
       });
     }
     const { cableprice } = cableresponse[0];
-
-
     const { credit, email } = userData;
     const intprice = parseInt(cableprice, 10);
     const intamount = intprice + realamount;
@@ -49,62 +45,71 @@ async function Buyeducation(req, res) {
         message: "You have Insufficient balance to purchase this service",
         success: false,
       });
-    } else if (balance >= intamount) {
-      const responseData = await makePurchaseRequest({ requesttime, billersCode, serviceID, variation_code, phone });
-      if (responseData.code === "000") {
-        const {
-          content: {
-            transactions: { unique_element, phone, product_name },
-          },
-          response_description,
-          purchased_code,
-          tokens,
-          cards,
-          type,
-        } = responseData;
-
-        const imade = {
-          userid,
-          network: serviceID,
-          recipient: unique_element || phone,
-          Status: "successful",
-          name: product_name,
-          token: purchased_code || tokens[0] || JSON.stringify(cards),
-          plan: type,
-          amount: intamount,
-        };
-
-        await setEducation(imade);
-        await executor("UPDATE users SET credit = credit - ? WHERE userid = ?", [
-          intamount,
-          userid,
-        ]);
-        Points(userid, amount, email)
-        return res.status(200).json({
-          message: `Your Cable Purchase Transaction was Successful`,
-          success: true,
-        });
-      } else if (responseData.code === "099") {
-        return res.status(500).json({
-          message: `Purchase is processing, Kindly contact support with the code ${requesttime} `,
-          success: true,
-        });
-      } else {
-        return res.status(500).json({
-          message: `Purchase Failed, Kindly Try Again later ${responseData.code}`,
-          success: false,
-        });
-      }
     }
+    await executor("UPDATE users SET credit = credit - ? WHERE userid = ?", [
+      intamount,
+      userid,
+    ]);
+    deductedAmount = intamount
+    const responseData = await makePurchaseRequest({ requesttime, billersCode, serviceID, variation_code, phone });
+    if (responseData.code === "000") {
+      const {
+        content: {
+          transactions: { unique_element, phone, product_name },
+        },
+        response_description,
+        purchased_code,
+        tokens,
+        cards,
+        type,
+      } = responseData;
+
+      const imade = {
+        userid,
+        network: serviceID,
+        recipient: unique_element || phone,
+        Status: "successful",
+        name: product_name,
+        token: purchased_code || tokens[0] || JSON.stringify(cards),
+        plan: type,
+        amount: intamount,
+      };
+
+      await setEducation(imade);
+      Points(userid, amount, email)
+      return res.status(200).json({
+        message: `Your Cable Purchase Transaction was Successful`,
+        success: true,
+      });
+    } else if (responseData.code === "099") {
+      return res.status(500).json({
+        message: `Purchase is processing, Kindly contact support with the code ${requesttime} `,
+        success: true,
+      });
+    } else {
+      await executor("UPDATE users SET credit = credit + ? WHERE userid = ?", [
+        deductedAmount,
+        userid,
+      ]);
+      return res.status(500).json({
+        message: `Purchase Failed, Kindly Try Again later ${responseData.code}`,
+        success: false,
+      });
+    }
+  
   } catch (error) {
-    console.warn("Error occurred:", error);
-    const responsed = {
-      message: "We apologize, we are currently unable to process your cable plan purchase. Please try again later.",
-      success: false,
-      data: error,
-    };
-    res.status(500).json(responsed);
-  }
+    await executor("UPDATE users SET credit = credit + ? WHERE userid = ?", [
+      deductedAmount,
+      userid,
+    ]);
+  console.warn("Error occurred:", error);
+  const responsed = {
+    message: "We apologize, we are currently unable to process your cable plan purchase. Please try again later.",
+    success: false,
+    data: error,
+  };
+  res.status(500).json(responsed);
+}
 }
 
 

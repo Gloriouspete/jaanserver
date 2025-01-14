@@ -9,6 +9,7 @@ const { check, validationResult } = require("express-validator");
 
 const myCache = new NodeCache();
 async function Buydata(req, res) {
+  let deductedAmount = 0
   const userid = req.user.userid;
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
@@ -51,6 +52,7 @@ async function Buydata(req, res) {
       });
     }
     const { pin, phone, credit, email, verified, ban } = userData;
+
     const mypin = parseInt(pin, 10);
     const balance = parseInt(credit, 10);
     if (ban === "yes") {
@@ -64,9 +66,9 @@ async function Buydata(req, res) {
         });
     }
     if (verified === "no") {
-        console.error("identity not verified");
-        return res.status(401).json({ success: false, message: "Your Kyc Account has not been verified. Please go to profile to verify your Identity before proceeding with this transaction." });
-      }
+      console.error("identity not verified");
+      return res.status(401).json({ success: false, message: "Your Kyc Account has not been verified. Please go to profile to verify your Identity before proceeding with this transaction." });
+    }
     if (mypin.toString().trim() !== pincode.toString().trim()) {
       console.log("incorect pin");
       return res.status(200).json({
@@ -76,79 +78,77 @@ async function Buydata(req, res) {
       });
     }
     const newbalance = balance - dataamount;
-
     if (newbalance < 0 || newbalance === undefined) {
       console.log("Insufficient funds");
-
       return res.status(200).json({
         success: false,
         message: "Insufficient Funds",
         data: null,
       });
-    } else if (balance < dataamount) {
-      console.log("no money");
-      return res.status(200).json({
-        success: false,
-        message: "Insufficient Funds",
-        data: null,
-      });
-    } else if (balance >= dataamount) {
-      const authToken = datasecret;
-      const data = {
-        network: netcode,
-        mobile_number: number,
-        plan: dataplan,
-        Ported_number: true,
-      };
-      const config = {
-        method: "post",
-        maxBodyLength: Infinity,
-        url: "https://datastation.com.ng/api/data/",
-        headers: {
-          Authorization: `Token ${authToken}`,
-          "Content-Type": "application/json",
-        },
-        data: data,
-      };
-
-      const response = await axios(config);
-      const responseData = response.data;
-      const { mobile_number, Status, plan_network, plan_name, plan_amount } =
-        responseData;
-      const newdate = new Date();
-      const create_date = newdate.toISOString();
-      const imade = {
-        userid,
-        recipient: mobile_number,
-        Status,
-        network: plan_network,
-        plan: plan_name,
-        amount: dataamount,
-        create_date,
-      };
-      await setData(imade);
-
-      if (responseData.Status === "successful") {
-        const newbalancee = balance - dataamount;
-        await executor("UPDATE users SET credit = ? WHERE userid = ?", [
-          newbalancee,
-          userid,
-        ]);
-        Points(userid, dataamount, email);
-        return res.status(200).json({
-          success: true,
-          message: "Data Purchase Successful ",
-          data: null,
-        });
-      } else {
-        return res.status(200).json({
-          success: false,
-          message: "Data Purchase" + " " + responseData.Status,
-          data: null,
-        });
-      }
     }
+    await executor("UPDATE users SET credit = credit - ? WHERE userid = ?", [
+      dataamount,
+      userid,
+    ]);
+    deductedAmount = dataamount
+
+    const authToken = datasecret;
+    const data = {
+      network: netcode,
+      mobile_number: number,
+      plan: dataplan,
+      Ported_number: true,
+    };
+    const config = {
+      method: "post",
+      maxBodyLength: Infinity,
+      url: "https://datastation.com.ng/api/data/",
+      headers: {
+        Authorization: `Token ${authToken}`,
+        "Content-Type": "application/json",
+      },
+      data: data,
+    };
+    const response = await axios(config);
+    const responseData = response.data;
+    const { mobile_number, Status, plan_network, plan_name, plan_amount } =
+      responseData;
+    const newdate = new Date();
+    const create_date = newdate.toISOString();
+    const imade = {
+      userid,
+      recipient: mobile_number,
+      Status,
+      network: plan_network,
+      plan: plan_name,
+      amount: dataamount,
+      create_date,
+    };
+    await setData(imade);
+    if (responseData.Status === "successful") {
+      Points(userid, dataamount, email);
+      return res.status(200).json({
+        success: true,
+        message: "Data Purchase Successful ",
+        data: null,
+      });
+    } else {
+      await executor("UPDATE users SET credit = credit + ? WHERE userid = ?", [
+        deductedAmount,
+        userid,
+      ]);
+      return res.status(200).json({
+        success: false,
+        message: "Data Purchase" + " " + responseData.Status,
+        data: null,
+      });
+    }
+
   } catch (error) {
+    await executor("UPDATE users SET credit = credit + ? WHERE userid = ?", [
+      deductedAmount,
+      userid,
+    ]);
     console.error(error.response?.data);
     res
       .status(500)

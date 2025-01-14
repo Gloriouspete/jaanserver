@@ -10,6 +10,7 @@ const { check, validationResult } = require("express-validator");
 const myCache = new NodeCache();
 
 const Airtime = async (req, res) => {
+  let deductedAmount = 0;
   const userid = req.user.userid;
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
@@ -21,7 +22,6 @@ const Airtime = async (req, res) => {
         message: "Input Sanitization Failed, Check the inputs value",
       });
   }
-
   try {
     const { netcode, amount, number, pincode } = req.body;
     const lockExists = myCache.get(`airtransactionLocks:${userid}`);
@@ -34,7 +34,6 @@ const Airtime = async (req, res) => {
       });
     }
     myCache.set(`airtransactionLocks:${userid}`, "locked", 10);
-
     const [userData] = await executor(
       "SELECT * FROM users WHERE userid = ?",
       [userid]
@@ -52,7 +51,6 @@ const Airtime = async (req, res) => {
           "Your email address has not been verified. Please verify your email address before proceeding with this transaction.",
       });
     }
-
     const { pin: mypin, phone, credit, email, verified, ban } = userData;
     if (ban === "yes") {
       console.error("This user has been banned");
@@ -64,17 +62,16 @@ const Airtime = async (req, res) => {
             "You have been banned from using Jaan services.",
         });
     }
-    if (verified === "no") {
-      console.error("identity not verified");
-      return res
-        .status(401)
-        .json({
-          success: false,
-          message:
-            "Your Kyc Account has not been verified. Please go to profile to verify your Identity before proceeding with this transaction.",
-        });
-    }
-    console.log("this is userdata", credit);
+    // if (verified === "no") {
+    //   console.error("identity not verified");
+    //   return res
+    //     .status(401)
+    //     .json({
+    //       success: false,
+    //       message:
+    //         "Your Kyc Account has not been verified. Please go to profile to verify your Identity before proceeding with this transaction.",
+    //     });
+    // }
     if (mypin.toString() !== pincode.toString()) {
       console.log("Incorrect pin");
       return res.status(200).json({
@@ -86,7 +83,6 @@ const Airtime = async (req, res) => {
 
     const balancc = Number(credit);
     const amountcc = Number(amount);
-    const newbalance = balancc - amountcc;
 
     if (isNaN(balancc) || isNaN(amountcc)) {
       return res.status(400).json({
@@ -95,7 +91,6 @@ const Airtime = async (req, res) => {
         data: null,
       });
     }
-
     if (amountcc > balancc) {
       return res.status(400).json({
         success: false,
@@ -104,15 +99,11 @@ const Airtime = async (req, res) => {
       });
     }
 
-    if (newbalance < 0 || newbalance === undefined) {
-      console.log("Insufficient funds");
-      return res.status(200).json({
-        success: false,
-        message: "Insufficient Balance",
-        data: null,
-      });
-    }
-
+    await executor("UPDATE users SET credit = credit - ? WHERE userid = ?", [
+      amountcc,
+      userid,
+    ]);
+    deductedAmount = amountcc;
     const authToken = datasecret;
     const data = {
       network: netcode,
@@ -146,14 +137,8 @@ const Airtime = async (req, res) => {
       amount,
       create_date,
     };
-
     await airtimetran(imade);
-
     if (responseData.Status === "successful") {
-      await executor("UPDATE users SET credit = ? WHERE userid = ?", [
-        newbalance,
-        userid,
-      ]);
       Points(userid, amountcc, email);
       return res.status(200).json({
         success: true,
@@ -161,6 +146,10 @@ const Airtime = async (req, res) => {
         data: null,
       });
     } else {
+      await executor("UPDATE users SET credit = credit + ? WHERE userid = ?", [
+        deductedAmount,
+        userid,
+      ]);
       console.error("External API error:", responseData.Status);
       return res.status(200).json({
         success: false,
@@ -169,6 +158,10 @@ const Airtime = async (req, res) => {
       });
     }
   } catch (error) {
+    await executor("UPDATE users SET credit = credit + ? WHERE userid = ?", [
+      deductedAmount,
+      userid,
+    ]);
     console.error(error.response?.data);
     return res.status(200).json({
       success: false,

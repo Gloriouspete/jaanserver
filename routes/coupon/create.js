@@ -7,7 +7,7 @@ const Vemail = require("../../services/emailverify.js");
 const { check, validationResult } = require("express-validator");
 
 const Createcoupons = async (req, res) => {
-  console.log("got here");
+  let deductedAmount = 0;
   const userid = req.user.userid;
   const { amount, email } = req.body;
   const errors = validationResult(req);
@@ -26,7 +26,7 @@ const Createcoupons = async (req, res) => {
         data: null,
       });
     }
-    myCache.set(`couponLocks:${userid}`, "locked",10);
+    myCache.set(`couponLocks:${userid}`, "locked", 10);
 
     const [userData] = await executor(
       "SELECT * FROM users WHERE userid = ?",
@@ -38,7 +38,7 @@ const Createcoupons = async (req, res) => {
       return res.json({ success: false, message: "Account not found" });
     }
 
-   const emailverified = await Vemail(userid);
+    const emailverified = await Vemail(userid);
 
     if (emailverified === "no") {
       console.error("Account not verified");
@@ -61,7 +61,7 @@ const Createcoupons = async (req, res) => {
       }
     };
 
-    const { pin: mypin, phone, credit, ban,verified } = userData;
+    const { pin: mypin, phone, credit, ban, verified } = userData;
     console.error(`see user balance ${credit} ${phone}`)
     if (ban === "yes") {
       console.error("This user has been banned");
@@ -104,47 +104,42 @@ const Createcoupons = async (req, res) => {
       });
     }
 
-    if (newbalance < 0 || newbalance === undefined) {
-      console.log("Insufficient funds");
-      return res.status(400).json({
-        success: false,
-        message: "Insufficient Balance",
-        data: null,
-      });
+    await executor("UPDATE users SET credit = credit - ? WHERE userid = ?", [
+      amountcc,
+      userid,
+    ]);
+    deductedAmount = amountcc;
+    const insertCouponQuery =
+      "INSERT INTO coupon (couponid, amount,creator,admin) VALUES (?, ?,?,?)";
+
+    await executor(insertCouponQuery, [couponid, amount, userid, "false"]);
+    console.log("Inserted Coupon into the database successfully");
+    const newdate = new Date();
+    const create_date = newdate.toISOString();
+    const imade = {
+      userid,
+      recipient: phone,
+      Status: "Successful",
+      network: "coupon",
+      plan: couponid,
+      amount,
+      create_date,
+    };
+
+    await coupontran(imade);
+    if (email) {
+      await Email(email, couponid, amount);
     }
-    else if (balancc >= amountcc) {
-      const insertCouponQuery =
-        "INSERT INTO coupon (couponid, amount,creator,admin) VALUES (?, ?,?,?)";
+    return res.status(200).json({
+      message: `You have successfully created a coupon with ID ${couponid} with amount ${amount}`,
+      success: true,
+    });
 
-      await executor(insertCouponQuery, [couponid, amount, userid, "false"]);
-      console.log("Inserted Coupon into the database successfully");
-      const newdate = new Date();
-      const create_date = newdate.toISOString();
-      const imade = {
-        userid,
-        recipient: phone,
-        Status: "Successful",
-        network: "coupon",
-        plan: couponid,
-        amount,
-        create_date,
-      };
-
-      await coupontran(imade);
-
-      await executor("UPDATE users SET credit = credit - ? WHERE userid = ?", [
-        amountcc,
-        userid,
-      ]);
-      if (email) {
-        await Email(email, couponid, amount);
-      }
-      return res.status(200).json({
-        message: `You have successfully created a coupon with ID ${couponid} with amount ${amount}`,
-        success: true,
-      });
-    }
   } catch (error) {
+    await executor("UPDATE users SET credit = credit + ? WHERE userid = ?", [
+      deductedAmount,
+      userid,
+    ]);
     console.error(error);
     return res.status(500).json({
       success: false,
@@ -152,7 +147,7 @@ const Createcoupons = async (req, res) => {
       data: null,
     });
   }
-  finally{
+  finally {
     myCache.del(`couponLocks:${userid}`)
   }
 };
