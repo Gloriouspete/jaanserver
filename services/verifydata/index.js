@@ -1,4 +1,4 @@
-const executor = require("./config/db.js");
+const executor = require("../../config/db.js");
 const axios = require("axios");
 require('dotenv').config()
 const datasecret = process.env.DATA_SECRET;
