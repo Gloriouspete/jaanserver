@@ -21,10 +21,12 @@ async function Genemail(req, res) {
         success: false,
         message: "Your Account is already email verified!",
       });
-    }
+    };
+
     const hashedemail = jwt.sign({ email }, secretKey);
     const hashedlink = `https://jaan.ng/verifyemail?q=${hashedemail}`;
-    sendVerificationEmail(email, name, hashedlink);
+    console.error(email,name,hashedlink,hashedemail)
+    await sendVerificationEmail(email, name, hashedlink);
     res.status(200).json({
       success: true,
       message:
