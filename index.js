@@ -88,6 +88,14 @@ const PayWebhook = require("./routes/paywebhook/index.js");
 const Getalldata = require("./routes/getalldata/index.js");
 const BuyAlldata = require("./routes/alldata/index.js");
 const Getdataprice = require("./admin/price/data.js");
+const VendAirtime = require("./vendor/airtime/index.js");
+const VendAuth = require("./vendor/auth/index.js");
+const Venddata = require("./vendor/venddata/index.js");
+const GetVenddata = require("./vendor/getdata/getdata.js");
+const FetchInfo = require("./vendor/fetchinfo/index.js");
+const AuthVend = require("./middleware/authvend.js");
+const GetSecrets = require("./routes/secrets/fetchsecret.js");
+const CreateSecret = require("./routes/secrets/createsecret.js");
 const requestLimiter = rateLimit({
   windowMs: 10 * 1000, // 10 seconds
   max: 1, // Limit each user to 1 coupon creation per window
@@ -115,7 +123,6 @@ corsOptions = {
 
 app.use(cors(corsOptions));
 
-app.use(authenticateJWT);
 
 app.get("/", (req, res) => {
   res.send("Server is working correctly");
@@ -226,145 +233,159 @@ app.post("/api/v1/signup", Signup);
 
 app.post("/api/v1/login", Login);
 
-app.post("/api/v1/createpin", Createpin);
+app.post("/api/v1/createpin",authenticateJWT, Createpin);
 
-app.post("/api/v1/setpin", Setpin);
+app.post("/api/v1/setpin",authenticateJWT, Setpin);
 
 app.post("/api/v1/forgot", Forgot);
 
 app.post("/api/v1/resetpass", Resetpass);
 
-app.post("/api/v1/setpass", Setpass);
+app.post("/api/v1/setpass",authenticateJWT, Setpass);
 
-app.post("/api/v1/getdata", Getdata);
+app.post("/api/v1/getdata",authenticateJWT, Getdata);
 
-app.post("/api/v1/getalldata", Getalldata);
+app.post("/api/v1/getalldata",authenticateJWT, Getalldata);
 
-app.post("/api/v1/buyairtime", validateAirtimeRequest, requestLimiter, speedLimiter, Airtime);
+app.post("/api/v1/buyairtime",authenticateJWT, validateAirtimeRequest, requestLimiter, speedLimiter, Airtime);
 
-app.get("/api/v1/getuser", Getuser);
+app.get("/api/v1/getuser",authenticateJWT, Getuser);
 
-app.post("/api/v1/buydata", validateDataRequest, requestLimiter, speedLimiter, Buydata);
+app.post("/api/v1/buydata",authenticateJWT, validateDataRequest, requestLimiter, speedLimiter, Buydata);
 
-app.post("/api/v1/alldata", validateAllDataRequest, requestLimiter, speedLimiter, BuyAlldata);
+app.post("/api/v1/alldata",authenticateJWT, validateAllDataRequest, requestLimiter, speedLimiter, BuyAlldata);
 
-app.get("/api/v1/getcable", Getcable);
+app.get("/api/v1/getcable",authenticateJWT, Getcable);
 
-app.post("/api/v1/geteducation", Geteducation);
+app.post("/api/v1/geteducation",authenticateJWT, Geteducation);
 
-app.get("/api/v1/getelectric", Getelectric);
+app.get("/api/v1/getelectric",authenticateJWT, Getelectric);
 
-app.get("/api/v1/getbetting", Getbetting);
+app.get("/api/v1/getbetting",authenticateJWT, Getbetting);
 
-app.get("/api/v1/getgiftcard", Getcard);
+app.get("/api/v1/getgiftcard",authenticateJWT, Getcard);
 
-app.post("/api/v1/buyeducation", Buyeducation);
+app.post("/api/v1/buyeducation",authenticateJWT, Buyeducation);
 
-app.post("/api/v1/buycable", speedLimiter, requestLimiter, Buycable);
+app.post("/api/v1/buycable",authenticateJWT, speedLimiter, requestLimiter, Buycable);
 
-app.post("/api/v1/buyelectric", speedLimiter, requestLimiter, Buyelectric);
+app.post("/api/v1/buyelectric",authenticateJWT, speedLimiter, requestLimiter, Buyelectric);
 
-app.post("/api/v1/buybetting", speedLimiter, requestLimiter, Buybetting);
+app.post("/api/v1/buybetting",authenticateJWT, speedLimiter, requestLimiter, Buybetting);
 
-app.post("/api/v1/buygiftcard", speedLimiter, requestLimiter, Buygiftcard);
+app.post("/api/v1/buygiftcard",authenticateJWT, speedLimiter, requestLimiter, Buygiftcard);
 
-app.post("/api/v1/kyc", Kyc);
+app.post("/api/v1/kyc",authenticateJWT, Kyc);
 
-app.post("/api/v1/genaccount", Genaccount);
+app.post("/api/v1/genaccount",authenticateJWT, Genaccount);
 
-app.get("/api/v1/getprice", GetPrice);
+app.get("/api/v1/getprice",authenticateJWT, GetPrice);
 
-app.get("/api/v1/getpopup", GetPopup);
+app.get("/api/v1/getpopup",authenticateJWT, GetPopup);
 
-app.post("/api/v1/createcoupon", validateAmount, requestLimiter, speedLimiter, Createcoupons);
+app.post("/api/v1/createcoupon",authenticateJWT, validateAmount, requestLimiter, speedLimiter, Createcoupons);
 
-app.post("/api/v1/redeemcoupon", requestLimiter, speedLimiter, Redeemcoupon);
+app.post("/api/v1/redeemcoupon",authenticateJWT, requestLimiter, speedLimiter, Redeemcoupon);
 
-app.post("/api/v1/verifycable", Verifycable);
+app.post("/api/v1/verifycable",authenticateJWT, Verifycable);
 
-app.post("/api/v1/verifyelectric", Verifyelectric);
+app.post("/api/v1/verifyelectric",authenticateJWT, Verifyelectric);
 
-app.post("/api/v1/verifybet", Verifybet);
+app.post("/api/v1/verifybet",authenticateJWT, Verifybet);
 
-app.get("/api/v1/genemail", Genemail);
+app.get("/api/v1/genemail",authenticateJWT, Genemail);
 
-app.get("/api/v1/getadverts", Viewadvert)
+app.get("/api/v1/getadverts",authenticateJWT, Viewadvert)
 
-app.get("/admin/getusers", Getusers);
+app.get("/admin/getusers",authenticateJWT, Getusers);
 
 app.post("/admin/login", AdminLogin);
 
-app.get("/admin/getbalance", Getbalance);
+app.get("/admin/getbalance",authenticateJWT, Getbalance);
 
-app.get("/admin/totalfund", Totalfunds);
+app.get("/admin/totalfund",authenticateJWT, Totalfunds);
 
-app.post("/admin/deleteuser", Deleteuser);
+app.post("/admin/deleteuser",authenticateJWT, Deleteuser);
 
-app.post("/admin/banuser", Banuser);
+app.post("/admin/banuser",authenticateJWT, Banuser);
 
-app.post("/admin/unbanuser", Unbanuser);
+app.post("/admin/unbanuser",authenticateJWT, Unbanuser);
 
-app.post("/admin/checkuser", Checkuser);
+app.post("/admin/checkuser",authenticateJWT, Checkuser);
 
-app.post("/admin/manualfund", Manualfund);
+app.post("/admin/manualfund",authenticateJWT, Manualfund);
 
-app.get("/admin/transactions", Transaction);
+app.get("/admin/transactions",authenticateJWT, Transaction);
 
-app.get("/admin/alltransactions", Alltrans);
+app.get("/admin/alltransactions",authenticateJWT, Alltrans);
 
-app.post("/admin/setpin", Setpins);
+app.post("/admin/setpin",authenticateJWT, Setpins);
 
-app.get("/admin/getdata", Getadmindata);
+app.get("/admin/getdata",authenticateJWT, Getadmindata);
 
-app.post("/admin/editprice", Editprice);
+app.post("/admin/editprice",authenticateJWT, Editprice);
 
-app.post("/admin/editcable", Editcable);
+app.post("/admin/editcable",authenticateJWT, Editcable);
 
-app.post("/admin/editdata", Editdata);
+app.post("/admin/editdata",authenticateJWT, Editdata);
 
-app.post("/admin/editelectric", Editelectric);
+app.post("/admin/editelectric",authenticateJWT, Editelectric);
 
-app.get("/admin/electricprice", Getelectricprice);
+app.get("/admin/electricprice",authenticateJWT, Getelectricprice);
 
-app.get("/admin/cableprice", Getcableprice);
+app.get("/admin/cableprice",authenticateJWT, Getcableprice);
 
-app.get("/admin/dataprice", Getdataprice);
+app.get("/admin/dataprice",authenticateJWT, Getdataprice);
 
-app.get("/admin/datatransaction", Datatransaction);
+app.get("/admin/datatransaction",authenticateJWT, Datatransaction);
 
-app.get("/admin/airtimetransaction", Airtimetransaction);
+app.get("/admin/airtimetransaction",authenticateJWT, Airtimetransaction);
 
-app.post("/admin/createcoupon", Createcoupon);
+app.post("/admin/createcoupon",authenticateJWT, Createcoupon);
 
-app.post("/admin/deletecoupon", Deletecoupon);
+app.post("/admin/deletecoupon",authenticateJWT, Deletecoupon);
 
-app.post("/admin/createmessage", Createmessage);
+app.post("/admin/createmessage",authenticateJWT, Createmessage);
 
-app.post("/admin/deletemessage", Deletemessage);
+app.post("/admin/deletemessage",authenticateJWT, Deletemessage);
 
-app.get("/admin/viewcoupon", Viewcoupon);
+app.get("/admin/viewcoupon",authenticateJWT, Viewcoupon);
 
-app.get("/admin/viewmessage", Viewmessage);
+app.get("/admin/viewmessage",authenticateJWT, Viewmessage);
 
-app.get("/admin/getadverts", Viewadverts);
+app.get("/admin/getadverts",authenticateJWT, Viewadverts);
 
-app.post("/admin/createadvert", Createadvert);
+app.post("/admin/createadvert",authenticateJWT, Createadvert);
 
-app.post("/admin/deleteadvert", DeleteAdvert);
+app.post("/admin/deleteadvert",authenticateJWT, DeleteAdvert);
 
-app.post("/admin/changeadvertstatus", ChangeAdvertStatus)
+app.post("/admin/changeadvertstatus",authenticateJWT, ChangeAdvertStatus)
 
-app.get("/api/v1/getrefid", GetRefid);
+app.get("/api/v1/getrefid",authenticateJWT, GetRefid);
 
-app.get("/api/v1/getref", GetReferrals);
+app.get("/api/v1/getref",authenticateJWT, GetReferrals);
 
-app.post("/api/v1/convertpoints", validateAmount, Convertpoints);
+app.post("/api/v1/convertpoints",authenticateJWT, validateAmount, Convertpoints);
 
-app.post("/api/v1/verifyacc", Verifyacc);
-app.post("/api/v1/checkverify", Checkverify);
+app.post("/api/v1/verifyacc",authenticateJWT, Verifyacc);
+app.post("/api/v1/checkverify",authenticateJWT, Checkverify);
+
+app.get("/api/v1/fetchsecrets", authenticateJWT, GetSecrets);
+
+app.get("/api/v1/createsecret", authenticateJWT, CreateSecret);
+
+app.get("/vend/v1/auth", VendAuth);
+
+app.post("/vend/v1/dataplan", AuthVend, GetVenddata);
+
+app.post("/vend/v1/fetchinfo", AuthVend, FetchInfo);
+
+app.post("/vend/v1/buydata", AuthVend, Venddata);
+
+app.post("/vend/v1/buyairtime", AuthVend, VendAirtime);
 
 
-app.get("/api/v1/transactions", (req, res) => {
+app.get("/api/v1/transactions",authenticateJWT, (req, res) => {
   const userid = req.user.userid;
   try {
     const pquery = `select * from transactions where userid = ?`;
@@ -404,7 +425,7 @@ app.get("/api/v1/transactions", (req, res) => {
 
 
 
-app.get("/api/v1/callbalance", async (req, res) => {
+app.get("/api/v1/callbalance",authenticateJWT, async (req, res) => {
   const email = req.session.email;
 
   const db = await pool.getConnection();

@@ -9,7 +9,7 @@ const { check, validationResult } = require("express-validator");
 const Verifydata = require("../../services/verifydata/index.js");
 
 const myCache = new NodeCache();
-async function Buydata(req, res) {
+async function Venddata(req, res) {
     let deductedAmount = 0
     const userid = req.user.userid;
     const errors = validationResult(req);
@@ -168,4 +168,4 @@ const setData = async (data) => {
     }
 };
 
-module.exports = Buydata;
+module.exports = Venddata;
