@@ -5,6 +5,7 @@ const myCache = new NodeCache();
 const Email = require("./email.js");
 const Vemail = require("../../services/emailverify.js");
 const { finished } = require("nodemailer/lib/xoauth2/index.js");
+const { MaximumTran } = require("../../services/worker.js");
 
 const Redeemcoupon = async (req, res) => {
   console.log("got here")
@@ -70,7 +71,18 @@ const Redeemcoupon = async (req, res) => {
       console.error("Coupon already redeemed by user");
       return res.status(404).json({ success: false, message: "You already redeemed this coupon" });
     }
-    const { user_name, phone, credit, verified, ban } = userData;
+    const { user_name, phone, credit, verified, ban,business } = userData;
+    if (business === "no") {
+      const maximumprice = await MaximumTran(userid)
+      console.error("see maximun price", maximumprice)
+      if (Number(maximumprice) >= 20000) {
+        return res.status(403).json({
+          success: false,
+          message: "You have reached your maximum limit of 20,000 Naira for the day, Please upgrade to Business for unlimited transaction",
+          data: null,
+        });
+      }
+    }
     if (ban === "yes") {
       console.error("This user has been banned");
       return res

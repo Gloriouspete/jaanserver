@@ -197,7 +197,7 @@ app.post("/webhooksuccess", async (req, res) => {
 
   if (monnifySignature === computedHash) {
     const { eventData } = requestBody;
-    const { amountPaid: payment, paidOn: date, paymentReference } = eventData;
+    const { settlementAmount: payment, paidOn: date, paymentReference } = eventData;
     const { reference } = eventData.product;
 
     if (processedTransactions.has(paymentReference)) {

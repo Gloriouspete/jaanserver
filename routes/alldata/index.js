@@ -7,6 +7,7 @@ const Points = require("../../services/points/points.js");
 const Vemail = require("../../services/emailverify.js");
 const { check, validationResult } = require("express-validator");
 const { makePurchaseRequest } = require("./prop.js");
+const { MaximumTran } = require("../../services/worker.js");
 
 const myCache = new NodeCache();
 async function BuyAlldata(req, res) {
@@ -47,7 +48,7 @@ async function BuyAlldata(req, res) {
         message: "Your email address has not been verified. Please verify your email before proceeding.",
       });
     }
-    const { pin, phone, credit, email, verified, ban } = userData;
+    const { pin, phone, credit, email, verified, ban,business } = userData;
     const mypin = parseInt(pin, 10);
     const balance = parseInt(credit, 10);
     if (ban === "yes") {
@@ -64,14 +65,18 @@ async function BuyAlldata(req, res) {
       console.error("identity not verified");
       return res.status(403).json({ success: false, message: "Your Kyc Account has not been verified. Please go to profile to verify your Identity before proceeding with this transaction." });
     }
-    if (mypin.toString().trim() !== pincode.toString().trim()) {
-      console.log("incorect pin");
-      return res.status(200).json({
-        success: false,
-        message: "Incorrect Pin",
-        data: null,
-      });
+    if (business === "no") {
+      const maximumprice = await MaximumTran(userid)
+      console.error("see maximun price", maximumprice)
+      if (Number(maximumprice) >= 20000) {
+        return res.status(403).json({
+          success: false,
+          message: "You have reached your maximum limit of 20,000 Naira for the day, Please upgrade to Business for unlimited transaction",
+          data: null,
+        });
+      }
     }
+
     const parsedAmount = Number(dataAmount)
     if (isNaN(parsedAmount) || parsedAmount <= 0) {
       return res.status(400).json({ success: false, message: "Invalid data amount" });

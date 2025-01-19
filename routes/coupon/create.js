@@ -5,6 +5,7 @@ const myCache = new NodeCache({ stdTTL: 10 });
 const Email = require("./email.js");
 const Vemail = require("../../services/emailverify.js");
 const { check, validationResult } = require("express-validator");
+const { MaximumTran } = require("../../services/worker.js");
 
 const Createcoupons = async (req, res) => {
   let deductedAmount = 0;
@@ -61,7 +62,7 @@ const Createcoupons = async (req, res) => {
       }
     };
 
-    const { pin: mypin, phone, credit, ban, verified } = userData;
+    const { pin: mypin, phone, credit, ban, verified, business } = userData;
     console.error(`see user balance ${credit} ${phone}`)
     if (ban === "yes") {
       console.error("This user has been banned");
@@ -82,6 +83,17 @@ const Createcoupons = async (req, res) => {
           message:
             "Your Kyc Account has not been verified. Please go to profile to verify your Identity before proceeding with this transaction.",
         });
+    }
+    if (business === "no") {
+      const maximumprice = await MaximumTran(userid)
+      console.error("see maximun price", maximumprice)
+      if (Number(maximumprice) >= 20000) {
+        return res.status(403).json({
+          success: false,
+          message: "You have reached your maximum limit of 20,000 Naira for the day, Please upgrade to Business for unlimited transaction",
+          data: null,
+        });
+      }
     }
     console.warn("this is userdata", credit);
     const balancc = Number(credit);

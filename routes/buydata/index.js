@@ -6,6 +6,7 @@ const NodeCache = require("node-cache");
 const Points = require("../../services/points/points.js");
 const Vemail = require("../../services/emailverify.js");
 const { check, validationResult } = require("express-validator");
+const { MaximumTran } = require("../../services/worker.js");
 
 const myCache = new NodeCache();
 async function Buydata(req, res) {
@@ -51,7 +52,7 @@ async function Buydata(req, res) {
           "Your email address has not been verified. Please verify your email address before proceeding with this transaction.",
       });
     }
-    const { pin, phone, credit, email, verified, ban } = userData;
+    const { pin, phone, credit, email, verified, ban,business } = userData;
 
     const mypin = parseInt(pin, 10);
     const balance = parseInt(credit, 10);
@@ -77,6 +78,18 @@ async function Buydata(req, res) {
         data: null,
       });
     }
+    if (business === "no") {
+      const maximumprice = await MaximumTran(userid)
+      console.error("see maximun price", maximumprice)
+      if (Number(maximumprice) >= 20000) {
+        return res.status(403).json({
+          success: false,
+          message: "You have reached your maximum limit of 20,000 Naira for the day, Please upgrade to Business for unlimited transaction",
+          data: null,
+        });
+      }
+    }
+
     const newbalance = balance - dataamount;
     if (newbalance < 0 || newbalance === undefined) {
       console.log("Insufficient funds");

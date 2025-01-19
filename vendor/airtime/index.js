@@ -6,11 +6,10 @@ const NodeCache = require("node-cache");
 const Points = require("../../services/points/points.js");
 const Vemail = require("../../services/emailverify.js");
 const { check, validationResult } = require("express-validator");
-const { MaximumTran } = require("../../services/worker.js");
 
 const myCache = new NodeCache();
 
-const Airtime = async (req, res) => {
+const VendAirtime = async (req, res) => {
   let deductedAmount = 0;
   const userid = req.user.userid;
   const errors = validationResult(req);
@@ -24,17 +23,7 @@ const Airtime = async (req, res) => {
       });
   }
   try {
-    const { netcode, amount, number, pincode } = req.body;
-    const lockExists = myCache.get(`airtransactionLocks:${userid}`);
-    if (lockExists) {
-      console.log("Existing Transaction in progress");
-      return res.status(200).json({
-        success: false,
-        message: "Too Many Requests",
-        data: null,
-      });
-    }
-    myCache.set(`airtransactionLocks:${userid}`, "locked", 10);
+    const { netcode, amount, number } = req.body;
     const [userData] = await executor(
       "SELECT * FROM users WHERE userid = ?",
       [userid]
@@ -43,16 +32,7 @@ const Airtime = async (req, res) => {
       console.error("Account not found");
       return res.json({ success: false, message: "Account not found" });
     }
-    const emailverified = await Vemail(userid);
-    if (emailverified === "no") {
-      console.error("Account not verified");
-      return res.json({
-        success: false,
-        message:
-          "Your email address has not been verified. Please verify your email address before proceeding with this transaction.",
-      });
-    }
-    const { pin: mypin, phone, credit, email, verified, ban, business } = userData;
+    const { phone, credit, email, ban } = userData;
     if (ban === "yes") {
       console.error("This user has been banned");
       return res
@@ -63,36 +43,6 @@ const Airtime = async (req, res) => {
             "You have been banned from using Jaan services.",
         });
     }
-    // if (verified === "no") {
-    //   console.error("identity not verified");
-    //   return res
-    //     .status(401)
-    //     .json({
-    //       success: false,
-    //       message:
-    //         "Your Kyc Account has not been verified. Please go to profile to verify your Identity before proceeding with this transaction.",
-    //     });
-    // }
-    if (mypin.toString() !== pincode.toString()) {
-      console.log("Incorrect pin");
-      return res.status(200).json({
-        success: false,
-        message: "Incorrect Pin",
-        data: null,
-      });
-    }
-    if (business === "no") {
-      const maximumprice = await MaximumTran(userid)
-      console.error("see maximun price", maximumprice)
-      if (Number(maximumprice) >= 20000) {
-        return res.status(403).json({
-          success: false,
-          message: "You have reached your maximum limit of 20,000 Naira for the day, Please upgrade to Business for unlimited transaction",
-          data: null,
-        });
-      }
-    }
-
 
     const balancc = Number(credit);
     const amountcc = Number(amount);
@@ -156,7 +106,13 @@ const Airtime = async (req, res) => {
       return res.status(200).json({
         success: true,
         message: "Airtime Purchase Successful",
-        data: null,
+        data: {
+          recipient: mobile_number,
+          status: Status,
+          network: plan_network,
+          date: create_date,
+          amount
+        },
       });
     } else {
       await executor("UPDATE users SET credit = credit + ? WHERE userid = ?", [
@@ -212,4 +168,4 @@ const airtimetran = async (data) => {
   }
 };
 
-module.exports = Airtime;
+module.exports = VendAirtime;

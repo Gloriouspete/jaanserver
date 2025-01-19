@@ -7,7 +7,7 @@ const UserCount = async () => {
         const result = await executor(query, [])
         if (result) {
             const newresult = result[0].rowcount
-       
+
             return newresult
         }
     }
@@ -22,7 +22,7 @@ const Totalfund = async () => {
         const selectUserQuery = 'SELECT SUM(credit) AS totalbalance FROM users';
         const result = await executor(selectUserQuery, [])
         if (result) {
-           
+
             const mydata = result[0].totalbalance
             return mydata
         }
@@ -77,8 +77,30 @@ const DebitTran = async () => {
     }
 }
 
-class All {
-    
-}
+const MaximumTran = async (userid) => {
+    try {
 
-module.exports = { UserCount, Totalfund ,AllTran ,CreditTran,DebitTran }
+        const today = new Date().toISOString().split('T')[0];
+
+        const selectUserQuery = `
+            SELECT SUM(price) AS totalfund
+            FROM transactions
+            WHERE service != 'funding' 
+              AND userid = ? 
+              AND DATE(date) = ?;
+        `;
+        const result = await executor(selectUserQuery, [userid, today]);
+        console.error(result,"see maximun resukt")
+        if (result && result[0] && result[0].totalfund !== null) {
+            return result[0].totalfund;
+        }
+        return 0;
+    } catch (error) {
+        console.error('Error fetching total funds:', error);
+        throw new Error('Could not retrieve total funds for today');
+    }
+};
+
+
+
+module.exports = { UserCount, Totalfund, AllTran, CreditTran, DebitTran, MaximumTran }

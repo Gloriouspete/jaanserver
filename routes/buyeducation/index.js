@@ -6,6 +6,7 @@ const GetPricer = require("../../services/price/price.js");
 const { makePurchaseRequest, getUserData } = require("./prop.js");
 const Vemail = require("../../services/emailverify.js");
 const Points = require("../../services/points/points.js");
+const { MaximumTran } = require("../../services/worker.js");
 async function Buyeducation(req, res) {
   const { userid } = req.user;
   const { billersCode, serviceID, variation_code, phone, amount } = req.body;
@@ -36,7 +37,29 @@ async function Buyeducation(req, res) {
       });
     }
     const { cableprice } = cableresponse[0];
-    const { credit, email } = userData;
+    const { credit, email, ban, business } = userData;
+    if (ban === "yes") {
+      console.error("This user has been banned");
+      return res
+        .status(401)
+        .json({
+          success: false,
+          message:
+            "You have been banned from using Jaan services.",
+        });
+    }
+    if (business === "no") {
+      const maximumprice = await MaximumTran(userid)
+      console.error("see maximun price", maximumprice)
+      if (Number(maximumprice) >= 20000) {
+        return res.status(403).json({
+          success: false,
+          message: "You have reached your maximum limit of 20,000 Naira for the day, Please upgrade to Business for unlimited transaction",
+          data: null,
+        });
+      }
+    }
+
     const intprice = parseInt(cableprice, 10);
     const intamount = intprice + realamount;
     const balance = parseInt(credit, 10);
@@ -46,6 +69,7 @@ async function Buyeducation(req, res) {
         success: false,
       });
     }
+
     await executor("UPDATE users SET credit = credit - ? WHERE userid = ?", [
       intamount,
       userid,
@@ -96,20 +120,20 @@ async function Buyeducation(req, res) {
         success: false,
       });
     }
-  
+
   } catch (error) {
     await executor("UPDATE users SET credit = credit + ? WHERE userid = ?", [
       deductedAmount,
       userid,
     ]);
-  console.warn("Error occurred:", error);
-  const responsed = {
-    message: "We apologize, we are currently unable to process your cable plan purchase. Please try again later.",
-    success: false,
-    data: error,
-  };
-  res.status(500).json(responsed);
-}
+    console.warn("Error occurred:", error);
+    const responsed = {
+      message: "We apologize, we are currently unable to process your cable plan purchase. Please try again later.",
+      success: false,
+      data: error,
+    };
+    res.status(500).json(responsed);
+  }
 }
 
 

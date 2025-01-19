@@ -37,7 +37,7 @@ async function makePurchaseRequest({
 async function getUserData(userid) {
   try {
     const [userData] = await executor(
-      "SELECT credit FROM users WHERE userid = ?",
+      "SELECT * FROM users WHERE userid = ?",
       [userid]
     );
     return userData;
