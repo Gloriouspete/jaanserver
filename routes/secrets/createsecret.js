@@ -4,7 +4,7 @@ const crypto = require("crypto")
 async function CreateSecret(req, res) {
     const { userid } = req.user;
     try {
-        const results = await executor.query("SELECT * from users where userid = ?", [userid])
+        const results = await executor("SELECT * from users where userid = ?", [userid])
         if (results.length === 0) {
             return res.status(401).json({
                 success: false,
@@ -27,7 +27,7 @@ async function CreateSecret(req, res) {
             });
         }
         const secretkey = crypto.randomBytes(12).toString('hex');
-        await executor.query(`UPDATE users SET secretkey = ? where userid = ?`, [secretkey, userid])
+        await executor(`UPDATE users SET secretkey = ? where userid = ?`, [secretkey, userid])
         return res.status(200).json({
             success: true,
             message: "You have successfully generated a new Secret Key",

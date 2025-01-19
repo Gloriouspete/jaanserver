@@ -3,7 +3,7 @@ const executor = require("../../config/db.js");
 function FetchInfo(req, res) {
   const userid = req.user;
 
-  executor.query("select * from users where userid = ?", [userid])
+  executor("select * from users where userid = ?", [userid])
     .then((results) => {
       const user = results[0];
       res.status(200).json({

@@ -2,7 +2,7 @@ const executor = require("../../config/db.js");
 async function GetSecrets(req, res) {
     const { userid } = req.user;
     try {
-        const results = await executor.query("SELECT * from users where userid = ?", [userid])
+        const results = await executor("SELECT * from users where userid = ?", [userid])
         if (results.length === 0) {
             return res.status(401).json({
                 success: false,

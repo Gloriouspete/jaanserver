@@ -14,7 +14,7 @@ function VendAuth(req, res) {
         return res.status(401).json({ success: false, message: 'Auth failed. Secret Key Missing' });
     }
 
-    executor.query("select * from users where userid = ?", [publicKey])
+    executor("select * from users where userid = ?", [publicKey])
         .then((results) => {
             if (!results || results.length === 0) {
                 return res.status(404).json({
