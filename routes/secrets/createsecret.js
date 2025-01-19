@@ -22,7 +22,7 @@ async function CreateSecret(req, res) {
         if (business === "no") {
             return res.status(403).json({
                 success: true,
-                message: "You haven't been upgraded to the business mode, Kindly contact support for assistane and requirement",
+                message: "You haven't been upgraded to the business mode, Kindly contact support for assistance and requirements",
                 data: null,
             });
         }
