@@ -17,13 +17,13 @@ async function Genaccount(req, res) {
     const { email, phone, name } = user;
     getAccount(userid, email, name, phone, type, number)
       .then(async (results) => {
-        // const mydata = results.data;
-        // const { bankname: bankName, accountnumber: accountNumber, accountname: accountName } = mydata;
-        // const fact = await setBank(bankName, accountNumber, accountName, userid);
-        if (results) {
+        const mydata = results.data;
+        const { bankname: bankName, accountnumber: accountNumber, accountname: accountName } = mydata;
+        const fact = await setBank(bankName, accountNumber, accountName, userid);
+        if (fact) {
           res.status(200).json({
             success: true,
-            message: results || "A new bank account has been generated for you ",
+            message: "A new bank account has been generated for you ",
             data: null,
           });
         } else

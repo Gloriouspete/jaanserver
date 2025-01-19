@@ -1,32 +1,50 @@
 require("dotenv").config();
 const API_KEY = process.env.MONNIFY_CLIENT;
-const SECRET_KEY = process.env.PAYSTACK_SECRET;
+const SECRET_KEY = process.env.MONNIFY_SECRET;
 const axios = require("axios");
-const getAccount = async (userid, email, username, phone, type, number) => {
+const getAccount = async (userid, email, username,phone,type,number) => {
+  const credentials = `${API_KEY}:${SECRET_KEY}`;
+  const encodedCredentials = Buffer.from(credentials).toString("base64");
+  const authHeader = `Basic ${encodedCredentials}`;
+
+  const loginEndpoint = "https://api.monnify.com/api/v1/auth/login";
 
   try {
+    const loginResponse = await axios.post(
+      loginEndpoint,
+      {},
+      {
+        headers: {
+          Authorization: authHeader,
+        },
+      }
+    );
+
+    const accessToken = loginResponse.data.responseBody.accessToken;
+
     const url =
-      "https://api.paystack.co/dedicated_account/assign";
+      "https://api.monnify.com/api/v2/bank-transfer/reserved-accounts";
     const headers = {
       "Content-Type": "application/json",
-      Authorization: `Bearer ${SECRET_KEY}`,
+      Authorization: `Bearer ${accessToken}`,
     };
+    
+     let requestBody;
 
-    let requestBody;
-
-    requestBody = {
-      customer: userid,
-      phone,
-      email,
-      first_name: username,
-      last_name: username,
-      country: "NG",
-      preferred_bank: "titan-paystack",
+     requestBody = {
+      accountReference: userid,
+      accountName: username,
+      currencyCode: "NGN",
+      contractCode: "832728158702",
+      customerEmail: email,
+      customerName: email,
+      getAllAvailableBanks: false,
+      preferredBanks: ["50515"],
     };
-
-    if (type === "bvn") {
+      
+    if(type === "bvn"){
       requestBody.bvn = number
-    } else {
+    }else{
       requestBody.nin = number
     }
 
@@ -34,26 +52,20 @@ const getAccount = async (userid, email, username, phone, type, number) => {
     const responseData = response.data;
     console.log(responseData);
 
-    if (responseData.status) {
-      // const bankname = responseData.data.bank.name;
-      // const accountname = responseData.data.account_name;
-      // const accountnumber = responseData.data.account_number;
-      // const accounts = {
-      //   bankname,
-      //   accountname,
-      //   accountnumber
-      // }
-      // const result = {
-      //   success: true,
-      //   data: accounts,
-      // };
-      return responseData.message;
+    if (responseData.requestSuccessful) {
+      const accounts = responseData.responseBody.accounts;
+      console.log(accounts);
+      const result = {
+        success: true,
+        data: accounts[0],
+      };
+      return result;
     } else {
       throw new Error("Error creating account");
     }
   } catch (error) {
-    console.error(error.response ? error.response.data.message : error.message);
-    const newmessage = error.response ? error.response.data.message : error.message;
+    console.error(error.response ? error.response.data.responseMessage : error.message);
+    const newmessage = error.response ? error.response.data.responseMessage : error.message;
     throw newmessage;
   }
 };
