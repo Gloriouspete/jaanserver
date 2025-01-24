@@ -97,4 +97,4 @@ const sendVerificationEmail = async (email, name, verificationLink) => {
     }
 };
 
-sendVerificationEmail("peterninyo4@gmail.com", "peter", "https://jaan.ng")
+sendVerificationEmail("mcgrin1@gmail.com", "peter", "https://jaan.ng")

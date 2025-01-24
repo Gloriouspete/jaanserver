@@ -57,7 +57,7 @@ const forgot = async (email, code) => {
     console.log("reset email sent successfully");
     return code;
   } catch (error) {
-    console.log(error);
+    console.error(error);
   }
 };
 
