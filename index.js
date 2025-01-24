@@ -97,6 +97,7 @@ const AuthVend = require("./middleware/authvend.js");
 const GetSecrets = require("./routes/secrets/fetchsecret.js");
 const CreateSecret = require("./routes/secrets/createsecret.js");
 const Business = require("./admin/business/index.js");
+const Emailverify = require("./admin/email/index.js");
 const requestLimiter = rateLimit({
   windowMs: 10 * 1000, // 10 seconds
   max: 1, // Limit each user to 1 coupon creation per window
@@ -309,6 +310,8 @@ app.get("/admin/totalfund", authenticateJWT, Totalfunds);
 app.post("/admin/deleteuser", authenticateJWT, Deleteuser);
 
 app.post("/admin/banuser", authenticateJWT, Banuser);
+
+app.post("/admin/emailverify", authenticateJWT, Emailverify);
 
 app.post("/admin/unbanuser", authenticateJWT, Unbanuser);
 
