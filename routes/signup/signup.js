@@ -77,7 +77,7 @@ async function Signup(req, res) {
     const refcode = generateReferralId();
 
     const insertUserQuery =
-      "INSERT INTO users (name, user_name, password, email, phone, status, credit, userid,pin,bankname,accountnumber,accountname,refer_by,refer_code,emailverified) VALUES (?, ?, ?, ?, ?, ?, ?, ?,?,?,?,?,?,?)";
+      "INSERT INTO users (name, user_name, password, email, phone, status, credit, userid,pin,bankname,accountnumber,accountname,refer_by,refer_code,emailverified) VALUES (?, ?, ?, ?, ?, ?, ?, ?,?,?,?,?,?,?,?)";
 
     await executor(insertUserQuery, [
       name,
@@ -100,7 +100,7 @@ async function Signup(req, res) {
     console.log("Inserted user into the database successfully");
     welcome(email, name);
     const hashedlink = `https://jaan.ng/verifyemail?q=${hashedemail}`;
-    sendVerificationEmail(email, name, hashedlink);
+    //sendVerificationEmail(email, name, hashedlink);
     await Addcredit(referrer);
     return res
       .status(200)
