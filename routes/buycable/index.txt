@@ -10,9 +10,7 @@ async function Buycable(req, res) {
   const { userid } = req.user;
   const { billersCode, serviceID, variation_code, phone, amount } = req.body;
   const realamount = parseInt(amount, 10);
-
   try {
-    
     const requesttime = Gettime();
     console.log("Request Time:", requesttime);
 

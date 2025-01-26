@@ -6,8 +6,8 @@ const Createmessage = (req, res) => {
   const thedate = new Date();
   const newdate = thedate.toISOString();
   try {
-    const messageQuery = `UPDATE message SET text = ?, status = 'active',date = ? where id = 1`;
-    executor(messageQuery, [text, newdate]).then((phoneResults) => {
+    const messageQuery = `UPDATE message SET text = ?, status = 'active', ticker = ? ,date = ? where id = 1`;
+    executor(messageQuery, [text,newdate, newdate]).then((phoneResults) => {
       res
         .status(200)
         .json({ success: true, message: "Successful created a Popup message" });

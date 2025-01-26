@@ -77,7 +77,7 @@ async function Signup(req, res) {
     const refcode = generateReferralId();
 
     const insertUserQuery =
-      "INSERT INTO users (name, user_name, password, email, phone, status, credit, userid,pin,bankname,accountnumber,accountname,refer_by,refer_code) VALUES (?, ?, ?, ?, ?, ?, ?, ?,?,?,?,?,?,?)";
+      "INSERT INTO users (name, user_name, password, email, phone, status, credit, userid,pin,bankname,accountnumber,accountname,refer_by,refer_code,emailverified) VALUES (?, ?, ?, ?, ?, ?, ?, ?,?,?,?,?,?,?)";
 
     await executor(insertUserQuery, [
       name,
@@ -94,6 +94,7 @@ async function Signup(req, res) {
       customerbankname,
       referrer.toString(),
       refcode,
+      "yes"
     ]);
 
     console.log("Inserted user into the database successfully");
