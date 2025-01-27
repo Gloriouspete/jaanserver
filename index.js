@@ -257,7 +257,7 @@ app.post("/api/v1/buydata", authenticateJWT, validateDataRequest, requestLimiter
 
 app.post("/api/v1/alldata", authenticateJWT, validateAllDataRequest, requestLimiter, speedLimiter, BuyAlldata);
 
-app.get("/api/v1/getcable", authenticateJWT, Getcable);
+app.post("/api/v1/getcable", authenticateJWT, Getcable);
 
 app.post("/api/v1/geteducation", authenticateJWT, Geteducation);
 

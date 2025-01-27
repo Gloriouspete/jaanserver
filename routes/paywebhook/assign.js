@@ -1,7 +1,7 @@
 const executor = require("../../config/db");
 
 const Assign = async (eventData) => {
-  console.error(eventData)
+
   try {
     const data = eventData.data;
     const email = data.customer.email;

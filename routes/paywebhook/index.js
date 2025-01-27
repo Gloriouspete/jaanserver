@@ -8,9 +8,7 @@ const PayWebhook = async (req, res) => {
     if (!paystackSignature) {
         return res.status(400).send("Missing Paystack Signature Header");
     }
-    // Parse the JSON directly from req.body
     const eventData = req.body;
-    console.log(eventData);
     const computedHash = crypto
         .createHmac("sha512", clientSecretKey)
         .update(JSON.stringify(eventData))

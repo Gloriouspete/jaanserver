@@ -1,6 +1,8 @@
 require("dotenv").config();
 const axios = require("axios");
-const secretKey = process.env.DATA_SECRET;
+
+const apiKey = process.env.VT_LIVE_API;
+const secretKey = process.env.VT_LIVE_SECRET;
 async function Verifycable(req, res) {
   const { plans, numbers } = req.body;
   const load = {
@@ -15,20 +17,17 @@ async function Verifycable(req, res) {
         data: null,
       });
     }
-    const cablename = getCableName(plans);
-    if (!cablename || cablename === null) {
-      return res.status(400).json({
-        success: false,
-        message: "We encountered a problem validating your request, Please try again later",
-        data: null,
-      });
-    }
-    const response = await axios.get(
-      `https://datastation.com.ng/ajax/validate_iuc?smart_card_number=${numbers}&cablename=${cablename}`,
+    const data = {
+      billersCode: numbers,
+      serviceID: plans,
+    };
+    const response = await axios.post(
+      `https://vtpass.com/api/merchant-verify`, data,
       {
         headers: {
           "Content-Type": "application/json",
-          "Authorization": `Token ${secretKey}`
+          "api-key": apiKey,
+          "secret-key": secretKey,
         }
       }
     );
