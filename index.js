@@ -98,6 +98,7 @@ const GetSecrets = require("./routes/secrets/fetchsecret.js");
 const CreateSecret = require("./routes/secrets/createsecret.js");
 const Business = require("./admin/business/index.js");
 const Emailverify = require("./admin/email/index.js");
+const EmailCampaign = require("./admin/email/campaign.js");
 const requestLimiter = rateLimit({
   windowMs: 10 * 1000, // 10 seconds
   max: 1, // Limit each user to 1 coupon creation per window
@@ -374,7 +375,10 @@ app.get("/api/v1/getref", authenticateJWT, GetReferrals);
 app.post("/api/v1/convertpoints", authenticateJWT, validateAmount, Convertpoints);
 
 app.post("/api/v1/verifyacc", authenticateJWT, Verifyacc);
+
 app.post("/api/v1/checkverify", authenticateJWT, Checkverify);
+
+app.post("/admin/send-email", authenticateJWT, EmailCampaign);
 
 app.get("/api/v1/fetchsecrets", authenticateJWT, GetSecrets);
 
