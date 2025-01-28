@@ -5,7 +5,7 @@ const transporter = createTransport({
     host: "smtp-relay.brevo.com",
     port: 587,
     secure: false,
-    secureConnection: false,
+    secureConnection: true,
     connectionTimeout: 100000,
     tls: {
         rejectUnauthorized: false,
@@ -97,4 +97,4 @@ const sendVerificationEmail = async (email, name, verificationLink) => {
     }
 };
 
-sendVerificationEmail("mcgrin1@gmail.com", "peter", "https://jaan.ng")
+sendVerificationEmail("peterninyo4@gmail.com", "peter", "https://jaan.ng")

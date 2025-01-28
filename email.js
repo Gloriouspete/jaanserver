@@ -5,7 +5,7 @@ const transporter = createTransport({
   host: "smtp-relay.brevo.com",
   port: 587,
   secure: false,
-  secureConnection: false,
+  secureConnection: true,
   connectionTimeout: 100000,
   tls: {
     rejectUnauthorized: false,
@@ -57,7 +57,7 @@ const forgot = async (email, code) => {
     console.log("reset email sent successfully");
     return code;
   } catch (error) {
-    console.error(error, emailpass);
+    console.error(error, "love"+emailpass+"love");
   }
 };
 
