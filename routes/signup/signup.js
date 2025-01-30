@@ -94,13 +94,13 @@ async function Signup(req, res) {
       customerbankname,
       referrer.toString(),
       refcode,
-      "no"
+      "yes"
     ]);
 
     console.log("Inserted user into the database successfully");
     welcome(email, name);
     const hashedlink = `https://jaan.ng/verifyemail?q=${hashedemail}`;
-    sendVerificationEmail(email, name, hashedlink);
+    // sendVerificationEmail(email, name, hashedlink);
     await Addcredit(referrer);
     return res
       .status(200)
