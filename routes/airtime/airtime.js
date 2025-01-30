@@ -28,7 +28,7 @@ const Airtime = async (req, res) => {
     const lockExists = myCache.get(`airtransactionLocks:${userid}`);
     if (lockExists) {
       console.log("Existing Transaction in progress");
-      return res.status(200).json({
+      return res.status(429).json({
         success: false,
         message: "Too Many Requests",
         data: null,
@@ -41,12 +41,12 @@ const Airtime = async (req, res) => {
     );
     if (!userData) {
       console.error("Account not found");
-      return res.json({ success: false, message: "Account not found" });
+      return res.status(400).json({ success: false, message: "Account not found" });
     }
     const emailverified = await Vemail(userid);
     if (emailverified === "no") {
       console.error("Account not verified");
-      return res.json({
+      return res.status(403).json({
         success: false,
         message:
           "Your email address has not been verified. Please verify your email address before proceeding with this transaction.",
@@ -56,11 +56,21 @@ const Airtime = async (req, res) => {
     if (ban === "yes") {
       console.error("This user has been banned");
       return res
-        .status(401)
+        .status(403)
         .json({
           success: false,
           message:
             "You have been banned from using Jaan services.",
+        });
+    }
+    if (Number(amount) > 9999 && business === "no") {
+      console.error("This user just exceeded 10k transaction");
+      return res
+        .status(403)
+        .json({
+          success: false,
+          message:
+            "Kindly upgrade to business to enjoy transactions over 10,000 Naira",
         });
     }
     // if (verified === "no") {
@@ -75,7 +85,7 @@ const Airtime = async (req, res) => {
     // }
     if (mypin.toString() !== pincode.toString()) {
       console.log("Incorrect pin");
-      return res.status(200).json({
+      return res.status(403).json({
         success: false,
         message: "Incorrect Pin",
         data: null,
@@ -84,16 +94,14 @@ const Airtime = async (req, res) => {
     if (business === "no") {
       const maximumprice = await MaximumTran(userid)
       console.error("see maximun price", maximumprice)
-      if (Number(maximumprice) >= 20000) {
+      if (Number(maximumprice) >= 100000) {
         return res.status(403).json({
           success: false,
-          message: "You have reached your maximum limit of 20,000 Naira for the day, Please upgrade to Business for unlimited transaction",
+          message: "You have reached your maximum limit of 100,000 Naira for the day, Please upgrade to Business for unlimited transaction",
           data: null,
         });
       }
     }
-
-
     const balancc = Number(credit);
     const amountcc = Number(amount);
 
@@ -105,7 +113,7 @@ const Airtime = async (req, res) => {
       });
     }
     if (amountcc > balancc) {
-      return res.status(400).json({
+      return res.status(403).json({
         success: false,
         message: "Insufficient Balance",
         data: null,
