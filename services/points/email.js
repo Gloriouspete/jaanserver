@@ -132,4 +132,4 @@ const Email = async (email, code) => {
 
 
 
-module.exports = Email
+module.exports = Email;

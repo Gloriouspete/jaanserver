@@ -1,23 +1,8 @@
 const { createTransport } = require("nodemailer");
 require("dotenv").config();
-// const emailpass = process.env.BREVO;
-// const transporter = createTransport({
-//     host: "smtp-relay.brevo.com",
-//     port: 587,
-//     secure: false,
-//     secureConnection: true,
-//     connectionTimeout: 100000,
-//     tls: {
-//         rejectUnauthorized: false,
-//     },
-//     auth: {
-//         user: "mcgrin1@gmail.com",
-//         pass: emailpass,
-//     },
-// });
-const emailpass = process.env.ZOHO;
+const emailpass = process.env.BREVO;
 const transporter = createTransport({
-    host: "smtp.zeptomail.com",
+    host: "smtp-relay.brevo.com",
     port: 587,
     secure: false,
     secureConnection: true,
@@ -26,10 +11,25 @@ const transporter = createTransport({
         rejectUnauthorized: false,
     },
     auth: {
-        user: "emailapikey",
+        user: "mcgrin1@gmail.com",
         pass: emailpass,
     },
 });
+// const emailpass = process.env.ZOHO;
+// const transporter = createTransport({
+//     host: "smtp.zeptomail.com",
+//     port: 587,
+//     secure: false,
+//     secureConnection: true,
+//     connectionTimeout: 100000,
+//     tls: {
+//         rejectUnauthorized: false,
+//     },
+//     auth: {
+//         user: "emailapikey",
+//         pass: emailpass,
+//     },
+// });
 const forgot = async (email, code) => {
   const mailOptions = {
     from: '"Jaan Services" <hello@jaan.ng>',

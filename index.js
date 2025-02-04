@@ -70,7 +70,7 @@ const Geteducation = require("./routes/geteducation/index.js");
 const Buyeducation = require("./routes/buyeducation/index.js");
 const Genemail = require("./routes/genemail/index.js");
 const Getbetting = require("./routes/getbetting/index.js");
-const { validateAirtimeRequest, validateDataRequest, validateAmount, validateAllDataRequest } = require("./validator.js");
+const { validateAirtimeRequest, validateDataRequest, validateAmount, validateAllDataRequest,validateEDataRequest } = require("./validator.js");
 const Banuser = require("./admin/banuser/index.js");
 const Unbanuser = require("./admin/unbanuser/index.js");
 const rateLimit = require('express-rate-limit');
@@ -82,7 +82,6 @@ const DeleteAdvert = require("./admin/adverts/delete.js");
 const ChangeAdvertStatus = require("./admin/adverts/changestatus.js");
 const Verifybet = require("./routes/verifybet/index.js");
 const Buybetting = require("./routes/buybetting/index.js");
-const Getcard = require("./routes/getcard/index.js");
 const Buygiftcard = require("./routes/buygiftcard/index.js");
 const PayWebhook = require("./routes/paywebhook/index.js");
 const Getalldata = require("./routes/getalldata/index.js");
@@ -99,6 +98,11 @@ const CreateSecret = require("./routes/secrets/createsecret.js");
 const Business = require("./admin/business/index.js");
 const Emailverify = require("./admin/email/index.js");
 const EmailCampaign = require("./admin/email/campaign.js");
+const GetdataV2 = require("./routes/getdata/index.js");
+const BuyAlldataV2 = require("./routes/alldatav2/index.js");
+const GetCard = require("./routes/getcard/index.js");
+const Vendcable = require("./vendor/vendcable/index.js");
+const Retrievecable = require("./vendor/retrievecable/index.js");
 const requestLimiter = rateLimit({
   windowMs: 10 * 1000, // 10 seconds
   max: 1, // Limit each user to 1 coupon creation per window
@@ -248,6 +252,8 @@ app.post("/api/v1/setpass", authenticateJWT, Setpass);
 
 app.post("/api/v1/getdata", authenticateJWT, Getdata);
 
+app.post("/api/v2/getdata", authenticateJWT, GetdataV2);
+
 app.post("/api/v1/getalldata", authenticateJWT, Getalldata);
 
 app.post("/api/v1/buyairtime", authenticateJWT, validateAirtimeRequest, requestLimiter, speedLimiter, Airtime);
@@ -258,6 +264,8 @@ app.post("/api/v1/buydata", authenticateJWT, validateDataRequest, requestLimiter
 
 app.post("/api/v1/alldata", authenticateJWT, validateAllDataRequest, requestLimiter, speedLimiter, BuyAlldata);
 
+app.post("/api/v2/alldata", authenticateJWT, validateEDataRequest, requestLimiter, speedLimiter, BuyAlldataV2);
+
 app.post("/api/v1/getcable", authenticateJWT, Getcable);
 
 app.post("/api/v1/geteducation", authenticateJWT, Geteducation);
@@ -266,7 +274,7 @@ app.get("/api/v1/getelectric", authenticateJWT, Getelectric);
 
 app.get("/api/v1/getbetting", authenticateJWT, Getbetting);
 
-app.get("/api/v1/getgiftcard", authenticateJWT, Getcard);
+app.get("/api/v1/getgiftcard", authenticateJWT, GetCard);
 
 app.post("/api/v1/buyeducation", authenticateJWT, Buyeducation);
 
@@ -393,6 +401,10 @@ app.post("/vend/v1/fetchinfo", AuthVend, FetchInfo);
 app.post("/vend/v1/buydata", AuthVend, Venddata);
 
 app.post("/vend/v1/buyairtime", AuthVend, VendAirtime);
+
+app.post("/vend/v1/retrievecable", AuthVend, Retrievecable);
+
+app.post("/vend/v1/vendcable", AuthVend, Vendcable);
 
 
 app.get("/api/v1/transactions", authenticateJWT, (req, res) => {
