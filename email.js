@@ -1,7 +1,6 @@
 const { createTransport } = require("nodemailer");
 require("dotenv").config();
 const emailpass = process.env.BREVO;
-
 const transporter = createTransport({
   host: 'smtp-relay.brevo.com',
   port: 587, 
@@ -69,7 +68,7 @@ const forgot = async (email, code) => {
 
   try {
     await transporter.sendMail(mailOptions);
-    console.log("reset email sent successfully");
+    console.error("reset email sent successfully");
     return code;
   } catch (error) {
     console.error(error, "love"+emailpass+"love");
