@@ -54,6 +54,7 @@ async function Venddata(req, res) {
         };
         const { phone, credit, email, verified, ban } = userData;
         const balance = parseInt(credit, 10);
+        console.error("see balance",balance)
         const intamount = await Verifydata(netcode, dataid)
         if (!intamount || intamount === undefined) {
             return res.status(500).json({
