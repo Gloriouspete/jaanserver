@@ -62,7 +62,7 @@ async function GetVenddata(req, res) {
 module.exports = GetVenddata;
 function transformData(data, type) {
     return data
-        .filter(product => product.plan_type !== 'DATA COUPONS' && product.plan_type === type)
+        .filter(product => product.plan_type !== 'DATA COUPONS' && product.plan_type === type.toUpperCase())
         .map(product => {
             const { plan_amount, plan_network, id, plan, month_validate, plan_type } = product;
             const multipliedAmount = parseFloat(plan_amount) * 1.03;
