@@ -32,6 +32,7 @@ async function Venddata(req, res) {
             });
         }
         const netcode = network.toLowerCase();
+        const apinetcode = networkMap[netcode];
         if (!netcode) {
             return res.status(400).json({
                 success: false,
@@ -87,7 +88,7 @@ async function Venddata(req, res) {
         deductedAmount = intamount
         const authToken = datasecret;
         const data = {
-            network: netcode,
+            network: apinetcode,
             mobile_number: number,
             plan: dataid,
             Ported_number: true,
