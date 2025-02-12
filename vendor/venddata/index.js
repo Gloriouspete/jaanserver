@@ -16,7 +16,7 @@ const networkMap = {
 const myCache = new NodeCache();
 async function Venddata(req, res) {
     let deductedAmount = 0
-    const userid = req.user.userid;
+    const userid = req.user;
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
         console.error(errors.array())

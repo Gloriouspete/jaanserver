@@ -8,7 +8,7 @@ const Vemail = require("../../services/emailverify.js");
 const Confirmcable = require("./verify.js");
 async function Vendcable(req, res) {
   let deductedAmount = 0;
-  const { userid } = req.user;
+  const userid  = req.user;
   const { billersCode, serviceID, variation_code, phone } = req.body;
   try {
     const requesttime = Gettime();

@@ -15,7 +15,7 @@ const myCache = new NodeCache();
 
 const VendAirtime = async (req, res) => {
   let deductedAmount = 0;
-  const userid = req.user.userid;
+  const userid = req.user;
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     console.error(errors.array());
