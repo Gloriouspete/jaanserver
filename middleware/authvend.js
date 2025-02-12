@@ -10,7 +10,7 @@ async function AuthVend(req, res, next) {
     }
     try {
         const decodedToken = jwt.verify(token, secretPhrase);
-        const result = await executor.query("select * from users where secretkey = ?", [decodedToken]);
+        const result = await executor("select * from users where secretkey = ?", [decodedToken]);
         if (result.length === 0) {
             return res.status(404).json({
                 success: false,
