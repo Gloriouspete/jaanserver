@@ -2,7 +2,6 @@
 const executor = require("../../config/db.js");
 function FetchInfo(req, res) {
   const userid = req.user;
-
   executor("select * from users where userid = ?", [userid])
     .then((results) => {
       const user = results[0];

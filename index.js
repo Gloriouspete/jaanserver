@@ -396,7 +396,7 @@ app.get("/vend/v1/auth", VendAuth);
 
 app.post("/vend/v1/dataplan", AuthVend, GetVenddata);
 
-app.post("/vend/v1/fetchinfo", AuthVend, FetchInfo);
+app.get("/vend/v1/fetchinfo", AuthVend, FetchInfo);
 
 app.post("/vend/v1/venddata", AuthVend, validateVendDataRequest, Venddata);
 
