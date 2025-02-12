@@ -1,41 +1,61 @@
-var axios = require('axios');
-require("dotenv").config();
-const secretKey = process.env.RE_TEST_SECRET;
-var config = {
-    method: 'get',
-    maxBodyLength: Infinity,
-    url: 'https://api-demo.systemspecsng.com/services/connect-gateway/api/v1/vending/categories?page=0&size=40',
-    headers: {
-        'secretKey': secretKey
+const executor = require("./config/db.js");
+const axios = require("axios");
+require('dotenv').config()
+const datasecret = process.env.DATA_SECRET;
+async function Verifydata(network, id) {
+    const url = 'https://datastation.com.ng/api/network/';
+    const authToken = datasecret;
+    try {
+        if (!network || typeof (network) !== "string") {
+            throw "Network does not exist or is not a string symbol"
+        }
+        if (!id) {
+            throw "Id does not exist"
+        }
+        const response = await axios.get(url, {
+            headers: {
+                'Authorization': `Token ${authToken}`,
+                'Accept': 'application/json',
+            }
+        });
+        let transformedData = [];
+        console.log(response.data.MTN_PLAN)
+        switch (network) {
+            case 'mtn':
+                transformedData = transformData(response.data.MTN_PLAN, id);
+                break;
+            case 'glo':
+                transformedData = transformData(response.data.GLO_PLAN, id);
+                break;
+            case '9mobile':
+                transformedData = transformData(response.data['9MOBILE_PLAN'], id);
+                break;
+            case 'airtel':
+                transformedData = transformData(response.data.AIRTEL_PLAN, id);
+                break;
+            default:
+                transformedData = [];
+                break;
+        }
+        console.error(transformedData)
+        return transformData
+    } catch (error) {
+        console.error(error);
+        throw new Error(error)
     }
-};
-var confige = {
-    method: 'get',
-    maxBodyLength: Infinity,
-    url: 'https://api-demo.systemspecsng.com/services/connect-gateway/api/v1/biller/get-biller-by-category/3',
-    headers: {
-        'secretKey': secretKey
-    }
-};
-var data = {
-    "billPaymentProductId": "202012122018",
-    "customerId": "12345678910"
-};
+}
 
-var configd = {
-    method: 'get',
-    maxBodyLength: Infinity,
-    url: 'https://api-demo.systemspecsng.com/services/connect-gateway/api/v1/vending/products?page=0&countryCode=NGA&categoryCode=electricity',
-    headers: {
-        'secretKey': secretKey
-    },
-    // data: data
-};
-console.log(secretKey);
-axios(config)
-    .then(function (response) {
-        console.log(response.data);
-    })
-    .catch(function (error) {
-        console.log(error);
-    });
+function transformData(data, id) {
+    
+    const result = data.filter(product => product.dataplan_id === id.toString())
+    console.log(result)
+    if (!result || result.length === 0) {
+        throw new Error("Error filtering data, id might be incorrect")
+    }
+    const amount = result[0].plan_amount;
+    const multipliedAmount = parseFloat(amount) * 1.03;
+    const floatedAmount = Math.floor(multipliedAmount)
+    return floatedAmount
+}
+
+Verifydata("mtn", 258);

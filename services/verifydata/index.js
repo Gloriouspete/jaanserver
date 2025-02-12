@@ -36,7 +36,7 @@ async function Verifydata(network, id) {
                 transformedData = [];
                 break;
         }
-        console.log(transformedData)
+        console.error(transformedData)
         return transformData
     } catch (error) {
         console.error(error);
@@ -45,7 +45,7 @@ async function Verifydata(network, id) {
 }
 
 function transformData(data, id) {
-    const result = data.filter(product => product.dataplan_id === id)
+    const result = data.filter(product => product.dataplan_id === id.toString())
     if (!result || result.length === 0) {
         throw new Error("Error filtering data, id might be incorrect")
     }
