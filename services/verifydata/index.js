@@ -36,7 +36,7 @@ async function Verifydata(network, id) {
                 transformedData = [];
                 break;
         }
-        return transformData
+        return transformedData
     } catch (error) {
         console.error(error);
         throw new Error(error)
