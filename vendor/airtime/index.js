@@ -4,9 +4,13 @@ const datasecret = process.env.DATA_SECRET;
 const axios = require("axios");
 const NodeCache = require("node-cache");
 const Points = require("../../services/points/points.js");
-const Vemail = require("../../services/emailverify.js");
-const { check, validationResult } = require("express-validator");
-
+const { validationResult } = require("express-validator");
+const networkMap = {
+  mtn: '1',
+  airtel: '4',
+  glo: '2',
+  '9mobile': '3',
+};
 const myCache = new NodeCache();
 
 const VendAirtime = async (req, res) => {
@@ -19,11 +23,28 @@ const VendAirtime = async (req, res) => {
       .status(400)
       .json({
         success: false,
-        message: "Input Sanitization Failed, Check the inputs value",
+        message: "Input Sanitization Failed, Bad parameters",
+        error: errors.array()
       });
   }
   try {
-    const { netcode, amount, number } = req.body;
+    const { network, amount, number } = req.body;
+    if (!network || typeof network !== 'string') {
+      return res.status(400).json({
+        success: false,
+        message: "Bad request: 'netcode' parameter is missing or invalid.",
+        data: null,
+      });
+    }
+    const normalizedNetcode = network.toLowerCase();
+    const netcode = networkMap[normalizedNetcode];
+    if (!netcode) {
+      return res.status(400).json({
+        success: false,
+        message: `Bad request: '${network}' is not a valid network code.`,
+        data: null,
+      });
+    }
     const [userData] = await executor(
       "SELECT * FROM users WHERE userid = ?",
       [userid]
@@ -43,10 +64,8 @@ const VendAirtime = async (req, res) => {
             "You have been banned from using Jaan services.",
         });
     }
-
     const balancc = Number(credit);
-    const amountcc = Number(amount);
-
+    const amountcc = Number(amount) * 0.99;
     if (isNaN(balancc) || isNaN(amountcc)) {
       return res.status(400).json({
         success: false,
@@ -61,7 +80,6 @@ const VendAirtime = async (req, res) => {
         data: null,
       });
     }
-
     await executor("UPDATE users SET credit = credit - ? WHERE userid = ?", [
       amountcc,
       userid,
@@ -75,7 +93,6 @@ const VendAirtime = async (req, res) => {
       Ported_number: true,
       airtime_type: "VTU",
     };
-
     const config = {
       method: "post",
       maxBodyLength: Infinity,
@@ -86,7 +103,6 @@ const VendAirtime = async (req, res) => {
       },
       data: data,
     };
-
     const response = await axios(config);
     const responseData = response.data;
     const { mobile_number, Status, plan_network } = responseData;
@@ -99,10 +115,10 @@ const VendAirtime = async (req, res) => {
       network: plan_network,
       amount,
       create_date,
+
     };
     await airtimetran(imade);
     if (responseData.Status === "successful") {
-      Points(userid, amountcc, email);
       return res.status(200).json({
         success: true,
         message: "Airtime Purchase Successful",
@@ -111,7 +127,9 @@ const VendAirtime = async (req, res) => {
           status: Status,
           network: plan_network,
           date: create_date,
-          amount
+          amount,
+          channel: "api"
+
         },
       });
     } else {
@@ -120,22 +138,26 @@ const VendAirtime = async (req, res) => {
         userid,
       ]);
       console.error("External API error:", responseData.Status);
-      return res.status(200).json({
+      return res.status(500).json({
         success: false,
-        message: "Airtime Purchase Failed",
+        message: `Airtime Purchase Failed`,
         data: null,
       });
     }
   } catch (error) {
+    const newdate = new Date();
+    const create_date = newdate.toISOString();
     await executor("UPDATE users SET credit = credit + ? WHERE userid = ?", [
       deductedAmount,
       userid,
     ]);
     console.error(error.response?.data);
-    return res.status(200).json({
+    return res.status(500).json({
       success: false,
-      message: "Airtime Purchase Failed",
-      data: null,
+      message: "Airtime Purchase Failed, Internal server error",
+      data: {
+        date: create_date
+      },
     });
   } finally {
     myCache.del(`airtransactionLocks:${userid}`);

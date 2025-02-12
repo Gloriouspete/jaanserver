@@ -1,19 +1,21 @@
 const { createTransport } = require("nodemailer");
 require("dotenv").config();
-const emailpass = process.env.ZOHO;
+const emailpass = process.env.BREVO;
 const transporter = createTransport({
-    host: "smtp.zeptomail.com",
-    port: 587,
-    secure: false,
-    secureConnection: true,
-    connectionTimeout: 100000,
-    tls: {
-        rejectUnauthorized: false,
-    },
-    auth: {
-        user: "emailapikey",
-        pass: emailpass,
-    },
+  host: 'smtp-relay.brevo.com',
+  port: 587, 
+  secure: false,
+  secureConnection: false,
+  connectionTimeout: 100000,
+  tls: {
+    rejectUnauthorized: false
+  },
+  logger: true, // Enable logging
+  debug: true ,
+  auth: {
+    user: 'mcgrin1@gmail.com', 
+    pass: emailpass,
+  },
 });
 
 

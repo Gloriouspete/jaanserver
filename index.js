@@ -70,7 +70,7 @@ const Geteducation = require("./routes/geteducation/index.js");
 const Buyeducation = require("./routes/buyeducation/index.js");
 const Genemail = require("./routes/genemail/index.js");
 const Getbetting = require("./routes/getbetting/index.js");
-const { validateAirtimeRequest, validateDataRequest, validateAmount, validateAllDataRequest,validateEDataRequest } = require("./validator.js");
+const { validateAirtimeRequest, validateDataRequest, validateAmount, validateAllDataRequest, validateEDataRequest, validateVendDataRequest, validateVendAirtimeRequest } = require("./validator.js");
 const Banuser = require("./admin/banuser/index.js");
 const Unbanuser = require("./admin/unbanuser/index.js");
 const rateLimit = require('express-rate-limit');
@@ -398,9 +398,9 @@ app.post("/vend/v1/dataplan", AuthVend, GetVenddata);
 
 app.post("/vend/v1/fetchinfo", AuthVend, FetchInfo);
 
-app.post("/vend/v1/buydata", AuthVend, Venddata);
+app.post("/vend/v1/venddata", AuthVend, validateVendDataRequest, Venddata);
 
-app.post("/vend/v1/buyairtime", AuthVend, VendAirtime);
+app.post("/vend/v1/vendairtime", AuthVend,validateVendAirtimeRequest, VendAirtime);
 
 app.post("/vend/v1/retrievecable", AuthVend, Retrievecable);
 

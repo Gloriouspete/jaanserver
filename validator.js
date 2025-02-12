@@ -69,5 +69,38 @@ const validateEDataRequest = [
     .isMobilePhone('any').withMessage('Invalid phone number format'), // Validate phone number format
 
 ];
+const validateVendDataRequest = [
+  check('network')
+    .exists().withMessage('Network code is required')
+    .trim()
+    .escape(),
+  check('number')
+    .exists().withMessage('Phone number is required')
+    .isMobilePhone('any').withMessage('Invalid phone number format')
+    .trim()
+    .escape(),
+  check('dataplan')
+    .exists().withMessage('Data plan is required')
+    .isString().withMessage('Data plan must be a string')
+    .trim()
+    .escape(),
+  check('dataid')
+    .exists().withMessage('Data id is required')
+    .trim()
+    .escape(),
+];
+const validateVendAirtimeRequest = [
+  check('network')
+    .exists().withMessage('Network code is required')
+    .trim()
+    .escape(),
 
-module.exports = { validateAmount, validateAirtimeRequest, validateDataRequest, validateAllDataRequest, validateEDataRequest }
+  check('number')
+    .exists().withMessage('Phone number is required') // Ensure number exists
+    .isMobilePhone('any').withMessage('Invalid phone number format')
+    .trim()
+    .escape(),
+
+];
+
+module.exports = { validateAmount, validateAirtimeRequest, validateDataRequest, validateAllDataRequest, validateEDataRequest, validateVendDataRequest, validateVendAirtimeRequest }
