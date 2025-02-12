@@ -56,6 +56,7 @@ async function Venddata(req, res) {
         const balance = parseInt(credit, 10);
         console.error("see balance",balance + " " + netcode + "h " + dataid)
         const intamount = await Verifydata(netcode, dataid)
+        console.error("see balancerr",balance + " " + netcode + "h " + dataid)
         if (!intamount || intamount === undefined) {
             return res.status(500).json({
                 success: false,
@@ -83,7 +84,7 @@ async function Venddata(req, res) {
             });
         }
         await executor("UPDATE users SET credit = credit - ? WHERE userid = ?", [
-            intamount,
+            intamount.toString(),
             userid,
         ]);
         console.error(intamount,"see int amiont")
