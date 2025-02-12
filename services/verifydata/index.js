@@ -36,7 +36,6 @@ async function Verifydata(network, id) {
                 transformedData = [];
                 break;
         }
-        console.error(transformedData)
         return transformData
     } catch (error) {
         console.error(error);
