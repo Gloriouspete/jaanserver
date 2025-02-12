@@ -7,6 +7,7 @@ const Points = require("../../services/points/points.js");
 const Vemail = require("../../services/emailverify.js");
 const { check, validationResult } = require("express-validator");
 const Verifydata = require("../../services/verifydata/index.js");
+const { response } = require("express");
 const networkMap = {
     mtn: '1',
     airtel: '4',
@@ -153,7 +154,7 @@ async function Venddata(req, res) {
             deductedAmount,
             userid,
         ]);
-        console.error(error);
+        console.error(error?.response?.data);
         res
             .status(500)
             .json({
@@ -195,3 +196,4 @@ const setData = async (data) => {
 };
 
 module.exports = Venddata;
+
