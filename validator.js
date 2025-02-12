@@ -79,11 +79,6 @@ const validateVendDataRequest = [
     .isMobilePhone('any').withMessage('Invalid phone number format')
     .trim()
     .escape(),
-  check('dataplan')
-    .exists().withMessage('Data plan is required')
-    .isString().withMessage('Data plan must be a string')
-    .trim()
-    .escape(),
   check('dataid')
     .exists().withMessage('Data id is required')
     .trim()

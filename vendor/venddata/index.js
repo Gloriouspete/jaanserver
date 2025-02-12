@@ -23,7 +23,7 @@ async function Venddata(req, res) {
         return res.status(400).json({ success: false, message: "Input Sanitization Failed, Invalid parameters", error: errors.array() });
     }
     try {
-        const { network, dataplan, number, dataid } = req.body;
+        const { network, number, dataid } = req.body;
         if (!network || typeof network !== 'string') {
             return res.status(400).json({
                 success: false,
@@ -90,7 +90,7 @@ async function Venddata(req, res) {
         const data = {
             network: netcode,
             mobile_number: number,
-            plan: dataplan,
+            plan: dataid,
             Ported_number: true,
         };
         const config = {
