@@ -153,11 +153,11 @@ async function Venddata(req, res) {
             deductedAmount,
             userid,
         ]);
-        console.error(error.response?.data);
+        console.error(error);
         res
             .status(500)
             .json({
-                message: "Currently Unable to purchase data, kindly try agin later",
+                message: "Currently Unable to purchase data, kindly try again later",
                 success: false,
             });
     } finally {
