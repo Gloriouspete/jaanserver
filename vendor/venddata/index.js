@@ -85,7 +85,7 @@ async function Venddata(req, res) {
             intamount,
             userid,
         ]);
-        console.error(intamount)
+        console.error(intamount,"see int amiont")
         deductedAmount = intamount
         const authToken = datasecret;
         const data = {
