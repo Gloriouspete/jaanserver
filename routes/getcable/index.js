@@ -19,7 +19,6 @@ async function Getcable(req, res) {
     const responseData = response.data;
     const variations = responseData.content.varations;
     variations.forEach(product => {
-
       function addNumberToText(text, numberToAdd) {
         return text.replace(/(\d{1,3}(,\d{3})*)/, (match) => {
           const numericValue = parseInt(match.replace(/,/g, ''));

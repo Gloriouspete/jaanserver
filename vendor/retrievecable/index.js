@@ -18,15 +18,19 @@ async function Retrievecable(req, res) {
         const responseData = response.data;
         const variations = responseData.content.varations;
         variations.forEach(product => {
-            const text = product.name;
+            product.name = addNumberToText(product.name)
+            product.variation_amount = changeAmount(product.variation_amount)
             function addNumberToText(text) {
                 return text.replace(/(\d{1,3}(,\d{3})*)/, (match) => {
                     const numericValue = parseInt(match.replace(/,/g, ''));
-                    return (numericValue + numericValue <= 5000 ? 30 : 60).toLocaleString();
+                    return (numericValue + (numericValue <= 5000 ? 50 : 100)).toLocaleString();
                 });
             }
-            const updatedName = addNumberToText(text);
-            product.name = updatedName;
+            function changeAmount(price) {
+                const floatedPrice = Math.floor(parseFloat(price));
+                const addedPrice = floatedPrice + (floatedPrice <= 5000 ? 50 : 100)
+                return addedPrice
+            }
         });
         return res.status(200).json({
             success: true,
