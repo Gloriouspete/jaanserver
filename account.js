@@ -61,6 +61,7 @@ const getAccount = async (userid, email, username,phone,type,number) => {
       };
       return result;
     } else {
+      console.error(responseData)
       throw new Error("Error creating account");
     }
   } catch (error) {
