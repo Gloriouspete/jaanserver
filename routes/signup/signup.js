@@ -7,6 +7,18 @@ const secretKey = process.env.SECRET;
 async function Signup(req, res) {
   const { name, username, phone, password, email, referrer } = req.body;
   try {
+    function isValidEmail(email) {
+      const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+      return emailRegex.test(email);
+    }
+    if (!isValidEmail(email)) {
+      return res.status(400).json({
+        success: false,
+        message: "Email is in incorrect format, Recheck it please",
+        data: null,
+      });
+    }
+    
     // Check if the phone number already exists
     const phoneQuery =
       "SELECT COUNT(*) AS phoneCount FROM users WHERE phone = ?";
