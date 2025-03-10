@@ -18,7 +18,7 @@ async function Genaccount(req, res) {
     getAccount(userid, email, name, phone, type, number)
       .then(async (results) => {
         const mydata = results.data;
-        const { bankname: bankName, accountnumber: accountNumber, accountname: accountName } = mydata;
+        const {bankName,accountNumber,accountName } = mydata;
         const fact = await setBank(bankName, accountNumber, accountName, userid);
         if (fact) {
           res.status(200).json({
@@ -29,7 +29,7 @@ async function Genaccount(req, res) {
         } else
           res.status(200).json({
             success: false,
-            message: "Currently unable to generate a bank account for you",
+            message: "Currently unable to generate a bank account for you, Unable to insert Record",
             data: user,
           });
       })
@@ -58,7 +58,7 @@ const setBank = async (bankname, accountnumber, name, userid) => {
       return true;
     });
   } catch (error) {
-    console.log(error);
+    console.error(error);
     return false;
   }
 };

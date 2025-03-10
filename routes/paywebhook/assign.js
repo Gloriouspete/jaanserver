@@ -24,7 +24,7 @@ const setBank = async (bankname, accountnumber, name, email) => {
       return true;
     });
   } catch (error) {
-    console.log(error);
+    console.error(error);
     return false;
   }
 };

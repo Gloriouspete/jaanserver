@@ -90,7 +90,7 @@ const MaximumTran = async (userid) => {
               AND DATE(date) = ?;
         `;
         const result = await executor(selectUserQuery, [userid, today]);
-        console.error(result,"see maximun resukt")
+       
         if (result && result[0] && result[0].totalfund !== null) {
             return result[0].totalfund;
         }
